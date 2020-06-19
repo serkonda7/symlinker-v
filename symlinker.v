@@ -11,6 +11,7 @@ Usage: symlinker [command] [argument]
 
 Commands:
   add <bin>    Create a new symlink to <binary>.
+  list         List all symlinks.
   version      Print the version text.
   help         Show this message.'
 
@@ -45,6 +46,17 @@ fn add_link(binary string) {
 	println('"$link_name" was successfully linked.')
 }
 
+fn list_links() {
+	links := os.ls(link_folder) or { panic(err) }
+
+	if links.len == 0 {
+		println('No symlinks detected.')
+	}
+	else {
+		println(links)
+	}
+}
+
 fn main() {
 	args := os.args[1..]
 
@@ -55,6 +67,7 @@ fn main() {
 
 	match args[0] {
 		'add' { add_link(args[1]) }
+		'list' { list_links() }
 		'version' { print_version() }
 		'help' { show_help() }
 		else {
