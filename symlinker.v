@@ -1,6 +1,7 @@
 module main
 
 import os
+import v.vmod
 
 const (
 	help_text =
@@ -9,11 +10,17 @@ const (
 Usage: symlinker [command]
 
 Commands:
-  help    Show this message.'
+  version     Print the version text.
+  help        Show this message.'
 )
 
 fn show_help() {
 	println(help_text)
+}
+
+fn print_version() {
+	mod := vmod.decode(@VMOD_FILE) or { panic(err) }
+	println('symlinker $mod.version')
 }
 
 fn main() {
@@ -25,6 +32,7 @@ fn main() {
 	}
 
 	match args[0] {
+		'version' { print_version() }
 		'help' { show_help() }
 		else {
 			println('${args[0]}: unknown command\nRun "symlinker help" for usage.')
