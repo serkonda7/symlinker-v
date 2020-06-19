@@ -31,10 +31,12 @@ fn add_link(binary string) {
 		os.mkdir_all(link_folder)
 	}
 
+	link_name := binary.split('/').last()
+	link_path := link_folder + link_name
 	abs_origin := os.real_path(binary)
-	link_path := link_folder + abs_origin.split('/').last()
 
 	os.symlink(abs_origin, link_path) or { panic(err) }
+	println('"$link_name" was successfully linked.')
 }
 
 fn main() {
