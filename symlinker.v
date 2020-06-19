@@ -7,11 +7,14 @@ const (
 	help_text =
 'symlinker
 
-Usage: symlinker [command]
+Usage: symlinker [command] [argument]
 
 Commands:
-  version     Print the version text.
-  help        Show this message.'
+  add <bin>    Create a new symlink to <binary>.
+  version      Print the version text.
+  help         Show this message.'
+
+	link_folder = os.home_dir() + '.local/bin/'
 )
 
 fn show_help() {
@@ -23,6 +26,17 @@ fn print_version() {
 	println('symlinker $mod.version')
 }
 
+fn add_link(binary string) {
+	if !os.exists(link_folder) {
+		os.mkdir_all(link_folder)
+	}
+
+	abs_origin := os.real_path(binary)
+	link_path := link_folder + abs_origin.split('/').last()
+
+	os.symlink(abs_origin, link_path) or { panic(err) }
+}
+
 fn main() {
 	args := os.args[1..]
 
@@ -32,6 +46,7 @@ fn main() {
 	}
 
 	match args[0] {
+		'add' { add_link(args[1]) }
 		'version' { print_version() }
 		'help' { show_help() }
 		else {
