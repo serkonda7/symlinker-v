@@ -32,7 +32,13 @@ fn add_link(binary string) {
 	}
 
 	link_name := binary.split('/').last()
+
 	link_path := link_folder + link_name
+	if os.exists(link_path) {
+		println('Symlink to $link_name already exists.')
+		return
+	}
+
 	abs_origin := os.real_path(binary)
 
 	os.symlink(abs_origin, link_path) or { panic(err) }
