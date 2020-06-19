@@ -5,17 +5,15 @@ import v.vmod
 
 const (
 	help_text =
-'symlinker
-
-Usage: symlinker [command] [argument]
+'Usage: symlinker [command] [argument]
 
 Commands:
-  add <bin>    Create a new symlink to <binary>.
+  add <file>   Create a symlink to <file>.
   list         List all symlinks.
   version      Print the version text.
   help         Show this message.'
 
-	link_folder = os.home_dir() + '.local/bin/'
+	link_dir = os.home_dir() + '.local/bin/'
 )
 
 fn show_help() {
@@ -28,26 +26,26 @@ fn print_version() {
 }
 
 fn add_link(binary string) {
-	if !os.exists(link_folder) {
-		os.mkdir_all(link_folder)
+	if !os.exists(link_dir) {
+		os.mkdir_all(link_dir)
 	}
 
 	link_name := binary.split('/').last()
 
-	link_path := link_folder + link_name
+	link_path := link_dir + link_name
 	if os.exists(link_path) {
-		println('Symlink to $link_name already exists.')
+		println('Error: link named "$link_name" already exists')
 		return
 	}
 
 	abs_origin := os.real_path(binary)
 
 	os.symlink(abs_origin, link_path) or { panic(err) }
-	println('"$link_name" was successfully linked.')
+	println('Successfully linked "$link_name".')
 }
 
 fn list_links() {
-	links := os.ls(link_folder) or { panic(err) }
+	links := os.ls(link_dir) or { panic(err) }
 
 	if links.len == 0 {
 		println('No symlinks detected.')
