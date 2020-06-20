@@ -8,10 +8,11 @@ const (
 'Usage: symlinker [command] [argument]
 
 Commands:
-  add <file>   Create a symlink to <file>.
-  list         List all symlinks.
-  version      Print the version text.
-  help         Show this message.'
+  add <file>    Create a symlink to <file>.
+  del <link>    Delete the specified symlink.
+  list          List all symlinks.
+  version       Print the version text.
+  help          Show this message.'
 
 	link_dir = os.home_dir() + '.local/bin/'
 )
@@ -44,6 +45,18 @@ fn add_link(binary string) {
 	println('Successfully linked "$link_name".')
 }
 
+fn delete_link(link string) {
+	link_path := link_dir + link
+
+	if !os.exists(link_path) {
+		println('Error: "$link" does not exist.\nRun "symlinker list" to see your links.')
+		return
+	}
+
+	os.rm(link_path)
+	println('Deleted link: $link')
+}
+
 fn list_links() {
 	links := os.ls(link_dir) or { panic(err) }
 
@@ -65,6 +78,7 @@ fn main() {
 
 	match args[0] {
 		'add' { add_link(args[1]) }
+		'del' { delete_link(args[1]) }
 		'list' { list_links() }
 		'version' { print_version() }
 		'help' { show_help() }
