@@ -8,11 +8,12 @@ const (
 'Usage: symlinker [command] [argument]
 
 Commands:
-  add <file>    Create a symlink to <file>.
-  del <link>    Delete the specified symlink.
-  list          List all symlinks.
-  version       Print the version text.
-  help          Show this message.'
+  add <file>     Create a symlink to <file>.
+    -n <name>    Use a custom name for the link.
+  del <link>     Delete the specified symlink.
+  list           List all symlinks.
+  version        Print the version text.
+  help           Show this message.'
 
 	link_dir = os.home_dir() + '.local/bin/'
 )
@@ -26,12 +27,17 @@ fn print_version() {
 	println('symlinker $mod.version')
 }
 
-fn add_link(binary string) {
+fn add_link(args []string) {
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir)
 	}
 
-	link_name := binary.split('/').last()
+	link_name := if args[1] == '-n' {
+		args[2]
+	}
+	else {
+		args[0].split('/').last()
+	}
 
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
@@ -39,9 +45,9 @@ fn add_link(binary string) {
 		return
 	}
 
-	abs_origin := os.real_path(binary)
+	file_path := os.real_path(args[0])
 
-	os.symlink(abs_origin, link_path) or { panic(err) }
+	os.symlink(file_path, link_path) or { panic(err) }
 	println('Successfully linked "$link_name".')
 }
 
@@ -77,7 +83,7 @@ fn main() {
 	}
 
 	match args[0] {
-		'add' { add_link(args[1]) }
+		'add' { add_link(args[1..]) }
 		'del' { delete_link(args[1]) }
 		'list' { list_links() }
 		'version' { print_version() }
