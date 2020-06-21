@@ -32,6 +32,12 @@ fn add_link(args []string) {
 		os.mkdir_all(link_dir)
 	}
 
+	file_path := os.real_path(args[0])
+	if !os.exists(file_path) {
+		println('Error: $file_path does not exist')
+		return
+	}
+
 	link_name := get_option_val(args, '-n') or {
 		args[0].split('/').last()
 	}
@@ -41,8 +47,6 @@ fn add_link(args []string) {
 		println('Error: link named "$link_name" already exists')
 		return
 	}
-
-	file_path := os.real_path(args[0])
 
 	os.symlink(file_path, link_path) or { panic(err) }
 	println('Successfully linked "$link_name".')
