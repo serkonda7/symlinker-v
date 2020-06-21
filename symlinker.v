@@ -32,10 +32,7 @@ fn add_link(args []string) {
 		os.mkdir_all(link_dir)
 	}
 
-	link_name := if args[1] == '-n' {
-		args[2]
-	}
-	else {
+	link_name := get_option_val(args, '-n') or {
 		args[0].split('/').last()
 	}
 
@@ -72,6 +69,19 @@ fn list_links() {
 	else {
 		println(links)
 	}
+}
+
+fn has_option(args []string, option string) bool {
+	return option in args
+}
+
+fn get_option_val(args []string, option string) ?string {
+	if has_option(args, option) {
+		ind := args.index(option)
+		return args[ind + 1]
+	}
+
+	return error('Option $option does not exist.')
 }
 
 fn main() {
