@@ -5,7 +5,7 @@ import v.vmod
 
 const (
 	help_text =
-'Usage: symlinker [command] [argument]
+'Usage: symlinker [command] [argument] [options]
 
 Commands:
   add <file>     Create a symlink to <file>.
