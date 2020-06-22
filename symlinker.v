@@ -5,7 +5,7 @@ import v.vmod
 
 const (
 	help_text =
-'Usage: symlinker [command] [argument] [options]
+'Usage: symlinker [command] [options] [argument]
 
 Commands:
   add <file>     Create a symlink to <file>.
@@ -18,7 +18,15 @@ Commands:
   help           Show this message.'
 
 	link_dir = os.home_dir() + '.local/bin/'
+
+	options_with_val = ['-n']
 )
+
+struct SortedArgs{
+mut:
+	main_arg string
+	options map[string]string
+}
 
 fn show_help() {
 	println(help_text)
@@ -29,19 +37,21 @@ fn print_version() {
 	println('symlinker $mod.version')
 }
 
-fn add_link(args []string) {
+fn add_link(args SortedArgs) {
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir)
 	}
 
-	file_path := os.real_path(args[0])
+	file_path := os.real_path(args.main_arg)
 	if !os.exists(file_path) {
 		println('Error: $file_path does not exist')
 		return
 	}
 
-	link_name := get_option_val(args, '-n') or {
-		args[0].split('/').last()
+	link_name := if '-n' in args.options {
+		args.options['-n']
+	} else {
+		args.main_arg.split('/').last()
 	}
 
 	link_path := link_dir + link_name
@@ -54,19 +64,19 @@ fn add_link(args []string) {
 	println('Successfully linked "$link_name".')
 }
 
-fn delete_link(link string) {
-	link_path := link_dir + link
+fn delete_link(args SortedArgs) {
+	link_path := link_dir + args.main_arg
 
 	if !os.exists(link_path) {
-		println('Error: "$link" does not exist.\nRun "symlinker list" to see your links.')
+		println('Error: "$args.main_arg" does not exist.\nRun "symlinker list" to see your links.')
 		return
 	}
 
 	os.rm(link_path)
-	println('Deleted link: $link')
+	println('Deleted link: $args.main_arg')
 }
 
-fn list_links(args []string) {
+fn list_links(args SortedArgs) {
 	links := os.ls(link_dir) or { panic(err) }
 
 	if links.len == 0 {
@@ -74,7 +84,7 @@ fn list_links(args []string) {
 		return
 	}
 
-	if has_option(args, '-r') {
+	if '-r' in args.options {
 		for link in links {
 			real_path := os.real_path(link_dir + link)
 			println('$link: $real_path')
@@ -92,17 +102,30 @@ fn open_link_folder() {
 
 }
 
-fn has_option(args []string, option string) bool {
-	return option in args
-}
+fn sort_args(args []string) SortedArgs {
+	mut sorted_args := SortedArgs{}
+	mut main_arg_set := false
 
-fn get_option_val(args []string, option string) ?string {
-	if has_option(args, option) {
-		ind := args.index(option)
-		return args[ind + 1]
+	for i := 0; i < args.len; i++ {
+		arg := args[i]
+		if arg.starts_with('-') {
+			if arg in options_with_val {
+				sorted_args.options[arg] = args[i + 1]
+				i++
+				continue
+			}
+
+			sorted_args.options[arg] = ''
+			continue
+		}
+
+		if !main_arg_set {
+			sorted_args.main_arg = arg
+			main_arg_set = true
+		}
 	}
 
-	return error('Option $option does not exist.')
+	return sorted_args
 }
 
 fn main() {
@@ -113,10 +136,12 @@ fn main() {
 		return
 	}
 
+	sorted_args := sort_args(args[1..])
+
 	match args[0] {
-		'add' { add_link(args[1..]) }
-		'del' { delete_link(args[1]) }
-		'list' { list_links(args[1..]) }
+		'add' { add_link(sorted_args) }
+		'del' { delete_link(sorted_args) }
+		'list' { list_links(sorted_args) }
 		'open' { open_link_folder() }
 		'version' { print_version() }
 		'help' { show_help() }
