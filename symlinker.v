@@ -12,6 +12,7 @@ Commands:
     -n <name>    Use a custom name for the link.
   del <link>     Delete the specified symlink.
   list           List all symlinks.
+    -r           Also print the path the links point to.
   version        Print the version text.
   help           Show this message.'
 
@@ -64,11 +65,20 @@ fn delete_link(link string) {
 	println('Deleted link: $link')
 }
 
-fn list_links() {
+fn list_links(args []string) {
 	links := os.ls(link_dir) or { panic(err) }
 
 	if links.len == 0 {
 		println('No symlinks detected.')
+		return
+	}
+
+	if has_option(args, '-r') {
+		for link in links {
+			real_path := os.real_path(link_dir + link)
+			println('$link: $real_path')
+
+		}
 	}
 	else {
 		println(links)
@@ -99,7 +109,7 @@ fn main() {
 	match args[0] {
 		'add' { add_link(args[1..]) }
 		'del' { delete_link(args[1]) }
-		'list' { list_links() }
+		'list' { list_links(args[1..]) }
 		'version' { print_version() }
 		'help' { show_help() }
 		else {
