@@ -18,7 +18,7 @@ Commands:
   help           Show this message.
 
 Options:
-  -g             Execute the command per machine. Use with "sudo".'
+  -g             Execute the command machine-wide. Use with "sudo".'
 
 	local_link_dir = os.home_dir() + '.local/bin/'
 	global_link_dir = '/usr/local/bin/'
