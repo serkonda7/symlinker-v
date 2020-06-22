@@ -15,9 +15,13 @@ Commands:
     -r           Also print the path the links point to.
   open           Open symlink folder in the file explorer.
   version        Print the version text.
-  help           Show this message.'
+  help           Show this message.
 
-	link_dir = os.home_dir() + '.local/bin/'
+Options:
+  -g             Execute the command per machine. Use with "sudo".'
+
+	local_link_dir = os.home_dir() + '.local/bin/'
+	global_link_dir = '/usr/local/bin/'
 
 	options_with_val = ['-n']
 )
@@ -25,7 +29,7 @@ Commands:
 struct SortedArgs{
 mut:
 	main_arg string
-	options map[string]string
+	options  map[string]string
 }
 
 fn show_help() {
@@ -38,6 +42,7 @@ fn print_version() {
 }
 
 fn add_link(args SortedArgs) {
+	link_dir := actual_link_dir(args)
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir)
 	}
@@ -65,7 +70,7 @@ fn add_link(args SortedArgs) {
 }
 
 fn delete_link(args SortedArgs) {
-	link_path := link_dir + args.main_arg
+	link_path := actual_link_dir(args) + args.main_arg
 
 	if !os.exists(link_path) {
 		println('Error: "$args.main_arg" does not exist.\nRun "symlinker list" to see your links.')
@@ -77,7 +82,7 @@ fn delete_link(args SortedArgs) {
 }
 
 fn list_links(args SortedArgs) {
-	links := os.ls(link_dir) or { panic(err) }
+	links := os.ls(actual_link_dir(args)) or { panic(err) }
 
 	if links.len == 0 {
 		println('No symlinks detected.')
@@ -86,7 +91,7 @@ fn list_links(args SortedArgs) {
 
 	if '-r' in args.options {
 		for link in links {
-			real_path := os.real_path(link_dir + link)
+			real_path := os.real_path(actual_link_dir(args) + link)
 			println('$link: $real_path')
 
 		}
@@ -96,10 +101,14 @@ fn list_links(args SortedArgs) {
 	}
 }
 
-fn open_link_folder() {
+fn open_link_folder(args SortedArgs) {
+	link_dir := actual_link_dir(args)
 	command := 'xdg-open $link_dir'
 	os.exec(command) or { panic(err) }
+}
 
+fn actual_link_dir(args SortedArgs) string {
+	return if '-g' in args.options { global_link_dir } else { local_link_dir }
 }
 
 fn sort_args(args []string) SortedArgs {
@@ -142,7 +151,7 @@ fn main() {
 		'add' { add_link(sorted_args) }
 		'del' { delete_link(sorted_args) }
 		'list' { list_links(sorted_args) }
-		'open' { open_link_folder() }
+		'open' { open_link_folder(sorted_args) }
 		'version' { print_version() }
 		'help' { show_help() }
 		else {
