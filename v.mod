@@ -1,6 +1,6 @@
 Module {
 	name: 'symlinker',
-	description: '',
+	description: 'Utility to manage symlinks',
 	author: 'Lukas Neubert <lukas.neubert3@gmail.com>',
 	license: 'MIT',
 	repo_url: 'https://github.com/Serkonda/symlinker',
