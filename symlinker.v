@@ -13,6 +13,7 @@ Commands:
   del <link>     Delete the specified symlink.
   list           List all symlinks.
     -r           Also print the path the links point to.
+  open           Open symlink folder in the file explorer.
   version        Print the version text.
   help           Show this message.'
 
@@ -85,6 +86,12 @@ fn list_links(args []string) {
 	}
 }
 
+fn open_link_folder() {
+	command := 'xdg-open $link_dir'
+	os.exec(command) or { panic(err) }
+
+}
+
 fn has_option(args []string, option string) bool {
 	return option in args
 }
@@ -110,6 +117,7 @@ fn main() {
 		'add' { add_link(args[1..]) }
 		'del' { delete_link(args[1]) }
 		'list' { list_links(args[1..]) }
+		'open' { open_link_folder() }
 		'version' { print_version() }
 		'help' { show_help() }
 		else {
