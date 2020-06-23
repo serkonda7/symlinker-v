@@ -50,7 +50,7 @@ fn add_link(args SortedArgs) {
 	file_path := os.real_path(args.main_arg)
 	if !os.exists(file_path) {
 		println('Error: $file_path does not exist')
-		return
+		exit(0)
 	}
 
 	link_name := if '-n' in args.options {
@@ -62,7 +62,7 @@ fn add_link(args SortedArgs) {
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
 		println('Error: link named "$link_name" already exists')
-		return
+		exit(0)
 	}
 
 	os.symlink(file_path, link_path) or { panic(err) }
@@ -74,7 +74,7 @@ fn delete_link(args SortedArgs) {
 
 	if !os.exists(link_path) {
 		println('Error: "$args.main_arg" does not exist.\nRun "symlinker list" to see your links.')
-		return
+		exit(0)
 	}
 
 	os.rm(link_path)
@@ -119,6 +119,10 @@ fn sort_args(args []string) SortedArgs {
 		arg := args[i]
 		if arg.starts_with('-') {
 			if arg in options_with_val {
+				if i + 1 >= args.len {
+					println('Error: missing agument for option "$arg"')
+					exit(0)
+				}
 				sorted_args.options[arg] = args[i + 1]
 				i++
 				continue
