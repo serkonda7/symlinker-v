@@ -30,6 +30,7 @@ struct SortedArgs{
 mut:
 	main_arg string
 	options  map[string]string
+	scope    string = 'local'
 }
 
 fn show_help() {
@@ -61,31 +62,31 @@ fn add_link(args SortedArgs) {
 
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
-		println('Error: link named "$link_name" already exists')
+		println('Error: a $args.scope link named "$link_name" already exists')
 		exit(0)
 	}
 
 	os.symlink(file_path, link_path) or { panic(err) }
-	println('Successfully linked "$link_name".')
+	println('Created $args.scope link: "$link_name".')
 }
 
 fn delete_link(args SortedArgs) {
 	link_path := actual_link_dir(args) + args.main_arg
 
 	if !os.exists(link_path) {
-		println('Error: "$args.main_arg" does not exist.\nRun "symlinker list" to see your links.')
+		println('Error: $args.scope link "$args.main_arg" does not exist.')
 		exit(0)
 	}
 
 	os.rm(link_path)
-	println('Deleted link: $args.main_arg')
+	println('Deleted $args.scope link: $args.main_arg')
 }
 
 fn list_links(args SortedArgs) {
 	links := os.ls(actual_link_dir(args)) or { panic(err) }
 
 	if links.len == 0 {
-		println('No symlinks detected.')
+		println('No $args.scope symlinks detected.')
 		return
 	}
 
@@ -108,7 +109,7 @@ fn open_link_folder(args SortedArgs) {
 }
 
 fn actual_link_dir(args SortedArgs) string {
-	return if '-g' in args.options { global_link_dir } else { local_link_dir }
+	return if args.scope == 'global' { global_link_dir } else { local_link_dir }
 }
 
 fn sort_args(args []string) SortedArgs {
@@ -125,6 +126,11 @@ fn sort_args(args []string) SortedArgs {
 				}
 				sorted_args.options[arg] = args[i + 1]
 				i++
+				continue
+			}
+
+			if arg == '-g' {
+				sorted_args.scope = 'global'
 				continue
 			}
 
