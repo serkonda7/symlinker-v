@@ -51,7 +51,7 @@ fn add_link(args SortedArgs) {
 	file_path := os.real_path(args.main_arg)
 	if !os.exists(file_path) {
 		println('Error: $file_path does not exist')
-		exit(0)
+		exit(1)
 	}
 
 	link_name := if '-n' in args.options {
@@ -63,10 +63,13 @@ fn add_link(args SortedArgs) {
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
 		println('Error: a $args.scope link named "$link_name" already exists')
-		exit(0)
+		exit(1)
 	}
 
-	os.symlink(file_path, link_path) or { panic(err) }
+	os.symlink(file_path, link_path) or {
+		println('Permission denied\nRun with "sudo" instead.')
+		exit(1)
+	}
 	println('Created $args.scope link: "$link_name".')
 }
 
@@ -75,10 +78,13 @@ fn delete_link(args SortedArgs) {
 
 	if !os.exists(link_path) {
 		println('Error: $args.scope link "$args.main_arg" does not exist.')
-		exit(0)
+		exit(1)
 	}
 
-	os.rm(link_path) or { panic(err) }
+	os.rm(link_path) or {
+		println('Permission denied\nRun with "sudo" instead.')
+		exit(1)
+	}
 	println('Deleted $args.scope link: $args.main_arg')
 }
 
@@ -122,7 +128,7 @@ fn sort_args(args []string) SortedArgs {
 			if arg in options_with_val {
 				if i + 1 >= args.len {
 					println('Error: missing agument for option "$arg"')
-					exit(0)
+					exit(1)
 				}
 				sorted_args.options[arg] = args[i + 1]
 				i++
