@@ -78,7 +78,7 @@ fn delete_link(args SortedArgs) {
 		exit(0)
 	}
 
-	os.rm(link_path)
+	os.rm(link_path) or { panic(err) }
 	println('Deleted $args.scope link: $args.main_arg')
 }
 
