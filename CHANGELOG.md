@@ -1,6 +1,15 @@
 # Changelog
 
 
+## 0.4.0
+_24 June 2020_
+
+- Print scope in success and error messages
+- Fix invalid success message for `del -g ...` without sudo
+- Replace V panic on denied permission with custom error message
+- Fix error exit codes
+
+
 ## 0.3.0
 _23 June 2020_
 
