@@ -2,6 +2,7 @@ module main
 
 import os
 import v.vmod
+import chalk
 
 const (
 	help_text =
@@ -18,7 +19,7 @@ Commands:
   help           Show this message.
 
 Options:
-  -g             Execute the command machine-wide. Use with "sudo".'
+  -g             Execute the command machine-wide.'
 
 	local_link_dir = os.home_dir() + '.local/bin/'
 	global_link_dir = '/usr/local/bin/'
@@ -50,8 +51,7 @@ fn add_link(args SortedArgs) {
 
 	file_path := os.real_path(args.main_arg)
 	if !os.exists(file_path) {
-		println('Error: $file_path does not exist')
-		exit(1)
+		print_err('Error: $file_path does not exist')
 	}
 
 	link_name := if '-n' in args.options {
@@ -62,13 +62,11 @@ fn add_link(args SortedArgs) {
 
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
-		println('Error: a $args.scope link named "$link_name" already exists')
-		exit(1)
+		print_err('Error: a $args.scope link named "$link_name" already exists')
 	}
 
 	os.symlink(file_path, link_path) or {
-		println('Permission denied\nRun with "sudo" instead.')
-		exit(1)
+		print_err('Permission denied\nRun with "sudo" instead.')
 	}
 	println('Created $args.scope link: "$link_name".')
 }
@@ -77,13 +75,11 @@ fn delete_link(args SortedArgs) {
 	link_path := actual_link_dir(args) + args.main_arg
 
 	if !os.exists(link_path) {
-		println('Error: $args.scope link "$args.main_arg" does not exist.')
-		exit(1)
+		print_err('Error: $args.scope link "$args.main_arg" does not exist.')
 	}
 
 	os.rm(link_path) or {
-		println('Permission denied\nRun with "sudo" instead.')
-		exit(1)
+		print_err('Permission denied\nRun with "sudo" instead.')
 	}
 	println('Deleted $args.scope link: $args.main_arg')
 }
@@ -118,6 +114,11 @@ fn actual_link_dir(args SortedArgs) string {
 	return if args.scope == 'global' { global_link_dir } else { local_link_dir }
 }
 
+fn print_err(msg string) {
+	println(chalk.fg(msg, 'light_red'))
+	exit(1)
+}
+
 fn sort_args(args []string) SortedArgs {
 	mut sorted_args := SortedArgs{}
 	mut main_arg_set := false
@@ -127,8 +128,7 @@ fn sort_args(args []string) SortedArgs {
 		if arg.starts_with('-') {
 			if arg in options_with_val {
 				if i + 1 >= args.len {
-					println('Error: missing agument for option "$arg"')
-					exit(1)
+					print_err('Error: missing agument for option "$arg"')
 				}
 				sorted_args.options[arg] = args[i + 1]
 				i++
