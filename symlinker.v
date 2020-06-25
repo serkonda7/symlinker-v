@@ -74,8 +74,11 @@ fn add_link(args SortedArgs) {
 fn delete_link(args SortedArgs) {
 	link_path := actual_link_dir(args) + args.main_arg
 
-	if !os.exists(link_path) {
+	if !os.exists(link_path) && !os.is_link(link_path) {
 		print_err('Error: $args.scope link "$args.main_arg" does not exist', '')
+	}
+	else if !os.is_link(link_path) {
+		print_err('Error: "$args.main_arg" is no $args.scope link', '')
 	}
 
 	os.rm(link_path) or {
