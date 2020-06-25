@@ -51,7 +51,7 @@ fn add_link(args SortedArgs) {
 
 	file_path := os.real_path(args.main_arg)
 	if !os.exists(file_path) {
-		print_err('Error: $file_path does not exist')
+		print_err('Error: path "$file_path" does not exist', '')
 	}
 
 	link_name := if '-n' in args.options {
@@ -62,26 +62,26 @@ fn add_link(args SortedArgs) {
 
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
-		print_err('Error: a $args.scope link named "$link_name" already exists')
+		print_err('Error: a $args.scope link named "$link_name" already exists', '')
 	}
 
 	os.symlink(file_path, link_path) or {
-		print_err('Permission denied\nRun with "sudo" instead.')
+		print_err('Permission denied', 'Run with "sudo" instead.')
 	}
-	println('Created $args.scope link: "$link_name".')
+	println('Created $args.scope link: "$link_name"')
 }
 
 fn delete_link(args SortedArgs) {
 	link_path := actual_link_dir(args) + args.main_arg
 
 	if !os.exists(link_path) {
-		print_err('Error: $args.scope link "$args.main_arg" does not exist.')
+		print_err('Error: $args.scope link "$args.main_arg" does not exist', '')
 	}
 
 	os.rm(link_path) or {
-		print_err('Permission denied\nRun with "sudo" instead.')
+		print_err('Permission denied', 'Run with "sudo" instead.')
 	}
-	println('Deleted $args.scope link: $args.main_arg')
+	println('Deleted $args.scope link: "$args.main_arg"')
 }
 
 fn list_links(args SortedArgs) {
@@ -114,8 +114,11 @@ fn actual_link_dir(args SortedArgs) string {
 	return if args.scope == 'global' { global_link_dir } else { local_link_dir }
 }
 
-fn print_err(msg string) {
+fn print_err(msg, help_msg string) {
 	println(chalk.fg(msg, 'light_red'))
+	if help_msg.len > 0 {
+		println(help_msg)
+	}
 	exit(1)
 }
 
@@ -128,7 +131,7 @@ fn sort_args(args []string) SortedArgs {
 		if arg.starts_with('-') {
 			if arg in options_with_val {
 				if i + 1 >= args.len {
-					print_err('Error: missing agument for option "$arg"')
+					print_err('Error: missing agument for option "$arg"', '')
 				}
 				sorted_args.options[arg] = args[i + 1]
 				i++
