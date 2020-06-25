@@ -1,6 +1,16 @@
 # Changelog
 
 
+## 0.5.0
+_25 June 2020_
+
+- Prevent deleting non-link files
+- Fix that links pointing to deleted or moved files could not be deleted
+- Do not list normal files anymore
+- Distinguish between normal files and links in error messages
+- Errors are print in red color
+
+
 ## 0.4.0
 _24 June 2020_
 
