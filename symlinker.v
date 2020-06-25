@@ -51,7 +51,7 @@ fn add_link(args SortedArgs) {
 
 	file_path := os.real_path(args.main_arg)
 	if !os.exists(file_path) {
-		print_err('Error: path "$file_path" does not exist', '')
+		print_err('Cannot link inexistent file "$file_path"', '')
 	}
 
 	link_name := if '-n' in args.options {
@@ -62,7 +62,10 @@ fn add_link(args SortedArgs) {
 
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
-		print_err('Error: a $args.scope link named "$link_name" already exists', '')
+		if os.is_link(link_path) {
+			print_err('Error: a $args.scope link named "$link_name" already exists', '')
+		}
+		print_err('Error: a file named "$link_name" already exists', '')
 	}
 
 	os.symlink(file_path, link_path) or {
@@ -74,10 +77,10 @@ fn add_link(args SortedArgs) {
 fn delete_link(args SortedArgs) {
 	link_path := actual_link_dir(args) + args.main_arg
 
-	if !os.exists(link_path) && !os.is_link(link_path) {
-		print_err('Error: $args.scope link "$args.main_arg" does not exist', '')
-	}
-	else if !os.is_link(link_path) {
+	if !os.is_link(link_path) {
+		if !os.exists(link_path) {
+			print_err('Error: $args.scope link "$args.main_arg" does not exist', '')
+		}
 		print_err('Error: "$args.main_arg" is no $args.scope link', '')
 	}
 
@@ -88,7 +91,8 @@ fn delete_link(args SortedArgs) {
 }
 
 fn list_links(args SortedArgs) {
-	links := os.ls(actual_link_dir(args)) or { panic(err) }
+	files := os.ls(actual_link_dir(args)) or { panic(err) }
+	links := files.filter(os.is_link(actual_link_dir(args) + it))
 
 	if links.len == 0 {
 		println('No $args.scope symlinks detected.')
