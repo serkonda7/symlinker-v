@@ -1,5 +1,7 @@
 # symlinker
  
+![CI](https://github.com/Serkonda/symlinker/workflows/CI/badge.svg?branch=master)
+
 Utility program to manage symlinks.
 
 
