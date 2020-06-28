@@ -121,10 +121,10 @@ fn actual_link_dir(args SortedArgs) string {
 	return if args.scope == 'global' { global_link_dir } else { local_link_dir }
 }
 
-fn print_err(msg, help_msg string) {
+fn print_err(msg, tip_msg string) {
 	println(chalk.fg(msg, 'light_red'))
-	if help_msg.len > 0 {
-		println(help_msg)
+	if tip_msg.len > 0 {
+		println(tip_msg)
 	}
 	exit(1)
 }
@@ -181,7 +181,7 @@ fn main() {
 		'version' { print_version() }
 		'help' { show_help() }
 		else {
-			println('${args[0]}: unknown command\nRun "symlinker help" for usage.')
+			print_err('Unknown command: ${args[0]}', 'Run "symlinker help" for usage.')
 		}
 	}
 }
