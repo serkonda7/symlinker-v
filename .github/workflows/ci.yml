@@ -22,9 +22,6 @@ jobs:
           v-version: master
         id: v
       - name: Install modules
-        run: |
-          v install etienne-napoleone.chalk
-          cd ~
-          cp -r .vmodules/etienne-napoleone/chalk .vmodules/chalk
+        run: v install etienne-napoleone.chalk
       - name: Build symlinker
         run: v -cg symlinker.v

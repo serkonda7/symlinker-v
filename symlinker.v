@@ -2,7 +2,7 @@ module main
 
 import os
 import v.vmod
-import chalk
+import etienne_napoleone.chalk
 
 const (
 	help_text =
