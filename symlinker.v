@@ -9,8 +9,8 @@ const (
 )
 
 fn list_links(cmd cli.Command) {
-	files := os.ls(global_link_dir) or { panic(err) }
-	links := files.filter(os.is_link(global_link_dir + it))
+	files := os.ls(actual_link_dir(cmd)) or { panic(err) }
+	links := files.filter(os.is_link(actual_link_dir(cmd) + it))
 
 	if links.len == 0 {
 		println('No symlinks detected.')
@@ -20,7 +20,7 @@ fn list_links(cmd cli.Command) {
 	f_real := cmd.flags.get_bool('real') or { panic(err) }
 	if f_real {
 		for link in links {
-			real_path := os.real_path(global_link_dir + link)
+			real_path := os.real_path(actual_link_dir(cmd) + link)
 			println('$link: $real_path')
 
 		}
@@ -28,6 +28,11 @@ fn list_links(cmd cli.Command) {
 	else {
 		println(links)
 	}
+}
+
+fn actual_link_dir(cmd cli.Command) string {
+	is_global := cmd.flags.get_bool('global') or { panic(err) }
+	return if is_global { global_link_dir } else { local_link_dir }
 }
 
 fn main() {
@@ -47,6 +52,12 @@ fn main() {
 		name: 'real',
 		abbrev: 'r',
 		description: 'Also print the path the links point to.'
+	})
+	list_cmd.add_flag(cli.Flag{
+		flag: .bool,
+		name: 'global',
+		abbrev: 'g',
+		description: 'Execute the command machine-wide.'
 	})
 
 	cmd.add_command(list_cmd)
