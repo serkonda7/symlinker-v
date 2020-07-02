@@ -1,69 +1,34 @@
 module main
 
+import cli
 import os
-import v.vmod
 import etienne_napoleone.chalk
 
 const (
-	help_text =
-'Usage: symlinker [command] [options] [argument]
-
-Commands:
-  add <file>     Create a symlink to <file>.
-    -n <name>    Use a custom name for the link.
-  del <link>     Delete the specified symlink.
-  list           List all symlinks.
-    -r           Also print the path the links point to.
-  open           Open symlink folder in the file explorer.
-  version        Print the version text.
-  help           Show this message.
-
-Options:
-  -g             Execute the command machine-wide.'
-
 	local_link_dir = os.home_dir() + '.local/bin/'
 	global_link_dir = '/usr/local/bin/'
-
-	options_with_val = ['-n']
 )
 
-struct SortedArgs{
-mut:
-	main_arg string
-	options  map[string]string
-	scope    string = 'local'
-}
-
-fn show_help() {
-	println(help_text)
-}
-
-fn print_version() {
-	mod := vmod.decode(@VMOD_FILE) or { panic(err) }
-	println('symlinker $mod.version')
-}
-
-fn add_link(args SortedArgs) {
-	link_dir := actual_link_dir(args)
+fn add_link(cmd cli.Command) {
+	link_dir := actual_link_dir(cmd)
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir)
 	}
 
-	file_path := os.real_path(args.main_arg)
+	file_path := os.real_path(cmd.args[0])
 	if !os.exists(file_path) {
 		print_err('Cannot link inexistent file "$file_path"', '')
 	}
 
-	link_name := if '-n' in args.options {
-		args.options['-n']
-	} else {
-		args.main_arg.split('/').last()
+	mut link_name := cmd.flags.get_string('name') or { panic(err) }
+	if link_name == '' {
+		link_name = cmd.args[0].split('/').last()
 	}
 
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
 		if os.is_link(link_path) {
-			print_err('Error: a $args.scope link named "$link_name" already exists', '')
+			print_err('Error: a ${scope(cmd)} link named "$link_name" already exists', '')
 		}
 		print_err('Error: a file named "$link_name" already exists', '')
 	}
@@ -71,37 +36,38 @@ fn add_link(args SortedArgs) {
 	os.symlink(file_path, link_path) or {
 		print_err('Permission denied', 'Run with "sudo" instead.')
 	}
-	println('Created $args.scope link: "$link_name"')
+	println('Created ${scope(cmd)} link: "$link_name"')
 }
 
-fn delete_link(args SortedArgs) {
-	link_path := actual_link_dir(args) + args.main_arg
+fn delete_link(cmd cli.Command) {
+	link_path := actual_link_dir(cmd) + cmd.args[0]
 
 	if !os.is_link(link_path) {
 		if !os.exists(link_path) {
-			print_err('Error: $args.scope link "$args.main_arg" does not exist', '')
+			print_err('Error: ${scope(cmd)} link "${cmd.args[0]}" does not exist', '')
 		}
-		print_err('Error: "$args.main_arg" is no $args.scope link', '')
+		print_err('Error: "${cmd.args[0]}" is no ${scope(cmd)} link', '')
 	}
 
 	os.rm(link_path) or {
 		print_err('Permission denied', 'Run with "sudo" instead.')
 	}
-	println('Deleted $args.scope link: "$args.main_arg"')
+	println('Deleted ${scope(cmd)} link: "${cmd.args[0]}"')
 }
 
-fn list_links(args SortedArgs) {
-	files := os.ls(actual_link_dir(args)) or { panic(err) }
-	links := files.filter(os.is_link(actual_link_dir(args) + it))
+fn list_links(cmd cli.Command) {
+	files := os.ls(actual_link_dir(cmd)) or { panic(err) }
+	links := files.filter(os.is_link(actual_link_dir(cmd) + it))
 
 	if links.len == 0 {
-		println('No $args.scope symlinks detected.')
+		println('No ${scope(cmd)} symlinks detected.')
 		return
 	}
 
-	if '-r' in args.options {
+	f_real := cmd.flags.get_bool('real') or { panic(err) }
+	if f_real {
 		for link in links {
-			real_path := os.real_path(actual_link_dir(args) + link)
+			real_path := os.real_path(actual_link_dir(cmd) + link)
 			println('$link: $real_path')
 
 		}
@@ -111,14 +77,20 @@ fn list_links(args SortedArgs) {
 	}
 }
 
-fn open_link_folder(args SortedArgs) {
-	link_dir := actual_link_dir(args)
+fn open_link_folder(cmd cli.Command) {
+	link_dir := actual_link_dir(cmd)
 	command := 'xdg-open $link_dir'
 	os.exec(command) or { panic(err) }
 }
 
-fn actual_link_dir(args SortedArgs) string {
-	return if args.scope == 'global' { global_link_dir } else { local_link_dir }
+fn actual_link_dir(cmd cli.Command) string {
+	is_global := cmd.flags.get_bool('global') or { panic(err) }
+	return if is_global { global_link_dir } else { local_link_dir }
+}
+
+fn scope(cmd cli.Command) string {
+	is_global := cmd.flags.get_bool('global') or { panic(err) }
+	return if is_global { 'global' } else { 'local' }
 }
 
 fn print_err(msg, tip_msg string) {
@@ -129,59 +101,60 @@ fn print_err(msg, tip_msg string) {
 	exit(1)
 }
 
-fn sort_args(args []string) SortedArgs {
-	mut sorted_args := SortedArgs{}
-	mut main_arg_set := false
-
-	for i := 0; i < args.len; i++ {
-		arg := args[i]
-		if arg.starts_with('-') {
-			if arg in options_with_val {
-				if i + 1 >= args.len {
-					print_err('Error: missing agument for option "$arg"', '')
-				}
-				sorted_args.options[arg] = args[i + 1]
-				i++
-				continue
-			}
-
-			if arg == '-g' {
-				sorted_args.scope = 'global'
-				continue
-			}
-
-			sorted_args.options[arg] = ''
-			continue
-		}
-
-		if !main_arg_set {
-			sorted_args.main_arg = arg
-			main_arg_set = true
-		}
-	}
-
-	return sorted_args
-}
-
 fn main() {
-	args := os.args[1..]
+	mut cmd := cli.Command{
+		name: 'symlinker',
+		version: '0.5.0',
+		disable_flags: true
+		sort_commands: false
+	}
+	cmd.add_flag(cli.Flag{
+		flag: .bool,
+		name: 'global',
+		abbrev: 'g',
+		description: 'Execute the command machine-wide.'
+		global: true
+	})
 
-	if args.len == 0 {
-		show_help()
-		return
+	mut add_cmd := cli.Command{
+		name: 'add',
+		description: 'Create a symlink to <file>.',
+		execute: add_link
+	}
+	add_cmd.add_flag(cli.Flag{
+		flag: .string,
+		name: 'name',
+		abbrev: 'n',
+		description: 'Use a custom name for the link.'
+	})
+
+	mut del_cmd := cli.Command{
+		name: 'del',
+		description: 'Delete the specified symlink.',
+		execute: delete_link
 	}
 
-	sorted_args := sort_args(args[1..])
-
-	match args[0] {
-		'add' { add_link(sorted_args) }
-		'del' { delete_link(sorted_args) }
-		'list' { list_links(sorted_args) }
-		'open' { open_link_folder(sorted_args) }
-		'version' { print_version() }
-		'help' { show_help() }
-		else {
-			print_err('Unknown command: ${args[0]}', 'Run "symlinker help" for usage.')
-		}
+	mut list_cmd := cli.Command{
+		name: 'list',
+		description: 'List all symlinks.',
+		execute: list_links
 	}
+	list_cmd.add_flag(cli.Flag{
+		flag: .bool,
+		name: 'real',
+		abbrev: 'r',
+		description: 'Also print the path the links point to.'
+	})
+
+	mut open_cmd := cli.Command{
+		name: 'open',
+		description: 'Open symlink folder in the file explorer.',
+		execute: open_link_folder
+	}
+
+	cmd.add_command(add_cmd)
+	cmd.add_command(del_cmd)
+	cmd.add_command(list_cmd)
+	cmd.add_command(open_cmd)
+	cmd.parse(os.args)
 }
