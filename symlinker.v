@@ -82,6 +82,13 @@ fn main() {
 		version: '0.5.0',
 		disable_flags: true
 	}
+	cmd.add_flag(cli.Flag{
+		flag: .bool,
+		name: 'global',
+		abbrev: 'g',
+		description: 'Execute the command machine-wide.'
+		global: true
+	})
 
 	mut add_cmd := cli.Command{
 		name: 'add',
@@ -94,12 +101,6 @@ fn main() {
 		abbrev: 'n',
 		description: 'Use a custom name for the link.'
 	})
-	add_cmd.add_flag(cli.Flag{
-		flag: .bool,
-		name: 'global',
-		abbrev: 'g',
-		description: 'Execute the command machine-wide.'
-	})
 
 	mut list_cmd := cli.Command{
 		name: 'list',
@@ -111,12 +112,6 @@ fn main() {
 		name: 'real',
 		abbrev: 'r',
 		description: 'Also print the path the links point to.'
-	})
-	list_cmd.add_flag(cli.Flag{
-		flag: .bool,
-		name: 'global',
-		abbrev: 'g',
-		description: 'Execute the command machine-wide.'
 	})
 
 	cmd.add_command(add_cmd)
