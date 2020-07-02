@@ -36,12 +36,28 @@ fn add_link(cmd cli.Command) {
 	println('Created ${scope(cmd)} link: "$link_name"')
 }
 
+fn delete_link(cmd cli.Command) {
+	link_path := actual_link_dir(cmd) + cmd.args[0]
+
+	if !os.is_link(link_path) {
+		if !os.exists(link_path) {
+			print_err('Error: ${scope(cmd)} link "${cmd.args[0]}" does not exist', '')
+		}
+		print_err('Error: "${cmd.args[0]}" is no ${scope(cmd)} link', '')
+	}
+
+	os.rm(link_path) or {
+		print_err('Permission denied', 'Run with "sudo" instead.')
+	}
+	println('Deleted ${scope(cmd)} link: "${cmd.args[0]}"')
+}
+
 fn list_links(cmd cli.Command) {
 	files := os.ls(actual_link_dir(cmd)) or { panic(err) }
 	links := files.filter(os.is_link(actual_link_dir(cmd) + it))
 
 	if links.len == 0 {
-		println('No symlinks detected.')
+		println('No ${scope(cmd)} symlinks detected.')
 		return
 	}
 
