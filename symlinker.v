@@ -20,7 +20,10 @@ fn add_link(cmd cli.Command) {
 		print_err('Cannot link inexistent file "$file_path"', '')
 	}
 
-	link_name := cmd.flags.get_string_or('name', cmd.args[0].split('/').last())
+	mut link_name := cmd.flags.get_string('name') or { panic(err) }
+	if link_name == '' {
+		link_name = cmd.args[0].split('/').last()
+	}
 
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
@@ -118,6 +121,12 @@ fn main() {
 		description: 'Use a custom name for the link.'
 	})
 
+	mut del_cmd := cli.Command{
+		name: 'del',
+		description: 'Delete the specified symlink.',
+		execute: delete_link
+	}
+
 	mut list_cmd := cli.Command{
 		name: 'list',
 		description: 'List all symlinks.',
@@ -131,6 +140,7 @@ fn main() {
 	})
 
 	cmd.add_command(add_cmd)
+	cmd.add_command(del_cmd)
 	cmd.add_command(list_cmd)
 	cmd.parse(os.args)
 }
