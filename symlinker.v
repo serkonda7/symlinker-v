@@ -77,6 +77,12 @@ fn list_links(cmd cli.Command) {
 	}
 }
 
+fn open_link_folder(cmd cli.Command) {
+	link_dir := actual_link_dir(cmd)
+	command := 'xdg-open $link_dir'
+	os.exec(command) or { panic(err) }
+}
+
 fn actual_link_dir(cmd cli.Command) string {
 	is_global := cmd.flags.get_bool('global') or { panic(err) }
 	return if is_global { global_link_dir } else { local_link_dir }
@@ -139,8 +145,15 @@ fn main() {
 		description: 'Also print the path the links point to.'
 	})
 
+	mut open_cmd := cli.Command{
+		name: 'open',
+		description: 'Open symlink folder in the file explorer.',
+		execute: open_link_folder
+	}
+
 	cmd.add_command(add_cmd)
 	cmd.add_command(del_cmd)
 	cmd.add_command(list_cmd)
+	cmd.add_command(open_cmd)
 	cmd.parse(os.args)
 }
