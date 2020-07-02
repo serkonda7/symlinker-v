@@ -106,6 +106,7 @@ fn main() {
 		name: 'symlinker',
 		version: '0.5.0',
 		disable_flags: true
+		sort_commands: false
 	}
 	cmd.add_flag(cli.Flag{
 		flag: .bool,
