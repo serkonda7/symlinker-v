@@ -17,7 +17,7 @@ fn add_link(cmd cli.Command) {
 
 	file_path := os.real_path(cmd.args[0])
 	if !os.exists(file_path) {
-		print_err('Cannot link inexistent file "$file_path"', '')
+		err_and_exit('Cannot link inexistent file "$file_path"', '')
 	}
 
 	mut link_name := cmd.flags.get_string('name') or { panic(err) }
@@ -28,31 +28,33 @@ fn add_link(cmd cli.Command) {
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
 		if os.is_link(link_path) {
-			print_err('Error: a ${scope(cmd)} link named "$link_name" already exists', '')
+			err_and_exit('Error: a ${scope(cmd)} link named "$link_name" already exists', '')
 		}
-		print_err('Error: a file named "$link_name" already exists', '')
+		err_and_exit('Error: a file named "$link_name" already exists', '')
 	}
 
 	os.symlink(file_path, link_path) or {
-		print_err('Permission denied', 'Run with "sudo" instead.')
+		err_and_exit('Permission denied', 'Run with "sudo" instead.')
 	}
 	println('Created ${scope(cmd)} link: "$link_name"')
 }
 
 fn delete_link(cmd cli.Command) {
-	link_path := actual_link_dir(cmd) + cmd.args[0]
+	for arg in cmd.args {
+		link_path := actual_link_dir(cmd) + arg
 
-	if !os.is_link(link_path) {
-		if !os.exists(link_path) {
-			print_err('Error: ${scope(cmd)} link "${cmd.args[0]}" does not exist', '')
+		if !os.is_link(link_path) {
+			if !os.exists(link_path) {
+				print_err('Error: ${scope(cmd)} link "$arg" does not exist', '')
+			}
+			print_err('Error: "$arg" is no ${scope(cmd)} link', '')
 		}
-		print_err('Error: "${cmd.args[0]}" is no ${scope(cmd)} link', '')
-	}
 
-	os.rm(link_path) or {
-		print_err('Permission denied', 'Run with "sudo" instead.')
+		os.rm(link_path) or {
+			err_and_exit('Permission denied', 'Run with "sudo" instead.')
+		}
+		println('Deleted ${scope(cmd)} link: "$arg"')
 	}
-	println('Deleted ${scope(cmd)} link: "${cmd.args[0]}"')
 }
 
 fn list_links(cmd cli.Command) {
@@ -115,6 +117,10 @@ fn print_err(msg, tip_msg string) {
 	if tip_msg.len > 0 {
 		println(tip_msg)
 	}
+}
+
+fn err_and_exit(msg, tip_msg string) {
+	print_err(msg, tip_msg)
 	exit(1)
 }
 
@@ -147,7 +153,7 @@ fn main() {
 
 	mut del_cmd := cli.Command{
 		name: 'del',
-		description: 'Delete the specified symlink.',
+		description: 'Delete all specified symlinks.',
 		execute: delete_link
 	}
 
