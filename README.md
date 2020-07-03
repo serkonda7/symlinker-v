@@ -5,6 +5,16 @@
 Utility program to manage symlinks.
 
 
+## Installation
+
+Download the latest stable version from the [Releases page][releases].
+
+Place the executable in a directory of your choice and run 
+`sudo ./symlinker add -g ./symlinker`
+
+> At the moment only Linux is supported.
+
+
 ## Usage
 
 ```
@@ -28,8 +38,8 @@ Flags:
 
 ## License
 
-Licensed under the [MIT License][license]
+Licensed under the [MIT License](LICENSE.md)
 
 
 <!-- Links -->
-[license]: https://github.com/Serkonda/symlinker/blob/master/LICENSE.md
+[releases]: https://github.com/Serkonda/symlinker/releases
