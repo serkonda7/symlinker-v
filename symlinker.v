@@ -127,7 +127,7 @@ fn err_and_exit(msg, tip_msg string) {
 fn main() {
 	mut cmd := cli.Command{
 		name: 'symlinker',
-		version: '0.5.0',
+		version: '0.6.0',
 		disable_flags: true
 		sort_commands: false
 	}

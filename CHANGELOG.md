@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 0.6.0
+_3 July 2020_
+
+- Migrate to V cli
+- Delete multiple links at once by specifying each as arguments
+- New flag `list --all` to list global and local links
+
 ## 0.5.0
 _25 June 2020_
 
