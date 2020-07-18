@@ -45,21 +45,27 @@ fn add_link(cmd cli.Command) {
 fn delete_link(cmd cli.Command) {
 	scope := get_scope(cmd)
 	link_dir := scope_dirs[scope]
+	mut err := 0
 	for arg in cmd.args {
 		link_path := link_dir + arg
 
 		if !os.is_link(link_path) {
 			if !os.exists(link_path) {
 				print_err('$scope link `$arg` does not exist', 'Run `symlinker list` to see your links.')
+				err++
 				continue
 			}
 			print_err('"$arg" is no $scope link', '')
+			err++
 			continue
 		}
 		os.rm(link_path) or {
 			err_and_exit('Permission denied', 'Run with "sudo" instead.')
 		}
 		println('Deleted $scope link: "$arg"')
+	}
+	if err > 0 {
+		exit(1)
 	}
 }
 
