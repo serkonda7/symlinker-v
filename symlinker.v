@@ -82,7 +82,19 @@ fn list_links(cmd cli.Command) {
 			}
 		}
 		else {
-			println(links)
+			mut rows := []string{}
+			mut row_idx := 0
+			for i, link in links {
+				if i % 5 == 0 {
+					rows << ''
+					row_idx = i / 5
+				}
+				rows[row_idx] += '$link, '
+			}
+			rows[rows.len - 1] = rows.last().all_before_last(', ')
+			for row in rows {
+				println('  $row')
+			}
 		}
 	}
 }
