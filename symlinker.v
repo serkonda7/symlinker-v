@@ -63,21 +63,14 @@ fn delete_link(cmd cli.Command) {
 }
 
 fn list_links(cmd cli.Command) {
-	f_all := cmd.flags.get_bool('all') or { panic(err) }
-
-	dirs := if f_all {
-		[scope_dirs['local'], scope_dirs['global']]
-	} else {
-		[scope_dirs[get_scope(cmd)]]
-	}
-
-	for i, dir in dirs {
+	dirs := [scope_dirs['local'], scope_dirs['global']]
+	for dir in dirs {
 		files := os.ls(dir) or { panic(err) }
 		links := files.filter(os.is_link(dir + it))
 
 		if links.len == 0 {
 			println('No ${get_scope_by_dir(dir)} symlinks detected.')
-			return
+			continue
 		}
 
 		println(chalk.style('${get_scope_by_dir(dir)} links:', 'bold'))
@@ -85,15 +78,12 @@ fn list_links(cmd cli.Command) {
 		if f_real {
 			for link in links {
 				real_path := os.real_path(dir + link)
-				println('$link: $real_path')
-
+				println('  $link: $real_path')
 			}
 		}
 		else {
 			println(links)
 		}
-
-		if i < dirs.len-1 { println('') }
 	}
 }
 
@@ -162,20 +152,14 @@ fn main() {
 		description: 'List all symlinks.'
 		execute: list_links
 	}
-	list_cmd.add_flags([
+	list_cmd.add_flag(
 		cli.Flag {
 			flag: .bool
 			name: 'real'
 			abbrev: 'r'
 			description: 'Also print the path the links point to.'
-		},
-		cli.Flag {
-			flag: .bool,
-			name: 'all',
-			abbrev: 'a',
-			description: 'List both, local and global links.'
 		}
-	])
+	)
 
 	mut open_cmd := cli.Command{
 		name: 'open'
