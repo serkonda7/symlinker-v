@@ -116,7 +116,9 @@ fn list_links(cmd cli.Command) {
 }
 
 fn open_link_folder(cmd cli.Command) {
-	link_dir := scope_dirs[get_scope(cmd)]
+	scope := get_scope(cmd)
+	link_dir := scope_dirs[scope]
+	println('Opening the $scope symlink folder...')
 	command := 'xdg-open $link_dir'
 	os.exec(command) or { panic(err) }
 }
@@ -153,7 +155,7 @@ fn main() {
 		flag: .bool
 		name: 'global'
 		abbrev: 'g'
-		description: 'Execute the command machine-wide.'
+		description: 'Execute the command in global scope.'
 		global: true
 	})
 
