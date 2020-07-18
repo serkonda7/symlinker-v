@@ -116,6 +116,9 @@ fn list_links(cmd cli.Command) {
 }
 
 fn open_link_folder(cmd cli.Command) {
+	if os.getenv('SUDO_USER') != '' {
+		err_and_exit('Please run without `sudo`.', '')
+	}
 	scope := get_scope(cmd)
 	link_dir := scope_dirs[scope]
 	println('Opening the $scope symlink folder...')
