@@ -5,7 +5,7 @@ import os
 import etienne_napoleone.chalk
 
 const (
-	local_link_dir = os.home_dir() + '.local/bin/'
+	local_link_dir  = os.home_dir() + '.local/bin/'
 	global_link_dir = '/usr/local/bin/'
 )
 
@@ -28,9 +28,9 @@ fn add_link(cmd cli.Command) {
 	link_path := link_dir + link_name
 	if os.exists(link_path) {
 		if os.is_link(link_path) {
-			err_and_exit('Error: a ${scope(cmd)} link named "$link_name" already exists', '')
+			err_and_exit('${scope(cmd)} link named "$link_name" already exists', '')
 		}
-		err_and_exit('Error: a file named "$link_name" already exists', '')
+		err_and_exit('File named "$link_name" already exists', '')
 	}
 
 	os.symlink(file_path, link_path) or {
@@ -45,9 +45,9 @@ fn delete_link(cmd cli.Command) {
 
 		if !os.is_link(link_path) {
 			if !os.exists(link_path) {
-				print_err('Error: ${scope(cmd)} link "$arg" does not exist', '')
+				print_err('${scope(cmd)} link "$arg" does not exist', '')
 			}
-			print_err('Error: "$arg" is no ${scope(cmd)} link', '')
+			print_err('"$arg" is no ${scope(cmd)} link', '')
 		}
 
 		os.rm(link_path) or {
@@ -162,13 +162,20 @@ fn main() {
 		description: 'List all symlinks.',
 		execute: list_links
 	}
-	})
-	list_cmd.add_flag(cli.Flag{
-		flag: .bool,
-		name: 'all',
-		abbrev: 'a',
-		description: 'List both, local and global links.'
-	})
+	list_cmd.add_flags([
+		cli.Flag {
+			flag: .bool,
+			name: 'real',
+			abbrev: 'r',
+			description: 'Also print the path the links point to.'
+		},
+		cli.Flag {
+			flag: .bool,
+			name: 'all',
+			abbrev: 'a',
+			description: 'List both, local and global links.'
+		}
+	])
 
 	mut open_cmd := cli.Command{
 		name: 'open',
@@ -176,9 +183,6 @@ fn main() {
 		execute: open_link_folder
 	}
 
-	cmd.add_command(add_cmd)
-	cmd.add_command(del_cmd)
-	cmd.add_command(list_cmd)
-	cmd.add_command(open_cmd)
+	cmd.add_commands([add_cmd, del_cmd, list_cmd, open_cmd])
 	cmd.parse(os.args)
 }
