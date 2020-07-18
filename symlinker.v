@@ -50,11 +50,12 @@ fn delete_link(cmd cli.Command) {
 
 		if !os.is_link(link_path) {
 			if !os.exists(link_path) {
-				print_err('$scope link "$arg" does not exist', '')
+				print_err('$scope link `$arg` does not exist', 'Run `symlinker list` to see your links.')
+				continue
 			}
 			print_err('"$arg" is no $scope link', '')
+			continue
 		}
-
 		os.rm(link_path) or {
 			err_and_exit('Permission denied', 'Run with "sudo" instead.')
 		}
