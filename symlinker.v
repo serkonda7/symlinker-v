@@ -162,11 +162,6 @@ fn main() {
 		description: 'List all symlinks.',
 		execute: list_links
 	}
-	list_cmd.add_flag(cli.Flag{
-		flag: .bool,
-		name: 'real',
-		abbrev: 'r',
-		description: 'Also print the path the links point to.'
 	})
 	list_cmd.add_flag(cli.Flag{
 		flag: .bool,
