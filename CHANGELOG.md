@@ -1,6 +1,21 @@
 # Changelog
 
 
+## 0.7.0
+_18 July 2020_
+
+**Breaking:**
+- `list`: remove `--all` flag and make it the default behaviour
+
+**Changes:**
+- `list --real`: print links with some indentation
+- shorter error messages
+
+**Fixes:**
+- `list --all`: list global links if local ones are empty
+- `list --all`: print correct scope for no detected links
+
+
 ## 0.6.0
 _3 July 2020_
 
