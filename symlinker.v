@@ -83,9 +83,18 @@ fn list_links(cmd cli.Command) {
 		println(chalk.style('${get_scope_by_dir(dir)} links:', 'bold'))
 		f_real := cmd.flags.get_bool('real') or { panic(err) }
 		if f_real {
+			mut invalid_links := []string{}
 			for link in links {
-				real_path := os.real_path(dir + link)
+				link_path := dir + link
+				real_path := os.real_path(link_path)
+				if link_path == real_path {
+					invalid_links << link
+					continue
+				}
 				println('  $link: $real_path')
+			}
+			for inv_link in invalid_links {
+				println(chalk.fg('  INVALID', 'light_magenta') + ' $inv_link')
 			}
 		}
 		else {
