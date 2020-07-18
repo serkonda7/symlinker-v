@@ -1,6 +1,20 @@
 # Changelog
 
 
+## 0.8.0
+_19 July 2020_
+
+**Changes:**
+- `list --real`: label invalid links
+- `open`: print what folder was opened
+- `list`: print many symlinks more pretty by splitting into shorter rows
+
+**Fixes:**
+- `open`: disallow running with sudo
+- `del`: only show the correct error message
+- `del`: use exit code `1` if any error occurs
+
+
 ## 0.7.0
 _18 July 2020_
 
