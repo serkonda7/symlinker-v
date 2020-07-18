@@ -8,7 +8,7 @@ on:
     branches:
       - '**'
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 8,16 * * *'
 
 jobs:
   linux:
@@ -24,4 +24,4 @@ jobs:
       - name: Install modules
         run: v install etienne-napoleone.chalk
       - name: Build symlinker
-        run: v -cg symlinker.v
+        run: v -cg -prod symlinker.v
