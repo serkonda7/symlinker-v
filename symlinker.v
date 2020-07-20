@@ -72,15 +72,14 @@ fn delete_link(cmd cli.Command) {
 fn list_links(cmd cli.Command) {
 	dirs := [scope_dirs['local'], scope_dirs['global']]
 	for dir in dirs {
+		scope := get_scope_by_dir(dir)
 		files := os.ls(dir) or { panic(err) }
 		links := files.filter(os.is_link(dir + it))
-
 		if links.len == 0 {
-			println('No ${get_scope_by_dir(dir)} symlinks detected.')
+			println('No $scope symlinks detected.')
 			continue
 		}
-
-		println(chalk.style('${get_scope_by_dir(dir)} links:', 'bold'))
+		println(chalk.style('$scope links:', 'bold'))
 		f_real := cmd.flags.get_bool('real') or { panic(err) }
 		if f_real {
 			mut invalid_links := []string{}
