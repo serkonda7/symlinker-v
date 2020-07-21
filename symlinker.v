@@ -135,14 +135,14 @@ fn open_link_folder(cmd cli.Command) {
 
 fn get_scope(cmd cli.Command) string {
 	mut t := ''
-	$if test { t = 'test_' }
+	$if test { t = 't_' }
 	is_global := cmd.flags.get_bool('global') or { panic(err) }
 	return if is_global { '${t}global' } else { '${t}local' }
 }
 
 fn get_scope_by_dir(dir string) string {
 	mut t := ''
-	$if test { t = 'test_' }
+	$if test { t = 't_' }
 	$if linux {
 		return if dir == linux_dirs['local'] { '${t}local' } else { '${t}global' }
 	} $else {
