@@ -12,6 +12,9 @@ const (
 )
 
 fn add_link(cmd cli.Command) {
+	if cmd.args.len == 0 {
+		err_and_exit('`add` needs one argument', '')
+	}
 	scope := get_scope(cmd)
 	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {

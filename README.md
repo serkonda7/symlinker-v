@@ -26,7 +26,7 @@ Flags:
 Commands:
   add <file>             Create a symlink to <file>.
     -n, --name <name>      Use a custom name for the link.
-  del <links>            Delete all specified symlinks.
+  del <link1> <...>      Delete all specified symlinks.
   list                   List all symlinks.
     -r, --real             Also print the path the links point to.
   open                   Open symlink folder in the file explorer.
