@@ -43,6 +43,9 @@ fn add_link(cmd cli.Command) {
 }
 
 fn delete_link(cmd cli.Command) {
+	if cmd.args.len == 0 {
+		err_and_exit('`del` needs at least one argument', '')
+	}
 	scope := get_scope(cmd)
 	link_dir := get_dir(scope)
 	mut err := 0
