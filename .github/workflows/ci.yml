@@ -39,5 +39,7 @@ jobs:
         with:
           v-version: master
         id: v
+      - name: Install modules
+        run: v install etienne-napoleone.chalk
       - name: Run tests
         run: v test .
