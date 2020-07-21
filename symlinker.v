@@ -8,6 +8,8 @@ const (
 	linux_dirs = {
 		'local': os.home_dir() + '.local/bin/'
 		'global': '/usr/local/bin/'
+		'test_local': os.home_dir() + '.cache/symlinker_local/'
+		'test_global': os.home_dir() + '.cache/symlinker_global/'
 	}
 )
 
@@ -132,13 +134,17 @@ fn open_link_folder(cmd cli.Command) {
 }
 
 fn get_scope(cmd cli.Command) string {
+	mut t := ''
+	$if test { t = 'test_' }
 	is_global := cmd.flags.get_bool('global') or { panic(err) }
-	return if is_global { 'global' } else { 'local' }
+	return if is_global { '${t}global' } else { '${t}local' }
 }
 
 fn get_scope_by_dir(dir string) string {
+	mut t := ''
+	$if test { t = 'test_' }
 	$if linux {
-		return if dir == linux_dirs['local'] { 'local' } else { 'global' }
+		return if dir == linux_dirs['local'] { '${t}local' } else { '${t}global' }
 	} $else {
 		panic('Invalid os')
 	}
