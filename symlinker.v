@@ -5,7 +5,7 @@ import os
 import etienne_napoleone.chalk
 
 const (
-	scope_dirs = {
+	linux_dirs = {
 		'local': os.home_dir() + '.local/bin/'
 		'global': '/usr/local/bin/'
 	}
@@ -13,7 +13,7 @@ const (
 
 fn add_link(cmd cli.Command) {
 	scope := get_scope(cmd)
-	link_dir := scope_dirs[scope]
+	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir)
 	}
@@ -44,7 +44,7 @@ fn add_link(cmd cli.Command) {
 
 fn delete_link(cmd cli.Command) {
 	scope := get_scope(cmd)
-	link_dir := scope_dirs[scope]
+	link_dir := get_dir(scope)
 	mut err := 0
 	for arg in cmd.args {
 		link_path := link_dir + arg
@@ -70,7 +70,7 @@ fn delete_link(cmd cli.Command) {
 }
 
 fn list_links(cmd cli.Command) {
-	dirs := [scope_dirs['local'], scope_dirs['global']]
+	dirs := [get_dir('local'), get_dir('global')]
 	for dir in dirs {
 		scope := get_scope_by_dir(dir)
 		files := os.ls(dir) or { panic(err) }
@@ -119,7 +119,7 @@ fn open_link_folder(cmd cli.Command) {
 		err_and_exit('Please run without `sudo`.', '')
 	}
 	scope := get_scope(cmd)
-	link_dir := scope_dirs[scope]
+	link_dir := get_dir(scope)
 	println('Opening the $scope symlink folder...')
 	command := 'xdg-open $link_dir'
 	os.exec(command) or { panic(err) }
@@ -131,7 +131,19 @@ fn get_scope(cmd cli.Command) string {
 }
 
 fn get_scope_by_dir(dir string) string {
-	return if dir == scope_dirs['local'] { 'local' } else { 'global' }
+	$if linux {
+		return if dir == linux_dirs['local'] { 'local' } else { 'global' }
+	} $else {
+		panic('Invalid os')
+	}
+}
+
+fn get_dir(scope string) string {
+	$if linux {
+		return linux_dirs[scope]
+	} $else {
+		panic('Invalid os')
+	}
 }
 
 fn print_err(msg, tip_msg string) {
