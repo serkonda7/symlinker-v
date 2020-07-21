@@ -28,3 +28,5 @@ jobs:
         run: v install etienne-napoleone.chalk
       - name: Build symlinker
         run: v -cg -prod symlinker.v
+      - name: Run tests
+        run: v test .
