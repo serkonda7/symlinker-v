@@ -25,6 +25,15 @@ fn test_get_scope() {
 fn test_scope_by_dir() {
 	dirs := [os.home_dir() + '.local/bin/', '/usr/local/bin/']
 	expexted := ['t_local', 't_global']
+	expected := ['t_local', 't_global']
 	scopes := dirs.map(get_scope_by_dir(it))
-	assert scopes == expexted
+	assert scopes == expected
+}
+
+fn test_get_dir() {
+	scopes := linux_dirs.keys()
+	dirs := scopes.map(get_dir(it))
+	expected := [os.home_dir() + '.local/bin/', '/usr/local/bin/',
+		os.home_dir() + '.cache/symlinker_local/', os.home_dir() + '.cache/symlinker_global/',]
+	assert dirs == expected
 }

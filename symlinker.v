@@ -8,8 +8,8 @@ const (
 	linux_dirs = {
 		'local': os.home_dir() + '.local/bin/'
 		'global': '/usr/local/bin/'
-		'test_local': os.home_dir() + '.cache/symlinker_local/'
-		'test_global': os.home_dir() + '.cache/symlinker_global/'
+		't_local': os.home_dir() + '.cache/symlinker_local/'
+		't_global': os.home_dir() + '.cache/symlinker_global/'
 	}
 )
 
