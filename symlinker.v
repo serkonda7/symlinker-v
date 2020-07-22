@@ -127,9 +127,20 @@ fn open_link_folder(cmd cli.Command) {
 		err_and_exit('Please run without `sudo`.', '')
 	}
 	scope := get_scope(cmd)
-	link_dir := get_dir(scope)
-	println('Opening the $scope symlink folder...')
-	command := 'xdg-open $link_dir'
+	mut dir := get_dir(scope)
+	if cmd.args.len >= 1 {
+		target_link := cmd.args[0]
+		links := os.ls(dir) or { panic(err) }
+		if target_link in links {
+			dir = os.real_path(dir + target_link).all_before_last('/')
+			println('Opening the directory of "$target_link"...')
+		} else {
+			err_and_exit('Cannot open directory: "$target_link" is no $scope link', '')
+		}
+	} else {
+		println('Opening the $scope symlink folder...')
+	}
+	command := 'xdg-open $dir'
 	os.exec(command) or { panic(err) }
 }
 
