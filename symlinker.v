@@ -1,6 +1,6 @@
 module main
 
-import cli
+import cli { Command, Flag }
 import os
 import etienne_napoleone.chalk
 
@@ -13,7 +13,7 @@ const (
 	}
 )
 
-fn add_link(cmd cli.Command) {
+fn add_link(cmd Command) {
 	if cmd.args.len == 0 {
 		err_and_exit('`add` needs one argument', '')
 	}
@@ -47,7 +47,7 @@ fn add_link(cmd cli.Command) {
 	println('Created $scope link: "$link_name"')
 }
 
-fn delete_link(cmd cli.Command) {
+fn delete_link(cmd Command) {
 	if cmd.args.len == 0 {
 		err_and_exit('`del` needs at least one argument', '')
 	}
@@ -77,7 +77,7 @@ fn delete_link(cmd cli.Command) {
 	}
 }
 
-fn list_links(cmd cli.Command) {
+fn list_links(cmd Command) {
 	dirs := [get_dir('local'), get_dir('global')]
 	for dir in dirs {
 		scope := get_scope_by_dir(dir)
@@ -122,7 +122,38 @@ fn list_links(cmd cli.Command) {
 	}
 }
 
-fn open_link_folder(cmd cli.Command) {
+fn update_link(cmd Command) {
+	if cmd.args.len == 0 {
+		err_and_exit('`update` needs the link to update as argument', '')
+	}
+	new_name := cmd.flags.get_string_or('name', '')
+	new_path := cmd.flags.get_string_or('path', '')
+	if new_name == '' && new_path == '' {
+		err_and_exit('At least one of the flags is required for `update`', '')
+	}
+	scope := get_scope(cmd)
+	mut link_name := cmd.args[0]
+	dir := get_dir(scope)
+	mut link_path := dir + link_name
+	if !os.exists(link_path) {
+		err_and_exit('Cannot update inexistent link "$link_path"', '')
+	}
+	if new_name != '' {
+		os.mv_by_cp(link_path, dir + new_name) or { panic(err) }
+		link_path = dir + new_name
+		link_name = new_name
+		println('Renamed $scope link "$link_name" to ${new_name}.')
+	}
+	if new_path != '' {
+		os.rm(link_path) or { panic(err) }
+		os.symlink(new_path, link_path) or {
+			err_and_exit('Permission denied', 'Run with "sudo" instead.')
+		}
+		println('Updated path of ${link_name}.')
+	}
+}
+
+fn open_link_folder(cmd Command) {
 	if os.getenv('SUDO_USER') != '' {
 		err_and_exit('Please run without `sudo`.', '')
 	}
@@ -144,7 +175,7 @@ fn open_link_folder(cmd cli.Command) {
 	os.exec(command) or { panic(err) }
 }
 
-fn get_scope(cmd cli.Command) string {
+fn get_scope(cmd Command) string {
 	mut t := ''
 	$if test { t = 't_' }
 	is_global := cmd.flags.get_bool('global') or { panic(err) }
@@ -182,13 +213,13 @@ fn err_and_exit(msg, tip_msg string) {
 }
 
 fn main() {
-	mut cmd := cli.Command{
+	mut cmd := Command{
 		name: 'symlinker'
 		version: '0.8.0'
 		disable_flags: true
 		sort_commands: false
 	}
-	cmd.add_flag(cli.Flag{
+	cmd.add_flag(Flag{
 		flag: .bool
 		name: 'global'
 		abbrev: 'g'
@@ -196,31 +227,31 @@ fn main() {
 		global: true
 	})
 
-	mut add_cmd := cli.Command{
+	mut add_cmd := Command{
 		name: 'add'
 		description: 'Create a symlink to <file>.'
 		execute: add_link
 	}
-	add_cmd.add_flag(cli.Flag{
+	add_cmd.add_flag(Flag{
 		flag: .string
 		name: 'name'
 		abbrev: 'n'
 		description: 'Use a custom name for the link.'
 	})
 
-	mut del_cmd := cli.Command{
+	mut del_cmd := Command{
 		name: 'del'
 		description: 'Delete all specified symlinks.'
 		execute: delete_link
 	}
 
-	mut list_cmd := cli.Command{
+	mut list_cmd := Command{
 		name: 'list'
 		description: 'List all symlinks.'
 		execute: list_links
 	}
 	list_cmd.add_flag(
-		cli.Flag {
+		Flag {
 			flag: .bool
 			name: 'real'
 			abbrev: 'r'
@@ -228,12 +259,32 @@ fn main() {
 		}
 	)
 
-	mut open_cmd := cli.Command{
+	mut update_cmd := Command{
+		name: 'update'
+		description: 'Rename symlinks or update their real path.'
+		execute: update_link
+	}
+	update_cmd.add_flags([
+		Flag{
+			flag: .string
+			name: 'name'
+			abbrev: 'n'
+			description: 'The new name.'
+		},
+		Flag{
+			flag: .string
+			name: 'path'
+			abbrev: 'p'
+			description: 'The new path.'
+		}
+	])
+
+	mut open_cmd := Command{
 		name: 'open'
 		description: 'Open symlink folder in the file explorer.'
 		execute: open_link_folder
 	}
 
-	cmd.add_commands([add_cmd, del_cmd, list_cmd, open_cmd])
+	cmd.add_commands([add_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
 	cmd.parse(os.args)
 }
