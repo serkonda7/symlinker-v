@@ -21,7 +21,7 @@ fn create_link(cmd Command) {
 	if !os.exists(file_path) {
 		err_and_exit('Cannot link inexistent file "$file_path"', '')
 	}
-	mut link_name := cmd.flags.get_string_or('name', '')
+	mut link_name := cmd.flags.get_string_or('name', '').trim_right(' ')
 	if link_name == '' {
 		link_name = cmd.args[0].split('/').last()
 	}
