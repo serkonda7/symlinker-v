@@ -11,34 +11,89 @@ const (
 	}
 )
 
-fn create_link(cmd Command) {
-	scope := get_scope(cmd)
-	link_dir := get_dir(scope)
-	if !os.exists(link_dir) {
-		os.mkdir_all(link_dir)
+fn main() {
+	mut cmd := Command{
+		name: 'symlinker'
+		version: '0.8.0'
+		disable_flags: true
+		sort_commands: false
 	}
-	file_path := os.real_path(cmd.args[0])
-	if !os.exists(file_path) {
-		err_and_exit('Cannot link inexistent file "$file_path"', '')
+	cmd.add_flag(Flag{
+		flag: .bool
+		name: 'machine'
+		abbrev: 'm'
+		description: 'Execute the command machine-wide.'
+		global: true
+	})
+	mut link_cmd := Command{
+		name: 'link'
+		description: 'Create a symlink to <file>.'
+		required_args: 1
+		execute: link_func
 	}
-	mut link_name := cmd.flags.get_string_or('name', '').trim_right(' ')
-	if link_name == '' {
-		link_name = cmd.args[0].split('/').last()
+	link_cmd.add_flag(Flag{
+		flag: .string
+		name: 'name'
+		abbrev: 'n'
+		description: 'Use a custom name for the link.'
+	})
+	mut del_cmd := Command{
+		name: 'del'
+		description: 'Delete all specified symlinks.'
+		required_args: 1
+		execute: del_func
 	}
-	link_path := link_dir + link_name
-	if os.exists(link_path) {
-		if os.is_link(link_path) {
-			err_and_exit('$scope link with name "$link_name" already exists', '')
-		}
-		err_and_exit('File named "$link_name" already exists', '')
+	mut list_cmd := Command{
+		name: 'list'
+		description: 'List all symlinks.'
+		execute: list_func
 	}
-	os.symlink(file_path, link_path) or {
-		err_and_exit('Permission denied', 'Run with `sudo` instead.')
+	list_cmd.add_flag(Flag{
+		flag: .bool
+		name: 'real'
+		abbrev: 'r'
+		description: 'Also print the path the links point to.'
+	})
+	mut update_cmd := Command{
+		name: 'update'
+		description: 'Rename symlinks or update their real path.'
+		execute: update_func
 	}
-	println('Created $scope link: "$link_name"')
+	update_cmd.add_flags([
+		Flag{
+			flag: .string
+			name: 'name'
+			abbrev: 'n'
+			description: 'The new name.'
+		},
+		Flag{
+			flag: .string
+			name: 'path'
+			abbrev: 'p'
+			description: 'The new path.'
+		},
+	])
+	mut open_cmd := Command{
+		name: 'open'
+		description: 'Open symlink folder in the file explorer.'
+		execute: open_func
+	}
+	cmd.add_commands([link_cmd, del_cmd, list_cmd, /* update_cmd, */ open_cmd])
+	cmd.parse(os.args)
 }
 
-fn delete_link(cmd Command) {
+fn link_func(cmd Command) {
+	scope := get_scope(cmd)
+	real_name := cmd.args[0]
+	mut target_name := cmd.flags.get_string_or('name', '').trim_right(' ')
+	if target_name == '' {
+		target_name = real_name.split('/').last()
+	}
+	create_link(scope, real_name, target_name)
+	println('Created $scope link: "$target_name"')
+}
+
+fn del_func(cmd Command) {
 	scope := get_scope(cmd)
 	link_dir := get_dir(scope)
 	mut err := 0
@@ -64,7 +119,7 @@ fn delete_link(cmd Command) {
 	}
 }
 
-fn list_links(cmd Command) {
+fn list_func(cmd Command) {
 	for _, dir in link_dirs {
 		scope := get_scope_by_dir(dir)
 		files := os.ls(dir) or {
@@ -109,7 +164,7 @@ fn list_links(cmd Command) {
 	}
 }
 
-fn update_link(cmd Command) {
+fn update_func(cmd Command) {
 	if cmd.args.len == 0 {
 		err_and_exit('`update` needs the link to update as argument', '')
 	}
@@ -144,7 +199,7 @@ fn update_link(cmd Command) {
 	}
 }
 
-fn open_link_folder(cmd Command) {
+fn open_func(cmd Command) {
 	if os.getenv('SUDO_USER') != '' {
 		err_and_exit('Please run without `sudo`.', '')
 	}
@@ -167,6 +222,27 @@ fn open_link_folder(cmd Command) {
 	command := 'xdg-open $dir'
 	os.exec(command) or {
 		panic(err)
+	}
+}
+
+fn create_link(scope, real_name, target_name string) {
+	link_parent_dir := get_dir(scope)
+	if !os.exists(link_parent_dir) {
+		os.mkdir_all(link_parent_dir)
+	}
+	source_path := os.real_path(real_name)
+	if !os.exists(source_path) {
+		err_and_exit('Cannot link inexistent file "$source_path"', '')
+	}
+	destination_path := link_parent_dir + target_name
+	if os.exists(destination_path) {
+		if os.is_link(destination_path) {
+			err_and_exit('$scope link with name "$target_name" already exists', '')
+		}
+		err_and_exit('File with name "$target_name" already exists', '')
+	}
+	os.symlink(source_path, destination_path) or {
+		err_and_exit('Permission denied', 'Run with `sudo` instead.')
 	}
 }
 
@@ -209,75 +285,4 @@ fn print_err(msg, tip_msg string) {
 fn err_and_exit(msg, tip_msg string) {
 	print_err(msg, tip_msg)
 	exit(1)
-}
-
-fn main() {
-	mut cmd := Command{
-		name: 'symlinker'
-		version: '0.8.0'
-		disable_flags: true
-		sort_commands: false
-	}
-	cmd.add_flag(Flag{
-		flag: .bool
-		name: 'machine'
-		abbrev: ''
-		description: 'Execute the command machine-wide.'
-		global: true
-	})
-	mut link_cmd := Command{
-		name: 'link'
-		description: 'Create a symlink to <file>.'
-		required_args: 1
-		execute: create_link
-	}
-	link_cmd.add_flag(Flag{
-		flag: .string
-		name: 'name'
-		abbrev: 'n'
-		description: 'Use a custom name for the link.'
-	})
-	mut del_cmd := Command{
-		name: 'del'
-		description: 'Delete all specified symlinks.'
-		required_args: 1
-		execute: delete_link
-	}
-	mut list_cmd := Command{
-		name: 'list'
-		description: 'List all symlinks.'
-		execute: list_links
-	}
-	list_cmd.add_flag(Flag{
-		flag: .bool
-		name: 'real'
-		abbrev: 'r'
-		description: 'Also print the path the links point to.'
-	})
-	mut update_cmd := Command{
-		name: 'update'
-		description: 'Rename symlinks or update their real path.'
-		execute: update_link
-	}
-	update_cmd.add_flags([
-		Flag{
-			flag: .string
-			name: 'name'
-			abbrev: 'n'
-			description: 'The new name.'
-		},
-		Flag{
-			flag: .string
-			name: 'path'
-			abbrev: 'p'
-			description: 'The new path.'
-		},
-	])
-	mut open_cmd := Command{
-		name: 'open'
-		description: 'Open symlink folder in the file explorer.'
-		execute: open_link_folder
-	}
-	cmd.add_commands([link_cmd, del_cmd, list_cmd, /* update_cmd, */ open_cmd])
-	cmd.parse(os.args)
 }
