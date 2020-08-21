@@ -5,9 +5,9 @@ import os
 import etienne_napoleone.chalk
 
 const (
-	linux_dirs = {
-		'local': os.home_dir() + '.local/bin/'
-		'global': '/usr/local/bin/'
+	link_dirs = {
+		'user': os.home_dir() + '.local/bin/'
+		'machine-wide': '/usr/local/bin/'
 	}
 )
 
@@ -70,8 +70,7 @@ fn delete_link(cmd Command) {
 }
 
 fn list_links(cmd Command) {
-	dirs := [get_dir('local'), get_dir('global')]
-	for dir in dirs {
+	for _, dir in link_dirs {
 		scope := get_scope_by_dir(dir)
 		files := os.ls(dir) or { panic(err) }
 		links := files.filter(os.is_link(dir + it))
@@ -168,13 +167,13 @@ fn open_link_folder(cmd Command) {
 }
 
 fn get_scope(cmd Command) string {
-	is_global := cmd.flags.get_bool('global') or { panic(err) }
-	return if is_global { 'global' } else { 'local' }
+	machine_wide := cmd.flags.get_bool('machine') or { panic(err) }
+	return if machine_wide { 'machine-wide' } else { 'user' }
 }
 
 fn get_scope_by_dir(dir string) string {
 	$if linux {
-		return if dir == linux_dirs['local'] { 'local' } else { 'global' }
+		return if dir == link_dirs['user'] { 'user' } else { 'machine-wide' }
 	} $else {
 		panic('Invalid os')
 	}
@@ -182,7 +181,7 @@ fn get_scope_by_dir(dir string) string {
 
 fn get_dir(scope string) string {
 	$if linux {
-		return linux_dirs[scope]
+		return link_dirs[scope]
 	} $else {
 		panic('Invalid os')
 	}
@@ -209,9 +208,9 @@ fn main() {
 	}
 	cmd.add_flag(Flag{
 		flag: .bool
-		name: 'global'
-		abbrev: 'g'
-		description: 'Execute the command in global scope.'
+		name: 'machine'
+		abbrev: ''
+		description: 'Execute the command machine-wide.'
 		global: true
 	})
 
