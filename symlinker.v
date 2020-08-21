@@ -12,9 +12,6 @@ const (
 )
 
 fn add_link(cmd Command) {
-	if cmd.args.len == 0 {
-		err_and_exit('`add` needs one argument', '')
-	}
 	scope := get_scope(cmd)
 	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {
@@ -46,9 +43,6 @@ fn add_link(cmd Command) {
 }
 
 fn delete_link(cmd Command) {
-	if cmd.args.len == 0 {
-		err_and_exit('`del` needs at least one argument', '')
-	}
 	scope := get_scope(cmd)
 	link_dir := get_dir(scope)
 	mut err := 0
@@ -224,6 +218,7 @@ fn main() {
 	mut add_cmd := Command{
 		name: 'add'
 		description: 'Create a symlink to <file>.'
+		required_args: 1
 		execute: add_link
 	}
 	add_cmd.add_flag(Flag{
@@ -236,6 +231,7 @@ fn main() {
 	mut del_cmd := Command{
 		name: 'del'
 		description: 'Delete all specified symlinks.'
+		required_args: 1
 		execute: delete_link
 	}
 
@@ -279,6 +275,6 @@ fn main() {
 		execute: open_link_folder
 	}
 
-	cmd.add_commands([add_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
+	cmd.add_commands([add_cmd, del_cmd, list_cmd, /* update_cmd, */ open_cmd])
 	cmd.parse(os.args)
 }
