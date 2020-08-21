@@ -1,22 +1,19 @@
 # symlinker
- 
 ![CI](https://github.com/Serkonda/symlinker/workflows/CI/badge.svg?branch=master)
 
 Utility program to manage symlinks.
 
 
 ## Installation
-
 Download the latest stable version from the [Releases page][releases].
 
 Place the executable in a directory of your choice and run 
-`sudo ./symlinker add -g ./symlinker`
+`sudo ./symlinker link -m ./symlinker`
 
 > At the moment only Linux is supported.
 
 
 ## Usage
-
 ```
 Usage: symlinker [command] [flags] [arguments]
 
@@ -39,7 +36,6 @@ Commands:
 
 
 ## License
-
 Licensed under the [MIT License](LICENSE.md)
 
 
