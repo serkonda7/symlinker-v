@@ -18,18 +18,21 @@ Place the executable in a directory of your choice and run
 ## Usage
 
 ```
-Usage: symlinker [flags] [command] [arguments]
+Usage: symlinker [command] [flags] [arguments]
 
 Flags:
-  -g, --global           Execute the command machine-wide. Use with "sudo".
+  -m, --machine          Execute the command machine-wide.
 
 Commands:
-  add <file>             Create a symlink to <file>.
+  link <file>            Create a new symlink to <file>.
     -n, --name <name>      Use a custom name for the link.
   del <link1> <...>      Delete all specified symlinks.
   list                   List all symlinks.
     -r, --real             Also print the path the links point to.
-  open                   Open symlink folder in the file explorer.
+  update <link>          Rename a symlink or update it's real path. Use at least one of the flags.
+    -n, --name <name>      The new name.
+    -p, --path <path>      The new path.
+  open [link]            Open a specific symlink or the general root dir in the file explorer.
   version                Print the version text.
   help                   Show this message.
 ```

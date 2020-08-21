@@ -27,7 +27,7 @@ fn main() {
 	})
 	mut link_cmd := Command{
 		name: 'link'
-		description: 'Create a symlink to <file>.'
+		description: 'Create a new symlink to <file>.'
 		required_args: 1
 		execute: link_func
 	}
@@ -76,7 +76,7 @@ fn main() {
 	])
 	mut open_cmd := Command{
 		name: 'open'
-		description: 'Open symlink folder in the file explorer.'
+		description: 'Open a specific symlink or the general root dir in the file explorer.'
 		execute: open_func
 	}
 	cmd.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
