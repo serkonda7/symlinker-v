@@ -56,7 +56,8 @@ fn main() {
 	})
 	mut update_cmd := Command{
 		name: 'update'
-		description: 'Rename symlinks or update their real path.'
+		description: "Rename a symlink or update it's real path."
+		required_args: 1
 		execute: update_func
 	}
 	update_cmd.add_flags([
@@ -78,7 +79,7 @@ fn main() {
 		description: 'Open symlink folder in the file explorer.'
 		execute: open_func
 	}
-	cmd.add_commands([link_cmd, del_cmd, list_cmd, /* update_cmd, */ open_cmd])
+	cmd.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
 	cmd.parse(os.args)
 }
 
@@ -165,37 +166,33 @@ fn list_func(cmd Command) {
 }
 
 fn update_func(cmd Command) {
-	if cmd.args.len == 0 {
-		err_and_exit('`update` needs the link to update as argument', '')
-	}
-	new_name := cmd.flags.get_string_or('name', '')
-	new_path := cmd.flags.get_string_or('path', '')
-	if new_name == '' && new_path == '' {
-		err_and_exit('At least one of the flags is required for `update`', '')
+	name_flag_val := cmd.flags.get_string_or('name', '')
+	path_flag_val := cmd.flags.get_string_or('path', '')
+	update_name := name_flag_val != ''
+	update_path := path_flag_val != ''
+	if !update_name && !update_path {
+		err_and_exit('`update` should be used with at least one flag', '')
 	}
 	scope := get_scope(cmd)
-	mut link_name := cmd.args[0]
-	dir := get_dir(scope)
-	mut link_path := dir + link_name
-	if !os.exists(link_path) {
-		err_and_exit('Cannot update inexistent link "$link_path"', '')
+	link_parent_dir := get_dir(scope)
+	mut curr_name := cmd.args[0]
+	curr_path := link_parent_dir + curr_name
+	if !os.exists(curr_path) {
+		err_and_exit('Cannot update inexistent link "$curr_path"', '')
 	}
-	if new_name != '' {
-		os.mv_by_cp(link_path, dir + new_name) or {
-			panic(err)
-		}
-		link_path = dir + new_name
-		link_name = new_name
-		println('Renamed $scope link "$link_name" to ${new_name}.')
+	new_link_source := if update_path { path_flag_val } else { curr_name }
+	new_link_dest := if update_name { name_flag_val } else { curr_name }
+	create_link(scope, new_link_source, new_link_dest)
+	os.rm(curr_path) or {
+		panic(err)
 	}
-	if new_path != '' {
-		os.rm(link_path) or {
-			panic(err)
-		}
-		os.symlink(new_path, link_path) or {
-			err_and_exit('Permission denied', 'Run with "sudo" instead.')
-		}
-		println('Updated path of ${link_name}.')
+	if update_name {
+		println('Renamed $scope link "$curr_name" to "$new_link_dest".')
+	}
+	if update_path {
+		curr_name = new_link_dest
+		real_source := os.real_path(new_link_source)
+		println('Changed path of "$curr_name" to "$real_source".')
 	}
 }
 
@@ -225,21 +222,21 @@ fn open_func(cmd Command) {
 	}
 }
 
-fn create_link(scope, real_name, target_name string) {
+fn create_link(scope, source_name, dest_name string) {
 	link_parent_dir := get_dir(scope)
 	if !os.exists(link_parent_dir) {
 		os.mkdir_all(link_parent_dir)
 	}
-	source_path := os.real_path(real_name)
+	source_path := os.real_path(source_name)
 	if !os.exists(source_path) {
 		err_and_exit('Cannot link inexistent file "$source_path"', '')
 	}
-	destination_path := link_parent_dir + target_name
+	destination_path := link_parent_dir + dest_name
 	if os.exists(destination_path) {
 		if os.is_link(destination_path) {
-			err_and_exit('$scope link with name "$target_name" already exists', '')
+			err_and_exit('$scope link with name "$dest_name" already exists', '')
 		}
-		err_and_exit('File with name "$target_name" already exists', '')
+		err_and_exit('File with name "$dest_name" already exists', '')
 	}
 	os.symlink(source_path, destination_path) or {
 		err_and_exit('Permission denied', 'Run with `sudo` instead.')
