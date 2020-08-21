@@ -11,7 +11,7 @@ const (
 	}
 )
 
-fn add_link(cmd Command) {
+fn create_link(cmd Command) {
 	scope := get_scope(cmd)
 	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {
@@ -37,7 +37,7 @@ fn add_link(cmd Command) {
 	}
 
 	os.symlink(file_path, link_path) or {
-		err_and_exit('Permission denied', 'Run with "sudo" instead.')
+		err_and_exit('Permission denied', 'Run with `sudo` instead.')
 	}
 	println('Created $scope link: "$link_name"')
 }
@@ -60,7 +60,7 @@ fn delete_link(cmd Command) {
 			continue
 		}
 		os.rm(link_path) or {
-			err_and_exit('Permission denied', 'Run with "sudo" instead.')
+			err_and_exit('Permission denied', 'Run with `sudo` instead.')
 		}
 		println('Deleted $scope link: "$arg"')
 	}
@@ -214,13 +214,13 @@ fn main() {
 		global: true
 	})
 
-	mut add_cmd := Command{
-		name: 'add'
+	mut link_cmd := Command{
+		name: 'link'
 		description: 'Create a symlink to <file>.'
 		required_args: 1
-		execute: add_link
+		execute: create_link
 	}
-	add_cmd.add_flag(Flag{
+	link_cmd.add_flag(Flag{
 		flag: .string
 		name: 'name'
 		abbrev: 'n'
@@ -274,6 +274,6 @@ fn main() {
 		execute: open_link_folder
 	}
 
-	cmd.add_commands([add_cmd, del_cmd, list_cmd, /* update_cmd, */ open_cmd])
+	cmd.add_commands([link_cmd, del_cmd, list_cmd, /* update_cmd, */ open_cmd])
 	cmd.parse(os.args)
 }
