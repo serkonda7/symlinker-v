@@ -8,6 +8,7 @@ const (
 	link_dirs = {
 		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
+		'test': os.join_path(os.temp_dir(), 'symlinker', 'tlinks')
 	}
 )
 
@@ -90,7 +91,9 @@ fn link_func(cmd Command) {
 	if target_name == '' {
 		target_name = real_name.split('/').last()
 	}
-	create_link(scope, real_name, target_name)
+	create_link(scope, real_name, target_name) or {
+		err_and_exit(err, '')
+	}
 	println('Created $scope link: "$target_name"')
 }
 
@@ -182,7 +185,9 @@ fn update_func(cmd Command) {
 	}
 	new_link_source := if update_path { path_flag_val } else { curr_name }
 	new_link_dest := if update_name { name_flag_val } else { curr_name }
-	create_link(scope, new_link_source, new_link_dest)
+	create_link(scope, new_link_source, new_link_dest) or {
+		err_and_exit(err, '')
+	}
 	os.rm(curr_path) or {
 		panic(err)
 	}
@@ -222,28 +227,31 @@ fn open_func(cmd Command) {
 	}
 }
 
-fn create_link(scope, source_name, dest_name string) {
+fn create_link(scope, source_name, dest_name string) ? {
 	link_parent_dir := get_dir(scope)
 	if !os.exists(link_parent_dir) {
 		os.mkdir_all(link_parent_dir)
 	}
 	source_path := os.real_path(source_name)
 	if !os.exists(source_path) {
-		err_and_exit('Cannot link inexistent file "$source_path"', '')
+		return error('Cannot link inexistent file "$source_path"')
 	}
 	destination_path := link_parent_dir + dest_name
 	if os.exists(destination_path) {
 		if os.is_link(destination_path) {
-			err_and_exit('$scope link with name "$dest_name" already exists', '')
+			return error('$scope link with name "$dest_name" already exists')
 		}
-		err_and_exit('File with name "$dest_name" already exists', '')
+		return error('File with name "$dest_name" already exists')
 	}
 	os.symlink(source_path, destination_path) or {
-		err_and_exit('Permission denied', 'Run with `sudo` instead.')
+		return error('Permission denied\nRun with `sudo` instead.')
 	}
 }
 
 fn get_scope(cmd Command) string {
+	$if test {
+		return 'test'
+	}
 	machine_wide := cmd.flags.get_bool_or('machine', false)
 	return if machine_wide {
 		'machine-wide'
@@ -253,23 +261,18 @@ fn get_scope(cmd Command) string {
 }
 
 fn get_scope_by_dir(dir string) string {
-	$if linux {
-		return if dir == link_dirs['user'] {
-			'user'
-		} else {
-			'machine-wide'
-		}
-	} $else {
-		panic('Invalid os')
+	if dir == link_dirs['test'] {
+		return 'test'
+	}
+	return if dir == link_dirs['user'] {
+		'user'
+	} else {
+		'machine-wide'
 	}
 }
 
 fn get_dir(scope string) string {
-	$if linux {
-		return link_dirs[scope]
-	} $else {
-		panic('Invalid os')
-	}
+	return link_dirs[scope]
 }
 
 fn print_err(msg, tip_msg string) {
