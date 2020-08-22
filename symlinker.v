@@ -126,6 +126,7 @@ fn del_func(cmd Command) {
 fn list_func(cmd Command) {
 	for _, dir in link_dirs {
 		scope := get_scope_by_dir(dir)
+		if scope == 'test' { continue }
 		files := os.ls(dir) or {
 			panic(err)
 		}
