@@ -60,6 +60,11 @@ fn test_create_link_errors() {
 	assert err_count == 3
 }
 
+fn test_get_links() {
+	links := get_links(test_link_dir)
+	assert links == [sl_test2, sl_test, ]
+}
+
 fn test_delete_link() {
 	// del sl_test2
 	delete_link(scope, test_link_dir, sl_test)

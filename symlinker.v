@@ -117,10 +117,7 @@ fn del_func(cmd Command) {
 fn list_func(cmd Command) {
 	for _, dir in link_dirs {
 		scope := get_scope_by_dir(dir)
-		files := os.ls(dir) or {
-			panic(err)
-		}
-		links := files.filter(os.is_link(dir + it))
+		links := get_links(dir)
 		if links.len == 0 {
 			println('No $scope symlinks detected.')
 			continue
@@ -250,6 +247,14 @@ fn delete_link(scope, link_dir, name string) ? {
 	os.rm(link_path) or {
 		return error('Permission denied')
 	}
+}
+
+fn get_links(dir string) []string {
+	files := os.ls(dir) or {
+		panic(err)
+	}
+	links := files.filter(os.is_link(dir + it))
+	return links
 }
 
 fn get_scope(cmd Command) string {
