@@ -11,11 +11,28 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up V
+        uses: nocturlab/setup-vlang-action@v1
+        with:
+          v-version: master
+        id: v
+      - name: Install modules
+        run: v install etienne-napoleone.chalk
+      - name: Build symlinker
+        run: v -cg -prod symlinker.v
+      - name: Run tests
+        run: v test .
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest, macos-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
