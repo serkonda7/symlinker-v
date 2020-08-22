@@ -15,7 +15,7 @@ const (
 fn main() {
 	mut cmd := Command{
 		name: 'symlinker'
-		version: '0.8.0'
+		version: '1.0.0'
 		disable_flags: true
 		sort_commands: false
 	}

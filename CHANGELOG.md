@@ -1,6 +1,31 @@
 # Changelog
 
 
+## 1.0.0
+_22 August 2020_
+
+**Breaking**
+- Rename `--global` flag to `--machine`
+- Rename `add` command to `link`
+
+**Additions**
+- New `update` command to change the name or real path of existing links
+- `open <link>` will open the real directory of a specific link
+- CI: test building also on Windows and macOS
+
+**Changes**
+- Show an error if a required argument is missing
+- `link --name`: strip spaces from the name alias end
+- Prevent possible panics by providing default values
+- Improve scope names
+- `list`: minor optimization
+- Huge improvements and simplifications under the hood
+- Reduce scheduled CI frequency
+
+**Fixes**
+- `link --name`: ignore the flag if the name alias consits of spaces
+
+
 ## 0.8.0
 _19 July 2020_
 
