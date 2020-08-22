@@ -252,10 +252,6 @@ fn delete_link(scope, link_dir, name string) ? {
 	}
 }
 
-fn list_links() {
-
-}
-
 fn get_scope(cmd Command) string {
 	$if test {
 		return 'test'

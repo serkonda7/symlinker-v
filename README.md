@@ -1,16 +1,21 @@
 # symlinker
 ![CI](https://github.com/Serkonda/symlinker/workflows/CI/badge.svg?branch=master)
 
-Utility program to manage symlinks.
+CLI utility tool to create and manage symlinks in the PATH.
 
 
-## Installation
-Download the latest stable version from the [Releases page][releases].
+## Building from source
+symlinker is written in V. If you don't have it, go [here][v_repo] first.
 
-Place the executable in a directory of your choice and run 
-`sudo ./symlinker link -m ./symlinker`
+```sh
+git clone https://github.com/serkonda7/symlinker.git
+cd symlinker
+v symlinker.v
+```
 
-> At the moment only Linux is supported.
+Now run `sudo ./symlinker link -m ./symlinker` and you are finished.
+
+> Note: At the moment only Linux is supported.
 
 
 ## Usage
@@ -41,3 +46,4 @@ Licensed under the [MIT License](LICENSE.md)
 
 <!-- Links -->
 [releases]: https://github.com/Serkonda/symlinker/releases
+[v_repo]: https://github.com/vlang/v#installing-v-from-source
