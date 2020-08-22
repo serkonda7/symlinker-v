@@ -3,13 +3,17 @@ module main
 import os
 
 const (
-	tfolder = os.join_path( os.temp_dir(), 'symlinker', 'test')
+	tfolder = os.join_path(os.temp_dir(), 'symlinker', 'tfiles')
+	source_name = '__sl_test'
 )
 
 fn testsuite_begin() {
 	os.rmdir_all(tfolder)
 	os.mkdir_all(tfolder)
 	os.chdir(tfolder)
+	os.write_file(source_name, '') or {
+		panic(err)
+	}
 }
 
 fn testsuite_end() {
@@ -19,15 +23,12 @@ fn testsuite_end() {
 
 fn test_create_link() {
 	scope := 'user'
-	source_name := '_symlinker_test_file'
-	os.write_file(source_name, '') or {
-		panic(err)
-	}
-	mut test_links := []string{}
-	// symlinker link ./_symlinker_test_file
+	link_dir := link_dirs[scope]
+	// symlinker link ./__sl_test
 	create_link(scope, source_name, source_name)
-	assert os.exists(link_dirs['user'] + source_name)
-	os.rm(link_dirs['user'] + source_name) or {
-		panic(err)
-	}
+	assert os.exists(link_dir + source_name)
+	// symlinker link -n __sl_test2 ./__sl_test
+	dest_name := '__sl_test2'
+	create_link(scope, source_name, dest_name)
+	assert os.exists(link_dir + dest_name)
 }
