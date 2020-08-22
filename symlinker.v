@@ -8,8 +8,8 @@ const (
 	link_dirs = {
 		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
-		'test': os.join_path(os.temp_dir(), 'symlinker', 'tlinks/')
 	}
+	test_link_dir = os.join_path(os.temp_dir(), 'symlinker', 'tlinks/')
 )
 
 fn main() {
@@ -117,7 +117,6 @@ fn del_func(cmd Command) {
 fn list_func(cmd Command) {
 	for _, dir in link_dirs {
 		scope := get_scope_by_dir(dir)
-		if scope == 'test' { continue }
 		files := os.ls(dir) or {
 			panic(err)
 		}
@@ -253,6 +252,10 @@ fn delete_link(scope, link_dir, name string) ? {
 	}
 }
 
+fn list_links() {
+
+}
+
 fn get_scope(cmd Command) string {
 	$if test {
 		return 'test'
@@ -266,7 +269,7 @@ fn get_scope(cmd Command) string {
 }
 
 fn get_scope_by_dir(dir string) string {
-	if dir == link_dirs['test'] {
+	if dir == test_link_dir {
 		return 'test'
 	}
 	return if dir == link_dirs['user'] {
@@ -277,6 +280,9 @@ fn get_scope_by_dir(dir string) string {
 }
 
 fn get_dir(scope string) string {
+	$if test {
+		return test_link_dir
+	}
 	return link_dirs[scope]
 }
 

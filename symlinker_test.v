@@ -32,17 +32,15 @@ fn testsuite_end() {
 }
 
 fn test_create_link() {
-	link_dir := link_dirs[scope]
 	// symlinker link ./sl_test
 	create_link(scope, sl_test, sl_test)
-	assert os.is_link(link_dir + sl_test)
+	assert os.is_link(test_link_dir + sl_test)
 	// symlinker link -n sl_test2 ./sl_test
 	create_link(scope, sl_test, sl_test2)
-	assert os.is_link(link_dir + sl_test2)
+	assert os.is_link(test_link_dir + sl_test2)
 }
 
 fn test_create_link_errors() {
-	link_dir := link_dirs[scope]
 	mut err_count := 0
 	// link ./inexistent
 	create_link(scope, inexistent, inexistent) or {
@@ -64,21 +62,19 @@ fn test_create_link_errors() {
 
 fn test_delete_link() {
 	// del sl_test2
-	link_dir := link_dirs[scope]
-	delete_link(scope, link_dir, sl_test)
-	assert !os.exists(link_dir + sl_test)
+	delete_link(scope, test_link_dir, sl_test)
+	assert !os.exists(test_link_dir + sl_test)
 }
 
 fn test_delete_link_errors() {
-	link_dir := link_dirs[scope]
 	mut err_count := 0
 	// del inexistent
-	delete_link(scope, link_dir, inexistent) or {
+	delete_link(scope, test_link_dir, inexistent) or {
 		err_count++
 		assert err == '$scope link `$inexistent` does not exist'
 	}
 	// del normal_file
-	delete_link(scope, link_dir, normal_file) or {
+	delete_link(scope, test_link_dir, normal_file) or {
 		err_count++
 		assert err == '"$normal_file" is no $scope link'
 	}
