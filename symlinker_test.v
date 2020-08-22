@@ -84,3 +84,13 @@ fn test_delete_link_errors() {
 	}
 	assert err_count == 2
 }
+
+fn test_get_scope_by_dir() {
+	scope := get_scope_by_dir(tlinks)
+	assert scope == 'test'
+}
+
+fn test_get_dir() {
+	dir := get_dir('test')
+	assert dir == tlinks
+}
