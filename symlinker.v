@@ -8,7 +8,7 @@ const (
 	link_dirs = {
 		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
-		'test': os.join_path(os.temp_dir(), 'symlinker', 'tlinks')
+		'test': os.join_path(os.temp_dir(), 'symlinker', 'tlinks/')
 	}
 )
 
@@ -100,25 +100,16 @@ fn link_func(cmd Command) {
 fn del_func(cmd Command) {
 	scope := get_scope(cmd)
 	link_dir := get_dir(scope)
-	mut err := 0
+	mut err_count := 0
 	for arg in cmd.args {
-		link_path := link_dir + arg
-		if !os.is_link(link_path) {
-			if !os.exists(link_path) {
-				print_err('$scope link `$arg` does not exist', 'Run `symlinker list` to see your links.')
-				err++
-				continue
-			}
-			print_err('"$arg" is no $scope link', '')
-			err++
+		delete_link(scope, link_dir, arg) or {
+			err_count++
+			print_err(err, '')
 			continue
-		}
-		os.rm(link_path) or {
-			err_and_exit('Permission denied', 'Run with `sudo` instead.')
 		}
 		println('Deleted $scope link: "$arg"')
 	}
-	if err > 0 {
+	if err_count > 0 {
 		exit(1)
 	}
 }
@@ -245,7 +236,20 @@ fn create_link(scope, source_name, dest_name string) ? {
 		return error('File with name "$dest_name" already exists')
 	}
 	os.symlink(source_path, destination_path) or {
-		return error('Permission denied\nRun with `sudo` instead.')
+		return error('Permission denied')
+	}
+}
+
+fn delete_link(scope, link_dir, name string) ? {
+	link_path := link_dir + name
+	if !os.is_link(link_path) {
+		if !os.exists(link_path) {
+			return error('$scope link `$name` does not exist')
+		}
+		return error('"$name" is no $scope link')
+	}
+	os.rm(link_path) or {
+		return error('Permission denied')
 	}
 }
 
