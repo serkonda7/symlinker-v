@@ -1,9 +1,9 @@
 Module {
 	name: 'symlinker',
 	description: 'Utility tool to manage symlinks in the PATH.',
-	author: 'Lukas Neubert <lukas.neubert3@gmail.com>',
+	author: 'Lukas Neubert <serkonda@protonmail.com>',
 	license: 'MIT',
-	repo_url: 'https://github.com/Serkonda/symlinker',
+	repo_url: 'https://github.com/serkonda7/symlinker',
 	version: '1.0.0',
 	dependencies: []
 }
