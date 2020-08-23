@@ -61,8 +61,9 @@ fn test_create_link_errors() {
 }
 
 fn test_get_links() {
-	links := get_links(test_link_dir)
-	assert links == [sl_test2, sl_test, ]
+	mut links := get_links(test_link_dir)
+	links.sort()
+	assert links == [sl_test, sl_test2,]
 }
 
 fn test_delete_link() {
