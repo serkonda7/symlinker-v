@@ -12,7 +12,10 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          os: [ubuntu-latest, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -29,10 +32,7 @@ jobs:
         run: v test .
 
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest]
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
