@@ -1,8 +1,8 @@
 # Ignore build binaries
-*
-!*/
-!*.*
+symlinker
 *.exe
+*.ilk
+*.pdb
 
 # Ignore editor files
 *.code-workspace
