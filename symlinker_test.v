@@ -4,8 +4,8 @@ import os
 
 const (
 	troot = os.join_path(os.temp_dir(), 'symlinker/')
-	tfiles = troot + 'tfiles/'
-	tlinks = troot + 'tlinks/'
+	tfiles = (troot + 'tfiles/').replace('/', os.path_separator)
+	tlinks = (troot + 'tlinks/').replace('/', os.path_separator)
 	sl_test = 'sl_test'
 	sl_test2 = 'sl_test2'
 	normal_file = 'normal_file'
@@ -38,6 +38,9 @@ fn testsuite_end() {
 }
 
 fn test_create_link() {
+	$if windows {
+		return
+	}
 	// symlinker link ./sl_test
 	create_link(scope, sl_test, sl_test)
 	assert os.is_link(test_link_dir + sl_test)
@@ -47,6 +50,9 @@ fn test_create_link() {
 }
 
 fn test_create_link_errors() {
+	$if windows {
+		return
+	}
 	mut err_count := 0
 	// link ./inexistent
 	create_link(scope, inexistent, inexistent) or {
@@ -67,18 +73,27 @@ fn test_create_link_errors() {
 }
 
 fn test_get_links() {
+	$if windows {
+		return
+	}
 	mut links := get_links(test_link_dir)
 	links.sort()
 	assert links == [sl_test, sl_test2,]
 }
 
 fn test_delete_link() {
+	$if windows {
+		return
+	}
 	// del sl_test2
 	delete_link(scope, test_link_dir, sl_test)
 	assert !os.exists(test_link_dir + sl_test)
 }
 
 fn test_delete_link_errors() {
+	$if windows {
+		return
+	}
 	mut err_count := 0
 	// del inexistent
 	delete_link(scope, test_link_dir, inexistent) or {

@@ -5,11 +5,15 @@ import os
 import etienne_napoleone.chalk
 
 const (
-	link_dirs = {
+	linux_dirs = {
 		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 	}
-	test_link_dir = os.join_path(os.temp_dir(), 'symlinker', 'tlinks/')
+	windows_dirs = {
+		'user': os.home_dir() + 'AppData\\Local\\Microsoft\\WindowsApps'
+		'machine-wide': 'C:\\Windows\\system32'
+	}
+	test_link_dir = os.join_path(os.temp_dir(), 'symlinker', 'tlinks/').replace('/', os.path_separator)
 )
 
 fn main() {
@@ -115,6 +119,10 @@ fn del_func(cmd Command) {
 }
 
 fn list_func(cmd Command) {
+	mut link_dirs := linux_dirs
+	$if windows {
+		link_dirs = windows_dirs
+	}
 	for _, dir in link_dirs {
 		scope := get_scope_by_dir(dir)
 		links := get_links(dir)
@@ -273,10 +281,10 @@ fn get_scope_by_dir(dir string) string {
 	if dir == test_link_dir {
 		return 'test'
 	}
-	return if dir == link_dirs['user'] {
-		'user'
+	if dir == linux_dirs['user'] || dir == windows_dirs['user'] {
+		return 'user'
 	} else {
-		'machine-wide'
+		return 'machine-wide'
 	}
 }
 
@@ -284,7 +292,13 @@ fn get_dir(scope string) string {
 	$if test {
 		return test_link_dir
 	}
-	return link_dirs[scope]
+	$if linux {
+		return linux_dirs[scope]
+	}
+	$if windows {
+		return windows_dirs[scope]
+	}
+	err_and_exit('Invalid OS', '')
 }
 
 fn print_err(msg, tip_msg string) {
