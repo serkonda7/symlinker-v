@@ -15,13 +15,19 @@ const (
 
 fn testsuite_begin() {
 	os.rmdir_all(troot)
-	os.mkdir_all(tfiles)
-	os.mkdir_all(tlinks)
-	os.chdir(tfiles)
-	os.write_file(sl_test, 'sl_test') or {
+	os.mkdir_all(troot)
+	os.mkdir(tfiles) or {
 		panic(err)
 	}
-	os.write_file('../tlinks/' + normal_file, 'normal_file') or {
+	os.mkdir(tlinks) or {
+		panic(err)
+	}
+	os.chdir(tlinks)
+	os.write_file(normal_file, 'normal_file') or {
+		panic(err)
+	}
+	os.chdir(tfiles)
+	os.write_file(sl_test, 'sl_test') or {
 		panic(err)
 	}
 }
