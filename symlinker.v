@@ -298,7 +298,8 @@ fn get_dir(scope string) string {
 	$if windows {
 		return windows_dirs[scope]
 	}
-	err_and_exit('Invalid OS', '')
+	print_err('Invalid OS', '')
+	exit(1)
 }
 
 fn print_err(msg, tip_msg string) {
