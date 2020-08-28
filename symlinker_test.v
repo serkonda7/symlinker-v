@@ -3,14 +3,14 @@ module main
 import os
 
 const (
-	troot = os.join_path(os.temp_dir(), 'symlinker/')
-	tfiles = troot + 'tfiles/'
-	tlinks = troot + 'tlinks/'
-	sl_test = 'sl_test'
-	sl_test2 = 'sl_test2'
+	troot       = os.join_path(os.temp_dir(), 'symlinker/')
+	tfiles      = troot + 'tfiles/'
+	tlinks      = troot + 'tlinks/'
+	sl_test     = 'sl_test'
+	sl_test2    = 'sl_test2'
 	normal_file = 'normal_file'
-	inexistent = 'inexistent'
-	scope = 'test'
+	inexistent  = 'inexistent'
+	scope       = 'test'
 )
 
 fn testsuite_begin() {
@@ -63,7 +63,7 @@ fn test_create_link_errors() {
 fn test_get_links() {
 	mut links := get_links(test_link_dir)
 	links.sort()
-	assert links == [sl_test, sl_test2,]
+	assert links == [sl_test, sl_test2]
 }
 
 fn test_delete_link() {

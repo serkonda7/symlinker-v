@@ -5,7 +5,7 @@ import os
 import etienne_napoleone.chalk
 
 const (
-	link_dirs = {
+	link_dirs     = {
 		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 	}
