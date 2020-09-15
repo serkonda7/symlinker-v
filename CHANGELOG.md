@@ -1,6 +1,17 @@
 # Changelog
 
 
+## 1.0.1
+_15 September 2020_
+
+**Changes**
+- Replace `etienne_napoleone.chalk` with `vlib.term` module
+- CI: Verify code formatting with `vfmt`
+
+**Fixes**
+- Fix inconsitent result in `test_get_links()`
+
+
 ## 1.0.0
 _22 August 2020_
 
@@ -20,10 +31,10 @@ _22 August 2020_
 - Improve scope names
 - `list`: minor optimization
 - Huge improvements and simplifications under the hood
-- Reduce scheduled CI frequency
+- Reduce scheduled CI frequency to one run per day
 
 **Fixes**
-- `link --name`: ignore the flag if the name alias consits of spaces
+- `link --name`: ignore the flag if the name alias consists only of whitespace
 
 
 ## 0.8.0
