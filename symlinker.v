@@ -2,7 +2,7 @@ module main
 
 import cli { Command }
 import os
-import etienne_napoleone.chalk
+import term
 
 const (
 	link_dirs     = {
@@ -90,7 +90,8 @@ fn link_func(cmd Command) {
 		target_name = real_name.split('/').last()
 	}
 	create_link(scope, real_name, target_name) or {
-		err_and_exit(err, '')
+		term.fail_message(err)
+		exit(1)
 	}
 	println('Created $scope link: "$target_name"')
 }
@@ -102,7 +103,7 @@ fn del_func(cmd Command) {
 	for arg in cmd.args {
 		delete_link(scope, link_dir, arg) or {
 			err_count++
-			print_err(err, '')
+			term.fail_message(err)
 			continue
 		}
 		println('Deleted $scope link: "$arg"')
@@ -120,7 +121,7 @@ fn list_func(cmd Command) {
 			println('No $scope symlinks detected.')
 			continue
 		}
-		println(chalk.style('$scope links:', 'bold'))
+		println(term.bold('$scope links:'))
 		f_real := cmd.flags.get_bool_or('real', false)
 		if f_real {
 			mut invalid_links := []string{}
@@ -134,7 +135,7 @@ fn list_func(cmd Command) {
 				println('  $link: $real_path')
 			}
 			for inv_link in invalid_links {
-				println(chalk.fg('  INVALID', 'light_magenta') + ' $inv_link')
+				println(term.bright_magenta('  INVALID') + ' $inv_link')
 			}
 		} else {
 			mut rows := []string{}
@@ -160,19 +161,22 @@ fn update_func(cmd Command) {
 	update_name := name_flag_val != ''
 	update_path := path_flag_val != ''
 	if !update_name && !update_path {
-		err_and_exit('`update` should be used with at least one flag', '')
+		term.fail_message('`update` should be used with at least one flag')
+		exit(1)
 	}
 	scope := get_scope(cmd)
 	link_parent_dir := get_dir(scope)
 	mut curr_name := cmd.args[0]
 	curr_path := link_parent_dir + curr_name
 	if !os.exists(curr_path) {
-		err_and_exit('Cannot update inexistent link "$curr_path"', '')
+		term.fail_message('Cannot update inexistent link "$curr_path"')
+		exit(1)
 	}
 	new_link_source := if update_path { path_flag_val } else { curr_name }
 	new_link_dest := if update_name { name_flag_val } else { curr_name }
 	create_link(scope, new_link_source, new_link_dest) or {
-		err_and_exit(err, '')
+		term.fail_message(err)
+		exit(1)
 	}
 	os.rm(curr_path) or {
 		panic(err)
@@ -189,7 +193,8 @@ fn update_func(cmd Command) {
 
 fn open_func(cmd Command) {
 	if os.getenv('SUDO_USER') != '' {
-		err_and_exit('Please run without `sudo`.', '')
+		term.fail_message('Please run without `sudo`.')
+		exit(1)
 	}
 	scope := get_scope(cmd)
 	mut dir := get_dir(scope)
@@ -202,7 +207,8 @@ fn open_func(cmd Command) {
 			dir = os.real_path(dir + target_link).all_before_last('/')
 			println('Opening the directory of "$target_link"...')
 		} else {
-			err_and_exit('Cannot open directory: "$target_link" is no $scope link', '')
+			term.fail_message('Cannot open directory: "$target_link" is no $scope link')
+			exit(1)
 		}
 	} else {
 		println('Opening the $scope symlink folder...')
@@ -283,16 +289,4 @@ fn get_dir(scope string) string {
 		return test_link_dir
 	}
 	return link_dirs[scope]
-}
-
-fn print_err(msg, tip_msg string) {
-	println(chalk.fg(msg, 'light_red'))
-	if tip_msg.len > 0 {
-		println(tip_msg)
-	}
-}
-
-fn err_and_exit(msg, tip_msg string) {
-	print_err(msg, tip_msg)
-	exit(1)
 }
