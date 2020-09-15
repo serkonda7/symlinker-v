@@ -1,6 +1,6 @@
 module main
 
-import cli { Command, Flag }
+import cli { Command }
 import os
 import etienne_napoleone.chalk
 
@@ -19,7 +19,7 @@ fn main() {
 		disable_flags: true
 		sort_commands: false
 	}
-	cmd.add_flag(Flag{
+	cmd.add_flag({
 		flag: .bool
 		name: 'machine'
 		abbrev: 'm'
@@ -32,7 +32,7 @@ fn main() {
 		required_args: 1
 		execute: link_func
 	}
-	link_cmd.add_flag(Flag{
+	link_cmd.add_flag({
 		flag: .string
 		name: 'name'
 		abbrev: 'n'
@@ -49,7 +49,7 @@ fn main() {
 		description: 'List all symlinks.'
 		execute: list_func
 	}
-	list_cmd.add_flag(Flag{
+	list_cmd.add_flag({
 		flag: .bool
 		name: 'real'
 		abbrev: 'r'
@@ -61,20 +61,18 @@ fn main() {
 		required_args: 1
 		execute: update_func
 	}
-	update_cmd.add_flags([
-		Flag{
-			flag: .string
-			name: 'name'
-			abbrev: 'n'
-			description: 'The new name.'
-		},
-		Flag{
-			flag: .string
-			name: 'path'
-			abbrev: 'p'
-			description: 'The new path.'
-		},
-	])
+	update_cmd.add_flag({
+		flag: .string
+		name: 'name'
+		abbrev: 'n'
+		description: 'The new name.'
+	})
+	update_cmd.add_flag({
+		flag: .string
+		name: 'path'
+		abbrev: 'p'
+		description: 'The new path.'
+	})
 	mut open_cmd := Command{
 		name: 'open'
 		description: 'Open a specific symlink or the general root dir in the file explorer.'
