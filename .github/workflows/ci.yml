@@ -23,25 +23,11 @@ jobs:
         id: v
       - name: Verify code formatting
         run: |
-          v fmt -verify symlinker.v
-          v fmt -verify symlinker_test.v
+          v fmt -verify sl_cli.v
+          v fmt -verify linker/linker.v
+          v fmt -verify sl_cli_test.v
+          v fmt -verify linker_test.v
       - name: Build symlinker
-        run: v -cg -prod symlinker.v
+        run: v -cg -prod .
       - name: Run tests
         run: v test .
-
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up V
-        uses: nocturlab/setup-vlang-action@v1
-        with:
-          v-version: master
-        id: v
-      - name: Build symlinker
-        run: v -cg -prod symlinker.v
