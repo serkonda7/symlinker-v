@@ -97,7 +97,7 @@ fn link_func(cmd Command) {
 		target_name = os.file_name(source_name)
 	}
 	linker.create_link(source_name, target_name, scope) or {
-		term.fail_message(err)
+		println(term.bright_red(err))
 		exit(1)
 	}
 	println('Created $scope link "$target_name".')
@@ -248,6 +248,7 @@ fn get_links(dir string) []string {
 }
 
 fn get_scope(cmd Command) string {
+	// TODO: user --> per-user
 	$if test {
 		return 'test'
 	}
@@ -270,7 +271,7 @@ fn get_scope_by_dir(dir string) string {
 	}
 }
 
-// TODO: remove
+// TODO: remove this
 fn get_dir(scope string) string {
 	$if test {
 		return test_link_dir
