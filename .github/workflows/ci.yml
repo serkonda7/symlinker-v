@@ -21,14 +21,14 @@ jobs:
         with:
           v-version: master
         id: v
-      - name: Verify code formatting
-        run: |
-          v fmt -verify symlinker.v
-          v fmt -verify symlinker_test.v
-      - name: Build symlinker
-        run: v -cg -prod symlinker.v
-      - name: Run tests
-        run: v test .
+      # - name: Verify code formatting
+      #   run: |
+      #     v fmt -verify symlinker.v
+      #     v fmt -verify symlinker_test.v
+      # - name: Build symlinker
+      #   run: v -cg -prod symlinker.v
+      # - name: Run tests
+      #   run: v test .
 
   build:
     runs-on: ${{ matrix.os }}
@@ -43,5 +43,5 @@ jobs:
         with:
           v-version: master
         id: v
-      - name: Build symlinker
-        run: v -cg -prod symlinker.v
+      # - name: Build symlinker
+      #   run: v -cg -prod symlinker.v
