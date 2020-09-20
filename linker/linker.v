@@ -4,7 +4,8 @@ import os
 
 const (
 	link_dirs     = {
-		'per-user': os.home_dir() + '.local/bin/'
+		// TODO: user --> per-user
+		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 	}
 )
@@ -29,7 +30,6 @@ pub fn create_link(source_name, target_name, scope string) ? {
 	os.symlink(source_path, target_path) or {
 		return error('Permission denied.')
 	}
-	println('Created $scope link "$target_name".')
 }
 
 fn get_dir(scope string) string {
