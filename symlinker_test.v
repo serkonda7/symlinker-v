@@ -1,27 +1,30 @@
-module main
-
 import os
+import linker
 
 const (
-	troot       = os.join_path(os.temp_dir(), 'symlinker/')
-	tfiles      = troot + 'tfiles/'
-	tlinks      = troot + 'tlinks/'
-	sl_test     = 'sl_test'
-	sl_test2    = 'sl_test2'
+	scope = 'test'
+	test_target_dir = linker.link_dirs['test']
+	troot = os.temp_dir() + '/symlinker'
+	test_source_dir = troot + '/tfiles/'
+	sl_test     = 'test'
+	sl_test2    = 'test2'
 	normal_file = 'normal_file'
 	inexistent  = 'inexistent'
-	scope       = 'test'
 )
 
 fn testsuite_begin() {
 	os.rmdir_all(troot)
-	os.mkdir_all(tfiles)
-	os.mkdir_all(tlinks)
-	os.chdir(tfiles)
-	os.write_file(sl_test, 'sl_test') or {
+	os.mkdir_all(test_source_dir)
+	os.mkdir_all(test_target_dir)
+	os.chdir(test_target_dir)
+	os.write_file(normal_file, '') or {
 		panic(err)
 	}
-	os.write_file('../tlinks/' + normal_file, 'normal_file') or {
+	os.chdir(test_source_dir)
+	os.write_file(sl_test, '') or {
+		panic(err)
+	}
+	os.write_file(sl_test2, '') or {
 		panic(err)
 	}
 }
@@ -31,35 +34,40 @@ fn testsuite_end() {
 	os.rmdir_all(troot)
 }
 
+// TODO: test for success message and warning
 fn test_create_link() {
-	// symlinker link ./sl_test
-	create_link(scope, sl_test, sl_test)
-	assert os.is_link(test_link_dir + sl_test)
-	// symlinker link -n sl_test2 ./sl_test
-	create_link(scope, sl_test, sl_test2)
-	assert os.is_link(test_link_dir + sl_test2)
+	// link <file>
+	linker.create_link(sl_test, sl_test, scope)
+	assert link_exists(sl_test)
+	// link --name <name <file>
+	linker.create_link(sl_test, sl_test2, scope)
+	assert link_exists(sl_test)
 }
 
 fn test_create_link_errors() {
 	mut err_count := 0
-	// link ./inexistent
-	create_link(scope, inexistent, inexistent) or {
+	linker.create_link(inexistent, inexistent, scope) or {
 		err_count++
-		assert err == 'Cannot link inexistent file "$inexistent"'
+		assert err == 'Source file "$inexistent" does not exist.'
 	}
-	// link ./sl_test
-	create_link(scope, sl_test, sl_test) or {
+	linker.create_link(sl_test2, sl_test2, scope) or {
 		err_count++
-		assert err == '$scope link with name "$sl_test" already exists'
+		assert err == 'Another $scope link with name `$sl_test2` does already exist.'
 	}
-	// link -n normal_file ./sl_test
-	create_link(scope, sl_test, normal_file) or {
+	linker.create_link(sl_test, normal_file, scope) or {
 		err_count++
-		assert err == 'File with name "$normal_file" already exists'
+		assert err == 'File with name "$normal_file" does already exist.'
 	}
 	assert err_count == 3
 }
 
+// Helper functions
+fn link_exists(name string) bool {
+	path := test_target_dir + name
+	return os.is_link(path)
+}
+
+/*
 fn test_get_links() {
 	mut links := get_links(test_link_dir)
 	links.sort()
@@ -91,8 +99,4 @@ fn test_get_scope_by_dir() {
 	scope := get_scope_by_dir(tlinks)
 	assert scope == 'test'
 }
-
-fn test_get_dir() {
-	dir := get_dir('test')
-	assert dir == tlinks
-}
+*/

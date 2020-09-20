@@ -8,6 +8,7 @@ const (
 		// TODO: user --> per-user
 		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
+		'test': os.temp_dir() + '/symlinker/tlinks/'
 	}
 )
 
