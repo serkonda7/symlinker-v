@@ -3,6 +3,7 @@ module main
 import cli { Command }
 import os
 import term
+import linker
 
 const (
 	link_dirs     = {
@@ -13,6 +14,11 @@ const (
 )
 
 fn main() {
+	mut cmd := create_cmd()
+	cmd.parse(os.args)
+}
+
+fn create_cmd() Command {
 	mut cmd := Command{
 		name: 'symlinker'
 		version: '1.0.1'
@@ -79,7 +85,6 @@ fn main() {
 		execute: open_func
 	}
 	cmd.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
-	cmd.parse(os.args)
 }
 
 fn link_func(cmd Command) {
