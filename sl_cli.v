@@ -91,8 +91,13 @@ fn create_cmd() Command {
 fn link_func(cmd Command) {
 	scope := get_scope(cmd)
 	source_name := cmd.args[0]
-	mut target_name := cmd.flags.get_string_or('name', '').trim_right(' ')
-	// TODO: warning if provided path is empty || whitspace was stripped
+	mut target_name := cmd.flags.get_string_or('name', '')
+	if target_name.ends_with(' ') {
+		target_name = target_name.trim_space()
+		if target_name.len == 0 {
+			println('Value of `--name` is empty, "$source_name" will be used instead.')
+		}
+	}
 	if target_name == '' {
 		target_name = os.file_name(source_name)
 	}
@@ -100,7 +105,6 @@ fn link_func(cmd Command) {
 		println(term.bright_red(err))
 		exit(1)
 	}
-	println('Created $scope link "$target_name".')
 }
 
 fn del_func(cmd Command) {
