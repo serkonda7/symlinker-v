@@ -24,7 +24,8 @@ pub fn create_link(source_name, target_name, scope string) ? {
 	if os.exists(target_path) {
 		if os.is_link(target_path) {
 			if os.real_path(target_path) == source_path {
-				return error('`$target_name` already links to "$target_path".')
+				println('`${term.bold(target_name)}` already links to "$target_path".')
+				exit(0)
 			}
 			// TODO: show tip to use `update`
 			return error('Another $scope link with name `$target_name` does already exist.')
