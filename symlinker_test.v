@@ -2,14 +2,14 @@ import os
 import linker
 
 const (
-	scope = 'test'
+	scope           = 'test'
 	test_target_dir = linker.link_dirs['test']
-	troot = os.temp_dir() + '/symlinker'
+	troot           = os.temp_dir() + '/symlinker'
 	test_source_dir = troot + '/tfiles/'
-	sl_test     = 'test'
-	sl_test2    = 'test2'
-	normal_file = 'normal_file'
-	inexistent  = 'inexistent'
+	sl_test         = 'test'
+	sl_test2        = 'test2'
+	normal_file     = 'normal_file'
+	inexistent      = 'inexistent'
 )
 
 fn testsuite_begin() {

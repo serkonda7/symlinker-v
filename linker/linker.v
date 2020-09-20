@@ -4,8 +4,8 @@ import os
 import term
 
 const (
-	link_dirs     = {
-		// TODO: user --> per-user
+	// TODO: user --> per-user
+	link_dirs = {
 		'user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 		'test': os.temp_dir() + '/symlinker/tlinks/'
