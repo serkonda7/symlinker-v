@@ -25,7 +25,8 @@ jobs:
         run: |
           v fmt -verify sl_cli.v
           v fmt -verify linker/linker.v
-          v fmt -verify symlinker_test.v
+          v fmt -verify sl_cli_test.v
+          v fmt -verify linker_test.v
       - name: Build symlinker
         run: v -cg -prod .
       - name: Run tests
