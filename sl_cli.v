@@ -85,20 +85,22 @@ fn create_cmd() Command {
 		execute: open_func
 	}
 	cmd.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
+	return cmd
 }
 
 fn link_func(cmd Command) {
 	scope := get_scope(cmd)
-	real_name := cmd.args[0]
+	source_name := cmd.args[0]
 	mut target_name := cmd.flags.get_string_or('name', '').trim_right(' ')
+	// TODO: warning if provided path is empty || whitspace was stripped
 	if target_name == '' {
-		target_name = real_name.split('/').last()
+		target_name = os.file_name(source_name)
 	}
-	create_link(scope, real_name, target_name) or {
+	linker.create_link(source_name, target_name, scope) or {
 		term.fail_message(err)
 		exit(1)
 	}
-	println('Created $scope link: "$target_name"')
+	println('Created $scope link "$target_name".')
 }
 
 fn del_func(cmd Command) {
@@ -179,7 +181,7 @@ fn update_func(cmd Command) {
 	}
 	new_link_source := if update_path { path_flag_val } else { curr_name }
 	new_link_dest := if update_name { name_flag_val } else { curr_name }
-	create_link(scope, new_link_source, new_link_dest) or {
+	linker.create_link(new_link_source, new_link_dest, scope) or {
 		term.fail_message(err)
 		exit(1)
 	}
@@ -221,27 +223,6 @@ fn open_func(cmd Command) {
 	command := 'xdg-open $dir'
 	os.exec(command) or {
 		panic(err)
-	}
-}
-
-fn create_link(scope, source_name, dest_name string) ? {
-	link_parent_dir := get_dir(scope)
-	if !os.exists(link_parent_dir) {
-		os.mkdir_all(link_parent_dir)
-	}
-	source_path := os.real_path(source_name)
-	if !os.exists(source_path) {
-		return error('Cannot link inexistent file "$source_path"')
-	}
-	destination_path := link_parent_dir + dest_name
-	if os.exists(destination_path) {
-		if os.is_link(destination_path) {
-			return error('$scope link with name "$dest_name" already exists')
-		}
-		return error('File with name "$dest_name" already exists')
-	}
-	os.symlink(source_path, destination_path) or {
-		return error('Permission denied')
 	}
 }
 
@@ -289,6 +270,7 @@ fn get_scope_by_dir(dir string) string {
 	}
 }
 
+// TODO: remove
 fn get_dir(scope string) string {
 	$if test {
 		return test_link_dir
