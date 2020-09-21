@@ -276,7 +276,6 @@ fn get_scope_by_dir(dir string) string {
 	}
 }
 
-// TODO: remove this
 fn get_dir(scope string) string {
 	$if test {
 		return test_link_dir

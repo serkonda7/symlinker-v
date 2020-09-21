@@ -3,14 +3,14 @@ import term
 import linker
 
 const (
-	scope           = 'test'
-	ttarget = linker.link_dirs['test']
-	troot           = os.temp_dir() + '/symlinker'
-	tsource = troot + '/tfiles/'
-	sl_test         = 'test'
-	sl_test2        = 'test2'
-	normal_file     = 'normal_file'
-	inexistent      = 'inexistent'
+	scope       = 'test'
+	ttarget     = linker.link_dirs['test']
+	troot       = os.temp_dir() + '/symlinker'
+	tsource     = troot + '/tfiles/'
+	sl_test     = 'test'
+	sl_test2    = 'test2'
+	normal_file = 'normal_file'
+	inexistent  = 'inexistent'
 )
 
 fn testsuite_begin() {
@@ -36,13 +36,19 @@ fn testsuite_end() {
 }
 
 fn test_create_link() {
-	mut msg := linker.create_link(sl_test, sl_test, scope) or { '' }
+	mut msg := linker.create_link(sl_test, sl_test, scope) or {
+		panic(err)
+	}
 	assert link_exists(sl_test)
 	assert msg == 'Created $scope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
-	msg = linker.create_link(sl_test, sl_test2, scope) or { '' }
+	msg = linker.create_link(sl_test, sl_test2, scope) or {
+		panic(err)
+	}
 	assert link_exists(sl_test)
 	assert msg == 'Created $scope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
-	msg = linker.create_link(sl_test, sl_test, scope) or { '' }
+	msg = linker.create_link(sl_test, sl_test, scope) or {
+		panic(err)
+	}
 	assert link_exists(sl_test)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource$sl_test".'
 }
