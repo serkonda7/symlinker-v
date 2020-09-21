@@ -169,6 +169,7 @@ fn list_func(cmd Command) {
 }
 
 fn update_func(cmd Command) {
+	// TODO: move parts to linker
 	name_flag_val := cmd.flags.get_string_or('name', '')
 	path_flag_val := cmd.flags.get_string_or('path', '')
 	update_name := name_flag_val != ''
@@ -205,6 +206,7 @@ fn update_func(cmd Command) {
 }
 
 fn open_func(cmd Command) {
+	// TODO: move parts to linker
 	if os.getenv('SUDO_USER') != '' {
 		term.fail_message('Please run without `sudo`.')
 		exit(1)
@@ -256,17 +258,6 @@ fn get_scope(cmd Command) string {
 		'machine-wide'
 	} else {
 		'per-user'
-	}
-}
-
-fn get_scope_by_dir(dir string) string {
-	if dir == test_link_dir {
-		return 'test'
-	}
-	return if dir == link_dirs['per-user'] {
-		'per-user'
-	} else {
-		'machine-wide'
 	}
 }
 
