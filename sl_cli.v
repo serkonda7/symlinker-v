@@ -91,6 +91,7 @@ fn create_cmd() Command {
 fn link_func(cmd Command) {
 	scope := get_scope(cmd)
 	source_name := cmd.args[0]
+	// TODO: move into separate function
 	mut target_name := cmd.flags.get_string_or('name', '')
 	if target_name.ends_with(' ') {
 		target_name = target_name.trim_space()
@@ -110,15 +111,14 @@ fn link_func(cmd Command) {
 
 fn del_func(cmd Command) {
 	scope := get_scope(cmd)
-	link_dir := get_dir(scope)
 	mut err_count := 0
 	for arg in cmd.args {
-		delete_link(scope, link_dir, arg) or {
+		msg := linker.delete_link(arg, scope) or {
 			err_count++
-			term.fail_message(err)
+			println(term.bright_red(err))
 			continue
 		}
-		println('Deleted $scope link: "$arg"')
+		println(msg)
 	}
 	if err_count > 0 {
 		exit(1)
@@ -228,19 +228,6 @@ fn open_func(cmd Command) {
 	command := 'xdg-open $dir'
 	os.exec(command) or {
 		panic(err)
-	}
-}
-
-fn delete_link(scope, link_dir, name string) ? {
-	link_path := link_dir + name
-	if !os.is_link(link_path) {
-		if !os.exists(link_path) {
-			return error('$scope link `$name` does not exist')
-		}
-		return error('"$name" is no $scope link')
-	}
-	os.rm(link_path) or {
-		return error('Permission denied')
 	}
 }
 

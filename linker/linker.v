@@ -38,6 +38,23 @@ pub fn create_link(source_name, target_name, scope string) ?string {
 	return 'Created $scope link `${term.bold(target_name)}` to "$source_path".'
 }
 
+pub fn delete_link(name, scope string) ?string {
+	dir := get_dir(scope)
+	link_path := dir + name
+	if !os.is_link(link_path) {
+		if !os.exists(link_path) {
+			// TODO: check in other scope and make suggestion
+			return error('$scope link `$name` does not exist.')
+		}
+		return error('Only symlinks can be deleted but "$name" is no $scope link.')
+	}
+	source_path := os.real_path(link_path)
+	os.rm(link_path) or {
+		return error('Permission denied.')
+	}
+	return 'Deleted $scope link `$name` to "$source_path".'
+}
+
 fn get_dir(scope string) string {
 	return link_dirs[scope]
 }
