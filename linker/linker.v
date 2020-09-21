@@ -54,6 +54,19 @@ pub fn delete_link(name, scope string) ?string {
 	return 'Deleted $scope link `$name` to "$source_path".'
 }
 
+pub fn get_links(scope string) ([]string, string) {
+	mut msg := ''
+	dir := get_dir(scope)
+	files := os.ls(dir) or {
+		panic(err)
+	}
+	links := files.filter(os.is_link(dir + it))
+	if links.len == 0 {
+		msg = 'No $scope symlinks detected.'
+	}
+	return links, msg
+}
+
 fn get_dir(scope string) string {
 	return link_dirs[scope]
 }
