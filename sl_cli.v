@@ -101,10 +101,11 @@ fn link_func(cmd Command) {
 	if target_name == '' {
 		target_name = os.file_name(source_name)
 	}
-	linker.create_link(source_name, target_name, scope) or {
+	msg := linker.create_link(source_name, target_name, scope) or {
 		println(term.bright_red(err))
 		exit(1)
 	}
+	println(msg)
 }
 
 fn del_func(cmd Command) {

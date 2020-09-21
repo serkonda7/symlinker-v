@@ -12,7 +12,7 @@ const (
 	}
 )
 
-pub fn create_link(source_name, target_name, scope string) ? {
+pub fn create_link(source_name, target_name, scope string) ?string {
 	target_dir := get_dir(scope)
 	if !os.exists(target_dir) {
 		os.mkdir_all(target_dir)
@@ -25,8 +25,7 @@ pub fn create_link(source_name, target_name, scope string) ? {
 	if os.exists(target_path) {
 		if os.is_link(target_path) {
 			if os.real_path(target_path) == source_path {
-				println('`${term.bold(target_name)}` already links to "$target_path".')
-				exit(0)
+				return '`${term.bold(target_name)}` already links to "$source_path".'
 			}
 			// TODO: show tip to use `update`
 			return error('Another $scope link with name `$target_name` does already exist.')
@@ -36,7 +35,7 @@ pub fn create_link(source_name, target_name, scope string) ? {
 	os.symlink(source_path, target_path) or {
 		return error('Permission denied.')
 	}
-	println('Created $scope link `${term.bold(target_name)}` to "$source_path".')
+	return 'Created $scope link `${term.bold(target_name)}` to "$source_path".'
 }
 
 fn get_dir(scope string) string {

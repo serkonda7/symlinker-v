@@ -1,11 +1,12 @@
 import os
+import term
 import linker
 
 const (
 	scope           = 'test'
-	test_target_dir = linker.link_dirs['test']
+	ttarget = linker.link_dirs['test']
 	troot           = os.temp_dir() + '/symlinker'
-	test_source_dir = troot + '/tfiles/'
+	tsource = troot + '/tfiles/'
 	sl_test         = 'test'
 	sl_test2        = 'test2'
 	normal_file     = 'normal_file'
@@ -14,13 +15,13 @@ const (
 
 fn testsuite_begin() {
 	os.rmdir_all(troot)
-	os.mkdir_all(test_source_dir)
-	os.mkdir_all(test_target_dir)
-	os.chdir(test_target_dir)
+	os.mkdir_all(tsource)
+	os.mkdir_all(ttarget)
+	os.chdir(ttarget)
 	os.write_file(normal_file, '') or {
 		panic(err)
 	}
-	os.chdir(test_source_dir)
+	os.chdir(tsource)
 	os.write_file(sl_test, '') or {
 		panic(err)
 	}
@@ -34,14 +35,16 @@ fn testsuite_end() {
 	os.rmdir_all(troot)
 }
 
-// TODO: test for success message and warning
 fn test_create_link() {
-	// link <file>
-	linker.create_link(sl_test, sl_test, scope)
+	mut msg := linker.create_link(sl_test, sl_test, scope) or { '' }
 	assert link_exists(sl_test)
-	// link --name <name <file>
-	linker.create_link(sl_test, sl_test2, scope)
+	assert msg == 'Created $scope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
+	msg = linker.create_link(sl_test, sl_test2, scope) or { '' }
 	assert link_exists(sl_test)
+	assert msg == 'Created $scope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
+	msg = linker.create_link(sl_test, sl_test, scope) or { '' }
+	assert link_exists(sl_test)
+	assert msg == '`${term.bold(sl_test)}` already links to "$tsource$sl_test".'
 }
 
 fn test_create_link_errors() {
@@ -63,7 +66,7 @@ fn test_create_link_errors() {
 
 // Helper functions
 fn link_exists(name string) bool {
-	path := test_target_dir + name
+	path := ttarget + name
 	return os.is_link(path)
 }
 
