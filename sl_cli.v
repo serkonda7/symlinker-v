@@ -91,16 +91,10 @@ fn create_cmd() Command {
 fn link_func(cmd Command) {
 	scope := get_scope(cmd)
 	source_name := cmd.args[0]
-	// TODO: move into separate function
-	mut target_name := cmd.flags.get_string_or('name', '')
-	if target_name.ends_with(' ') {
-		target_name = target_name.trim_space()
-		if target_name.len == 0 {
-			println('Value of `--name` is empty, "$source_name" will be used instead.')
-		}
-	}
-	if target_name == '' {
-		target_name = os.file_name(source_name)
+	name_flag_val := cmd.flags.get_string_or('name', '')
+	target_name, validation_msg := validate_name_flag(name_flag_val, source_name)
+	if validation_msg != '' {
+		println(validation_msg)
 	}
 	msg := linker.create_link(source_name, target_name, scope) or {
 		println(term.bright_red(err))
@@ -237,6 +231,21 @@ fn get_links(dir string) []string {
 	}
 	links := files.filter(os.is_link(dir + it))
 	return links
+}
+
+fn validate_name_flag(name, alt_name string) (string, string) {
+	mut msg := ''
+	mut tname := name
+	if tname.ends_with(' ') {
+		tname = tname.trim_space()
+		if tname.len == 0 {
+			msg = 'Value of `--name` is empty, "$alt_name" will be used instead.'
+		}
+	}
+	if tname == '' {
+		tname = os.file_name(alt_name)
+	}
+	return tname, msg
 }
 
 fn get_scope(cmd Command) string {
