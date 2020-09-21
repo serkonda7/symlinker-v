@@ -134,6 +134,7 @@ fn list_func(cmd Command) {
 		println(term.bold('$scope links:'))
 		f_real := cmd.flags.get_bool_or('real', false)
 		if f_real {
+			// TODO: move into extra function
 			mut invalid_links := []string{}
 			for link in links {
 				link_path := dir + link
@@ -148,6 +149,7 @@ fn list_func(cmd Command) {
 				println(term.bright_magenta('  INVALID') + ' $inv_link')
 			}
 		} else {
+			// TODO: move into extra function
 			mut rows := []string{}
 			mut row_idx := 0
 			for i, link in links {
