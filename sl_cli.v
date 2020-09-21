@@ -7,7 +7,7 @@ import linker
 
 const (
 	link_dirs     = {
-		'user': os.home_dir() + '.local/bin/'
+		'per-user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 	}
 	test_link_dir = os.join_path(os.temp_dir(), 'symlinker', 'tlinks/')
@@ -249,7 +249,6 @@ fn validate_name_flag(name, alt_name string) (string, string) {
 }
 
 fn get_scope(cmd Command) string {
-	// TODO: user --> per-user
 	$if test {
 		return 'test'
 	}
@@ -257,7 +256,7 @@ fn get_scope(cmd Command) string {
 	return if machine_wide {
 		'machine-wide'
 	} else {
-		'user'
+		'per-user'
 	}
 }
 
@@ -265,8 +264,8 @@ fn get_scope_by_dir(dir string) string {
 	if dir == test_link_dir {
 		return 'test'
 	}
-	return if dir == link_dirs['user'] {
-		'user'
+	return if dir == link_dirs['per-user'] {
+		'per-user'
 	} else {
 		'machine-wide'
 	}
