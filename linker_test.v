@@ -75,15 +75,19 @@ fn test_get_links() {
 	links.sort()
 	assert links == [sl_test, sl_test2]
 	assert msg == ''
-	// TODO: test the msg after all links were deleted
 }
 
 fn test_delete_link() {
-	msg := linker.delete_link(sl_test, scope) or {
+	mut msg := linker.delete_link(sl_test, scope) or {
 		panic(err)
 	}
 	assert !link_exists(sl_test)
 	assert msg == 'Deleted $scope link `$sl_test` to "$tsource$sl_test".'
+	msg = linker.delete_link(sl_test2, scope) or {
+		panic(err)
+	}
+	assert !link_exists(sl_test2)
+	assert msg == 'Deleted $scope link `$sl_test2` to "$tsource$sl_test".'
 }
 
 fn test_delete_link_errors() {
@@ -97,6 +101,12 @@ fn test_delete_link_errors() {
 		assert err == 'Only symlinks can be deleted but "$normal_file" is no $scope link.'
 	}
 	assert err_count == 2
+}
+
+fn test_get_links_in_empty_scope() {
+	mut links, msg := linker.get_links(scope)
+	assert links.len == 0
+	assert msg == 'No $scope symlinks detected.'
 }
 
 // Helper functions
