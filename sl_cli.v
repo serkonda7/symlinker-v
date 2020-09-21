@@ -120,16 +120,21 @@ fn del_func(cmd Command) {
 }
 
 fn list_func(cmd Command) {
-	for _, dir in link_dirs {
-		scope := get_scope_by_dir(dir)
-		links := get_links(dir)
-		if links.len == 0 {
-			println('No $scope symlinks detected.')
+	for scope, dir in link_dirs {
+		$if !test {
+			if scope == 'test' {
+				continue
+			}
+		}
+		links, msg := linker.get_links(scope)
+		if msg != '' {
+			println(msg)
 			continue
 		}
 		println(term.bold('$scope links:'))
 		f_real := cmd.flags.get_bool_or('real', false)
 		if f_real {
+			// TODO: move into extra function
 			mut invalid_links := []string{}
 			for link in links {
 				link_path := dir + link
@@ -144,6 +149,7 @@ fn list_func(cmd Command) {
 				println(term.bright_magenta('  INVALID') + ' $inv_link')
 			}
 		} else {
+			// TODO: move into extra function
 			mut rows := []string{}
 			mut row_idx := 0
 			for i, link in links {
@@ -223,14 +229,6 @@ fn open_func(cmd Command) {
 	os.exec(command) or {
 		panic(err)
 	}
-}
-
-fn get_links(dir string) []string {
-	files := os.ls(dir) or {
-		panic(err)
-	}
-	links := files.filter(os.is_link(dir + it))
-	return links
 }
 
 fn validate_name_flag(name, alt_name string) (string, string) {

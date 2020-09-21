@@ -44,7 +44,7 @@ fn test_create_link() {
 	msg = linker.create_link(sl_test, sl_test2, scope) or {
 		panic(err)
 	}
-	assert link_exists(sl_test)
+	assert link_exists(sl_test2)
 	assert msg == 'Created $scope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
 	msg = linker.create_link(sl_test, sl_test, scope) or {
 		panic(err)
@@ -70,12 +70,24 @@ fn test_create_link_errors() {
 	assert err_count == 3
 }
 
+fn test_get_links() {
+	mut links, msg := linker.get_links(scope)
+	links.sort()
+	assert links == [sl_test, sl_test2]
+	assert msg == ''
+}
+
 fn test_delete_link() {
-	msg := linker.delete_link(sl_test, scope) or {
+	mut msg := linker.delete_link(sl_test, scope) or {
 		panic(err)
 	}
 	assert !link_exists(sl_test)
 	assert msg == 'Deleted $scope link `$sl_test` to "$tsource$sl_test".'
+	msg = linker.delete_link(sl_test2, scope) or {
+		panic(err)
+	}
+	assert !link_exists(sl_test2)
+	assert msg == 'Deleted $scope link `$sl_test2` to "$tsource$sl_test".'
 }
 
 fn test_delete_link_errors() {
@@ -91,21 +103,14 @@ fn test_delete_link_errors() {
 	assert err_count == 2
 }
 
+fn test_get_links_in_empty_scope() {
+	mut links, msg := linker.get_links(scope)
+	assert links.len == 0
+	assert msg == 'No $scope symlinks detected.'
+}
+
 // Helper functions
 fn link_exists(name string) bool {
 	path := ttarget + name
 	return os.is_link(path)
 }
-
-/*
-fn test_get_links() {
-	mut links := get_links(test_link_dir)
-	links.sort()
-	assert links == [sl_test, sl_test2]
-}
-
-fn test_get_scope_by_dir() {
-	scope := get_scope_by_dir(tlinks)
-	assert scope == 'test'
-}
-*/
