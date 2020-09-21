@@ -44,7 +44,7 @@ fn test_create_link() {
 	msg = linker.create_link(sl_test, sl_test2, scope) or {
 		panic(err)
 	}
-	assert link_exists(sl_test)
+	assert link_exists(sl_test2)
 	assert msg == 'Created $scope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
 	msg = linker.create_link(sl_test, sl_test, scope) or {
 		panic(err)
@@ -74,6 +74,8 @@ fn test_get_links() {
 	mut links, msg := linker.get_links(scope)
 	links.sort()
 	assert links == [sl_test, sl_test2]
+	assert msg == ''
+	// TODO: test the msg after all links were deleted
 }
 
 fn test_delete_link() {
