@@ -70,6 +70,27 @@ fn test_create_link_errors() {
 	assert err_count == 3
 }
 
+fn test_delete_link() {
+	msg := linker.delete_link(sl_test, scope) or {
+		panic(err)
+	}
+	assert !link_exists(sl_test)
+	assert msg == 'Deleted $scope link `$sl_test` to "$tsource$sl_test".'
+}
+
+fn test_delete_link_errors() {
+	mut err_count := 0
+	linker.delete_link(inexistent, scope) or {
+		err_count++
+		assert err == '$scope link `$inexistent` does not exist.'
+	}
+	linker.delete_link(normal_file, scope) or {
+		err_count++
+		assert err == 'Only symlinks can be deleted but "$normal_file" is no $scope link.'
+	}
+	assert err_count == 2
+}
+
 // Helper functions
 fn link_exists(name string) bool {
 	path := ttarget + name
@@ -81,27 +102,6 @@ fn test_get_links() {
 	mut links := get_links(test_link_dir)
 	links.sort()
 	assert links == [sl_test, sl_test2]
-}
-
-fn test_delete_link() {
-	// del sl_test2
-	delete_link(scope, test_link_dir, sl_test)
-	assert !os.exists(test_link_dir + sl_test)
-}
-
-fn test_delete_link_errors() {
-	mut err_count := 0
-	// del inexistent
-	delete_link(scope, test_link_dir, inexistent) or {
-		err_count++
-		assert err == '$scope link `$inexistent` does not exist'
-	}
-	// del normal_file
-	delete_link(scope, test_link_dir, normal_file) or {
-		err_count++
-		assert err == '"$normal_file" is no $scope link'
-	}
-	assert err_count == 2
 }
 
 fn test_get_scope_by_dir() {
