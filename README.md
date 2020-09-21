@@ -10,7 +10,7 @@ symlinker is written in V. If you don't have it, go [here][v_repo] first.
 ```sh
 git clone https://github.com/serkonda7/symlinker.git
 cd symlinker
-v symlinker.v
+v .
 ```
 
 Now run `sudo ./symlinker link -m ./symlinker` and you are finished.
