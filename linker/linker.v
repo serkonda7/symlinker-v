@@ -51,6 +51,9 @@ pub fn delete_link(name, scope string) ?string {
 	os.rm(link_path) or {
 		return error('Permission denied.')
 	}
+	if source_path == link_path {
+		return 'Deleted invalid link `$name`.'
+	}
 	return 'Deleted $scope link `$name` to "$source_path".'
 }
 

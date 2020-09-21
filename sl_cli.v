@@ -150,6 +150,7 @@ fn list_func(cmd Command) {
 			}
 		} else {
 			// TODO: move into extra function
+			// TODO: print invalid links in purple
 			mut rows := []string{}
 			mut row_idx := 0
 			for i, link in links {

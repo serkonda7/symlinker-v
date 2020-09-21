@@ -9,6 +9,7 @@ const (
 	tsource     = troot + '/tfiles/'
 	sl_test     = 'test'
 	sl_test2    = 'test2'
+	invalid     = 'invalid'
 	normal_file = 'normal_file'
 	inexistent  = 'inexistent'
 )
@@ -26,6 +27,9 @@ fn testsuite_begin() {
 		panic(err)
 	}
 	os.write_file(sl_test2, '') or {
+		panic(err)
+	}
+	os.write_file(invalid, '') or {
 		panic(err)
 	}
 }
@@ -51,6 +55,12 @@ fn test_create_link() {
 	}
 	assert link_exists(sl_test)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource$sl_test".'
+	// Create invalid link
+	linker.create_link(invalid, invalid, scope)
+	os.rm(invalid) or {
+		panic(err)
+	}
+	assert !os.exists(invalid)
 }
 
 fn test_create_link_errors() {
@@ -73,7 +83,7 @@ fn test_create_link_errors() {
 fn test_get_links() {
 	mut links, msg := linker.get_links(scope)
 	links.sort()
-	assert links == [sl_test, sl_test2]
+	assert links == [invalid, sl_test, sl_test2]
 	assert msg == ''
 }
 
@@ -88,6 +98,12 @@ fn test_delete_link() {
 	}
 	assert !link_exists(sl_test2)
 	assert msg == 'Deleted $scope link `$sl_test2` to "$tsource$sl_test".'
+	// Delete invalid link
+	msg = linker.delete_link(invalid, scope) or {
+		panic(err)
+	}
+	assert !link_exists(invalid)
+	assert msg == 'Deleted invalid link `$invalid`.'
 }
 
 fn test_delete_link_errors() {
