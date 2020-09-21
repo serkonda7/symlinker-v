@@ -23,10 +23,10 @@ jobs:
         id: v
       - name: Verify code formatting
         run: |
-          v fmt -verify sl_cli.v
-          v fmt -verify linker/linker.v
-          v fmt -verify sl_cli_test.v
-          v fmt -verify linker_test.v
+          v fmt -verify sl_cli.v sl_cli_test.v
+          cd linker
+          v fmt -verify linker.v linker_test.v
+          cd ..
       - name: Build symlinker
         run: v -cg -prod .
       - name: Run tests
