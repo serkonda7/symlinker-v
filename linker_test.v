@@ -70,6 +70,12 @@ fn test_create_link_errors() {
 	assert err_count == 3
 }
 
+fn test_get_links() {
+	mut links, msg := linker.get_links(scope)
+	links.sort()
+	assert links == [sl_test, sl_test2]
+}
+
 fn test_delete_link() {
 	msg := linker.delete_link(sl_test, scope) or {
 		panic(err)
@@ -96,16 +102,3 @@ fn link_exists(name string) bool {
 	path := ttarget + name
 	return os.is_link(path)
 }
-
-/*
-fn test_get_links() {
-	mut links := get_links(test_link_dir)
-	links.sort()
-	assert links == [sl_test, sl_test2]
-}
-
-fn test_get_scope_by_dir() {
-	scope := get_scope_by_dir(tlinks)
-	assert scope == 'test'
-}
-*/
