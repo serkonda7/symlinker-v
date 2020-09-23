@@ -112,17 +112,12 @@ fn del_func(cmd Command) {
 }
 
 fn list_func(cmd Command) {
-	scopes := link_dirs.keys()
+	scopes := $if test {
+		linker.test_link_dirs.keys()
+	} $else {
+		linker.link_dirs.keys()
+	}
 	for s, scope in scopes {
-		$if test {
-			if scope != 'test' {
-				continue
-			}
-		} $else {
-			if scope == 'test' {
-				continue
-			}
-		}
 		linkmap, msg := linker.get_real_links(scope)
 		if msg != '' {
 			println(msg)
