@@ -1,10 +1,11 @@
+module linker
+
 import os
 import term
-import linker
 
 const (
-	scope       = 'test'
-	ttarget     = linker.link_dirs['test']
+	uscope      = 'tuser'
+	mscope      = 'tmachine'
 	troot       = os.temp_dir() + '/symlinker'
 	tsource     = troot + '/tfiles/'
 	sl_test     = 'test'
@@ -15,10 +16,13 @@ const (
 )
 
 fn testsuite_begin() {
+	u_target := get_dir(uscope)
+	m_target := get_dir(mscope)
 	os.rmdir_all(troot)
 	os.mkdir_all(tsource)
-	os.mkdir_all(ttarget)
-	os.chdir(ttarget)
+	os.mkdir_all(u_target)
+	os.mkdir_all(m_target)
+	os.chdir(u_target)
 	os.write_file(normal_file, '') or {
 		panic(err)
 	}
@@ -40,23 +44,23 @@ fn testsuite_end() {
 }
 
 fn test_create_link() {
-	mut msg := linker.create_link(sl_test, sl_test, scope) or {
+	mut msg := create_link(sl_test, sl_test, uscope) or {
 		panic(err)
 	}
-	assert link_exists(sl_test)
-	assert msg == 'Created $scope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
-	msg = linker.create_link(sl_test, sl_test2, scope) or {
+	assert link_exists(sl_test, uscope)
+	assert msg == 'Created $uscope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
+	msg = create_link(sl_test, sl_test2, uscope) or {
 		panic(err)
 	}
-	assert link_exists(sl_test2)
-	assert msg == 'Created $scope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
-	msg = linker.create_link(sl_test, sl_test, scope) or {
+	assert link_exists(sl_test2, uscope)
+	assert msg == 'Created $uscope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
+	msg = create_link(sl_test, sl_test, uscope) or {
 		panic(err)
 	}
-	assert link_exists(sl_test)
+	assert link_exists(sl_test, uscope)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource$sl_test".'
 	// Create invalid link
-	linker.create_link(invalid, invalid, scope)
+	create_link(invalid, invalid, uscope)
 	os.rm(invalid) or {
 		panic(err)
 	}
@@ -66,15 +70,15 @@ fn test_create_link() {
 // TODO: test Permission denied error
 fn test_create_link_errors() {
 	mut err_count := 0
-	linker.create_link(inexistent, inexistent, scope) or {
+	create_link(inexistent, inexistent, uscope) or {
 		err_count++
 		assert err == 'Source file "$inexistent" does not exist.'
 	}
-	linker.create_link(sl_test2, sl_test2, scope) or {
+	create_link(sl_test2, sl_test2, uscope) or {
 		err_count++
-		assert err == 'Another $scope link with name `$sl_test2` does already exist.'
+		assert err == 'Another $uscope link with name `$sl_test2` does already exist.'
 	}
-	linker.create_link(sl_test, normal_file, scope) or {
+	create_link(sl_test, normal_file, uscope) or {
 		err_count++
 		assert err == 'File with name "$normal_file" does already exist.'
 	}
@@ -82,9 +86,9 @@ fn test_create_link_errors() {
 }
 
 fn test_get_real_links() {
-	linkmap, msg := linker.get_real_links(scope)
+	linkmap, msg := get_real_links(uscope)
 	mut expected := map[string]string{}
-	expected[invalid] = ttarget + invalid
+	expected[invalid] = get_dir(uscope) + invalid
 	expected[sl_test] = tsource + sl_test
 	expected[sl_test2] = tsource + sl_test
 	assert linkmap == expected
@@ -92,21 +96,20 @@ fn test_get_real_links() {
 }
 
 fn test_delete_link() {
-	mut msg := linker.delete_link(sl_test, scope) or {
+	mut msg := delete_link(sl_test, uscope) or {
 		panic(err)
 	}
-	assert !link_exists(sl_test)
-	assert msg == 'Deleted $scope link `$sl_test` to "$tsource$sl_test".'
-	msg = linker.delete_link(sl_test2, scope) or {
+	assert !link_exists(sl_test, uscope)
+	assert msg == 'Deleted $uscope link `$sl_test` to "$tsource$sl_test".'
+	msg = delete_link(sl_test2, uscope) or {
 		panic(err)
 	}
-	assert !link_exists(sl_test2)
-	assert msg == 'Deleted $scope link `$sl_test2` to "$tsource$sl_test".'
-	// Delete invalid link
-	msg = linker.delete_link(invalid, scope) or {
+	assert !link_exists(sl_test2, uscope)
+	assert msg == 'Deleted $uscope link `$sl_test2` to "$tsource$sl_test".'
+	msg = delete_link(invalid, uscope) or {
 		panic(err)
 	}
-	assert !link_exists(invalid)
+	assert !link_exists(invalid, uscope)
 	assert msg == 'Deleted invalid link `$invalid`.'
 }
 
@@ -114,25 +117,25 @@ fn test_delete_link() {
 // TODO: test Permission denied error
 fn test_delete_link_errors() {
 	mut err_count := 0
-	linker.delete_link(inexistent, scope) or {
+	delete_link(inexistent, uscope) or {
 		err_count++
-		assert err == '$scope link `$inexistent` does not exist.'
+		assert err == '$uscope link `$inexistent` does not exist.'
 	}
-	linker.delete_link(normal_file, scope) or {
+	delete_link(normal_file, uscope) or {
 		err_count++
-		assert err == 'Only symlinks can be deleted but "$normal_file" is no $scope link.'
+		assert err == 'Only symlinks can be deleted but "$normal_file" is no $uscope link.'
 	}
 	assert err_count == 2
 }
 
 fn test_get_real_links_in_empty_scope() {
-	linkmap, msg := linker.get_real_links(scope)
+	linkmap, msg := get_real_links(uscope)
 	assert linkmap.len == 0
-	assert msg == 'No $scope symlinks detected.'
+	assert msg == 'No $uscope symlinks detected.'
 }
 
 // Helper functions
-fn link_exists(name string) bool {
-	path := ttarget + name
-	return os.is_link(path)
+fn link_exists(name string, scope string) bool {
+	dir := get_dir(scope)
+	return os.is_link(dir + name)
 }
