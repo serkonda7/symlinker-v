@@ -120,7 +120,7 @@ fn del_func(cmd Command) {
 }
 
 fn list_func(cmd Command) {
-	for scope, dir in link_dirs {
+	for scope, _ in link_dirs {
 		$if test {
 			if scope != 'test' {
 				continue
@@ -136,31 +136,19 @@ fn list_func(cmd Command) {
 			continue
 		}
 		println(term.bold('$scope links:'))
+		valid, invalid := linker.split_valid_invalid_links(linkmap, scope)
 		f_real := cmd.flags.get_bool_or('real', false)
 		if f_real {
-			// TODO: function to get invalid links
-			mut invalid_links := []string{}
-			for link_, real_path in linkmap {
-				link_path := dir + link_
-				if link_path == real_path {
-					invalid_links << link_
-					continue
-				}
-				println('  $link_: $real_path')
+			for v in valid {
+				println('  $v: ${linkmap[v]}')
 			}
-			for inv_link in invalid_links {
-				println(term.bright_magenta('  INVALID') + ' $inv_link')
+			for inv in invalid {
+				println(term.bright_magenta('  INVALID: $inv'))
 			}
 		} else {
-			mut links := []string{}
-			// TODO: function to get invalid links
-			for link_, real_path in linkmap {
-				link_path := dir + link_
-				if link_path == real_path {
-					links << term.bright_magenta(link_)
-					continue
-				}
-				links << link_
+			mut links := valid
+			for inv in invalid {
+				links << term.bright_magenta(inv)
 			}
 			// TODO: move pretty print into extra function
 			mut rows := []string{}
