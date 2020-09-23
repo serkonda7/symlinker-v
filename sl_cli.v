@@ -121,7 +121,12 @@ fn del_func(cmd Command) {
 
 fn list_func(cmd Command) {
 	for scope, dir in link_dirs {
-		$if !test {
+		$if test {
+			if scope != 'test' {
+				continue
+			}
+		}
+		$else {
 			if scope == 'test' {
 				continue
 			}
