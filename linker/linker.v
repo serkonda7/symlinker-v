@@ -77,7 +77,6 @@ pub fn get_links(scope string) ([]string, string) {
 	return links, msg
 }
 
-// TODO: add tests
 pub fn get_real_links(scope string) (map[string]string, string) {
 	mut linkmap := map[string]string
 	links, msg := get_links(scope)

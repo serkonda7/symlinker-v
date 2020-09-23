@@ -88,6 +88,16 @@ fn test_get_links() {
 	assert msg == ''
 }
 
+fn test_get_real_links() {
+	linkmap, msg := linker.get_real_links(scope)
+	mut expected := map[string]string{}
+	expected[invalid] = ttarget + invalid
+	expected[sl_test] = tsource + sl_test
+	expected[sl_test2] = tsource + sl_test
+	assert linkmap == expected
+	assert msg == ''
+}
+
 fn test_delete_link() {
 	mut msg := linker.delete_link(sl_test, scope) or {
 		panic(err)
@@ -125,6 +135,12 @@ fn test_delete_link_errors() {
 fn test_get_links_in_empty_scope() {
 	mut links, msg := linker.get_links(scope)
 	assert links.len == 0
+	assert msg == 'No $scope symlinks detected.'
+}
+
+fn test_get_real_links_in_empty_scope() {
+	linkmap, msg := linker.get_real_links(scope)
+	assert linkmap.len == 0
 	assert msg == 'No $scope symlinks detected.'
 }
 
