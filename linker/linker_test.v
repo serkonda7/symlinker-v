@@ -39,6 +39,8 @@ fn testsuite_end() {
 	os.rmdir_all(troot)
 }
 
+// TODO: test Permission denied errors
+
 fn test_create_link() {
 	mut msg := linker.create_link(sl_test, sl_test, scope) or {
 		panic(err)
@@ -104,6 +106,7 @@ fn test_delete_link() {
 	}
 	assert !link_exists(invalid)
 	assert msg == 'Deleted invalid link `$invalid`.'
+	// TODO: test other scope suggestion
 }
 
 fn test_delete_link_errors() {

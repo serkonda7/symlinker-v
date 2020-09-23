@@ -125,8 +125,7 @@ fn list_func(cmd Command) {
 			if scope != 'test' {
 				continue
 			}
-		}
-		$else {
+		} $else {
 			if scope == 'test' {
 				continue
 			}

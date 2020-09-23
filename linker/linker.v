@@ -42,7 +42,14 @@ pub fn delete_link(name, scope string) ?string {
 	link_path := dir + name
 	if !os.is_link(link_path) {
 		if !os.exists(link_path) {
-			// TODO: check in other scope and make suggestion
+			oscope := other_scope(scope)
+			other_link_path := get_dir(oscope) + name
+			sudo, flag := if oscope == 'machine-wide' { 'sudo ', '-m ' } else {'', ''}
+			other_cmd := '${sudo}symlinker del $flag$name'
+			if os.is_link(other_link_path) {
+				// TODO: allow for testing this error
+				return error('`$name` is a $oscope link. Run `$other_cmd` to delete it.')
+			}
 			return error('$scope link `$name` does not exist.')
 		}
 		return error('Only symlinks can be deleted but "$name" is no $scope link.')
@@ -72,4 +79,15 @@ pub fn get_links(scope string) ([]string, string) {
 
 fn get_dir(scope string) string {
 	return link_dirs[scope]
+}
+
+fn other_scope(scope string) string {
+	$if test {
+		return 'test'
+	}
+	return if scope == 'per-user' {
+		'machine-wide'
+	} else {
+		'per-user'
+	}
 }
