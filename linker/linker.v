@@ -81,6 +81,22 @@ pub fn get_real_links(scope string) (map[string]string, string) {
 	return linkmap, msg
 }
 
+// TODO: add tests
+pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {
+	mut valid := []string{}
+	mut invalid := []string{}
+	dir := get_dir(scope)
+	for lnk, real_path in linkmap {
+		link_path := dir + lnk
+		if link_path == real_path {
+			invalid << lnk
+		} else {
+			valid << lnk
+		}
+	}
+	return valid, invalid
+}
+
 fn get_dir(scope string) string {
 	return link_dirs[scope]
 }
