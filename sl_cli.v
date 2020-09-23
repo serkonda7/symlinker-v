@@ -5,15 +5,6 @@ import os
 import term
 import linker
 
-// TODO: use same structure as linker
-const (
-	link_dirs     = {
-		'per-user': os.home_dir() + '.local/bin/'
-		'machine-wide': '/usr/local/bin/'
-	}
-	test_link_dir = os.join_path(os.temp_dir(), 'symlinker', 'tlinks/')
-)
-
 fn main() {
 	mut cmd := create_cmd()
 	cmd.parse(os.args)
@@ -184,7 +175,7 @@ fn update_func(cmd Command) {
 		exit(1)
 	}
 	scope := get_scope(cmd)
-	link_parent_dir := get_dir(scope)
+	link_parent_dir := linker.get_dir(scope)
 	mut curr_name := cmd.args[0]
 	curr_path := link_parent_dir + curr_name
 	if !os.exists(curr_path) {
@@ -217,7 +208,7 @@ fn open_func(cmd Command) {
 		exit(1)
 	}
 	scope := get_scope(cmd)
-	mut dir := get_dir(scope)
+	mut dir := linker.get_dir(scope)
 	if cmd.args.len >= 1 {
 		target_link := cmd.args[0]
 		links := os.ls(dir) or {
@@ -264,11 +255,4 @@ fn get_scope(cmd Command) string {
 	} else {
 		'per-user'
 	}
-}
-
-fn get_dir(scope string) string {
-	$if test {
-		return test_link_dir
-	}
-	return link_dirs[scope]
 }

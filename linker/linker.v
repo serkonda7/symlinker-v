@@ -104,7 +104,8 @@ pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]str
 	return valid, invalid
 }
 
-fn get_dir(scope string) string {
+// TODO: make private once sl_cli does not use it anymore
+pub fn get_dir(scope string) string {
 	$if test {
 		return test_link_dirs[scope]
 	} $else {
