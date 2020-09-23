@@ -47,10 +47,14 @@ pub fn delete_link(name, scope string) ?string {
 		if !os.exists(link_path) {
 			oscope := other_scope(scope)
 			other_link_path := get_dir(oscope) + name
-			sudo, flag := if oscope == 'machine-wide' { 'sudo ', '-m ' } else {'', ''}
+			mut sudo, mut flag := '', ''
+			$if test {
+				sudo, flag = if oscope == 'tmachine' { 'sudo ', '-m ' } else {'', ''}
+			} $else {
+				sudo, flag = if oscope == 'machine-wide' { 'sudo ', '-m ' } else {'', ''}
+			}
 			other_cmd := '${sudo}symlinker del $flag$name'
 			if os.is_link(other_link_path) {
-				// TODO: allow for testing this error
 				return error('`$name` is a $oscope link. Run `$other_cmd` to delete it.')
 			}
 			return error('$scope link `$name` does not exist.')

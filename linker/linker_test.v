@@ -10,6 +10,7 @@ const (
 	tsource     = troot + '/tfiles/'
 	sl_test     = 'test'
 	sl_test2    = 'test2'
+	m_link       = 'm_link'
 	invalid     = 'invalid'
 	normal_file = 'normal_file'
 	inexistent  = 'inexistent'
@@ -31,6 +32,9 @@ fn testsuite_begin() {
 		panic(err)
 	}
 	os.write_file(sl_test2, '') or {
+		panic(err)
+	}
+	os.write_file(m_link, '') or {
 		panic(err)
 	}
 	os.write_file(invalid, '') or {
@@ -65,6 +69,12 @@ fn test_create_link() {
 		panic(err)
 	}
 	assert !os.exists(invalid)
+	// Create tmachine link
+	msg = create_link(m_link, m_link, mscope) or {
+		panic(err)
+	}
+	assert link_exists(m_link, mscope)
+	assert msg == 'Created $mscope link `${term.bold(m_link)}` to "$tsource$m_link".'
 }
 
 // TODO: test Permission denied error
@@ -95,6 +105,30 @@ fn test_get_real_links() {
 	assert msg == ''
 }
 
+// TODO: test Permission denied error
+fn test_delete_link_errors() {
+	mut err_count := 0
+	delete_link(inexistent, uscope) or {
+		err_count++
+		assert err == '$uscope link `$inexistent` does not exist.'
+	}
+	delete_link(normal_file, uscope) or {
+		err_count++
+		assert err == 'Only symlinks can be deleted but "$normal_file" is no $uscope link.'
+	}
+	// Scope suggestion user --> machine
+	delete_link(m_link, uscope) or {
+		err_count++
+		assert err == '`$m_link` is a $mscope link. Run `sudo symlinker del -m $m_link` to delete it.'
+	}
+	// Scope suggestion machine --> user
+	delete_link(sl_test, mscope) or {
+		err_count++
+		assert err == '`$sl_test` is a $uscope link. Run `symlinker del $sl_test` to delete it.'
+	}
+	assert err_count == 4
+}
+
 fn test_delete_link() {
 	mut msg := delete_link(sl_test, uscope) or {
 		panic(err)
@@ -113,21 +147,6 @@ fn test_delete_link() {
 	assert msg == 'Deleted invalid link `$invalid`.'
 }
 
-// TODO: test other scope suggestion error
-// TODO: test Permission denied error
-fn test_delete_link_errors() {
-	mut err_count := 0
-	delete_link(inexistent, uscope) or {
-		err_count++
-		assert err == '$uscope link `$inexistent` does not exist.'
-	}
-	delete_link(normal_file, uscope) or {
-		err_count++
-		assert err == 'Only symlinks can be deleted but "$normal_file" is no $uscope link.'
-	}
-	assert err_count == 2
-}
-
 fn test_get_real_links_in_empty_scope() {
 	linkmap, msg := get_real_links(uscope)
 	assert linkmap.len == 0
@@ -135,7 +154,7 @@ fn test_get_real_links_in_empty_scope() {
 }
 
 // Helper functions
-fn link_exists(name string, scope string) bool {
+fn link_exists(name, scope string) bool {
 	dir := get_dir(scope)
 	return os.is_link(dir + name)
 }
