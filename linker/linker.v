@@ -7,7 +7,10 @@ const (
 	link_dirs = {
 		'per-user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
-		'test': os.temp_dir() + '/symlinker/tlinks/'
+	}
+	test_link_dirs = {
+		'tuser': os.temp_dir() + '/symlinker/tu_links/'
+		'tmachine': os.temp_dir() + '/symlinker/tm_links/'
 	}
 )
 
@@ -98,16 +101,25 @@ pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]str
 }
 
 fn get_dir(scope string) string {
-	return link_dirs[scope]
+	$if test {
+		return test_link_dirs[scope]
+	} $else {
+		return link_dirs[scope]
+	}
 }
 
 fn other_scope(scope string) string {
 	$if test {
-		return 'test'
-	}
-	return if scope == 'per-user' {
-		'machine-wide'
-	} else {
-		'per-user'
+		return if scope == 'tuser' {
+			'tmachine'
+		} else {
+			'tuser'
+		}
+	} $else {
+		return if scope == 'per-user' {
+			'machine-wide'
+		} else {
+			'per-user'
+		}
 	}
 }
