@@ -86,12 +86,12 @@ pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]str
 	mut valid := []string{}
 	mut invalid := []string{}
 	dir := get_dir(scope)
-	for link, real_path in linkmap {
-		link_path := dir + link
+	for lnk, real_path in linkmap {
+		link_path := dir + lnk
 		if link_path == real_path {
-			invalid << link
+			invalid << lnk
 		} else {
-			valid << link
+			valid << lnk
 		}
 	}
 	return valid, invalid
