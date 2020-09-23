@@ -7,7 +7,10 @@ const (
 	link_dirs = {
 		'per-user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
-		'test': os.temp_dir() + '/symlinker/tlinks/'
+	}
+	test_link_dirs = {
+		'tuser': os.temp_dir() + '/symlinker/tu_links/'
+		'tmachine': os.temp_dir() + '/symlinker/tm_links/'
 	}
 )
 
@@ -44,10 +47,14 @@ pub fn delete_link(name, scope string) ?string {
 		if !os.exists(link_path) {
 			oscope := other_scope(scope)
 			other_link_path := get_dir(oscope) + name
-			sudo, flag := if oscope == 'machine-wide' { 'sudo ', '-m ' } else {'', ''}
+			mut sudo, mut flag := '', ''
+			$if test {
+				sudo, flag = if oscope == 'tmachine' { 'sudo ', '-m ' } else {'', ''}
+			} $else {
+				sudo, flag = if oscope == 'machine-wide' { 'sudo ', '-m ' } else {'', ''}
+			}
 			other_cmd := '${sudo}symlinker del $flag$name'
 			if os.is_link(other_link_path) {
-				// TODO: allow for testing this error
 				return error('`$name` is a $oscope link. Run `$other_cmd` to delete it.')
 			}
 			return error('$scope link `$name` does not exist.')
@@ -97,17 +104,27 @@ pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]str
 	return valid, invalid
 }
 
-fn get_dir(scope string) string {
-	return link_dirs[scope]
+// TODO: make private once sl_cli does not use it anymore
+pub fn get_dir(scope string) string {
+	$if test {
+		return test_link_dirs[scope]
+	} $else {
+		return link_dirs[scope]
+	}
 }
 
 fn other_scope(scope string) string {
 	$if test {
-		return 'test'
-	}
-	return if scope == 'per-user' {
-		'machine-wide'
-	} else {
-		'per-user'
+		return if scope == 'tuser' {
+			'tmachine'
+		} else {
+			'tuser'
+		}
+	} $else {
+		return if scope == 'per-user' {
+			'machine-wide'
+		} else {
+			'per-user'
+		}
 	}
 }
