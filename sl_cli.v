@@ -130,7 +130,7 @@ fn list_func(cmd Command) {
 				continue
 			}
 		}
-		links, msg := linker.get_links(scope)
+		linkmap, msg := linker.get_real_links(scope)
 		if msg != '' {
 			println(msg)
 			continue
@@ -138,23 +138,31 @@ fn list_func(cmd Command) {
 		println(term.bold('$scope links:'))
 		f_real := cmd.flags.get_bool_or('real', false)
 		if f_real {
-			// TODO: move into extra function
+			// TODO: function to get invalid links
 			mut invalid_links := []string{}
-			for link in links {
-				link_path := dir + link
-				real_path := os.real_path(link_path)
+			for link_, real_path in linkmap {
+				link_path := dir + link_
 				if link_path == real_path {
-					invalid_links << link
+					invalid_links << link_
 					continue
 				}
-				println('  $link: $real_path')
+				println('  $link_: $real_path')
 			}
 			for inv_link in invalid_links {
 				println(term.bright_magenta('  INVALID') + ' $inv_link')
 			}
 		} else {
-			// TODO: move into extra function
-			// TODO: print invalid links in purple
+			mut links := []string{}
+			// TODO: function to get invalid links
+			for link_, real_path in linkmap {
+				link_path := dir + link_
+				if link_path == real_path {
+					links << term.bright_magenta(link_)
+					continue
+				}
+				links << link_
+			}
+			// TODO: move pretty print into extra function
 			mut rows := []string{}
 			mut row_idx := 0
 			for i, link in links {
