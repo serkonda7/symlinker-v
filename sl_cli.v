@@ -153,6 +153,7 @@ fn list_func(cmd Command) {
 			}
 		} else {
 			mut links := []string{}
+			// TODO: function to get invalid links
 			for link_, real_path in linkmap {
 				link_path := dir + link_
 				if link_path == real_path {
