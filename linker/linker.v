@@ -64,6 +64,7 @@ pub fn delete_link(name, scope string) ?string {
 	return 'Deleted $scope link `$name` to "$source_path".'
 }
 
+// TODO: remove this
 pub fn get_links(scope string) ([]string, string) {
 	mut msg := ''
 	dir := get_dir(scope)

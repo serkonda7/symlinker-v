@@ -140,36 +140,36 @@ fn list_func(cmd Command) {
 		if f_real {
 			// TODO: function to get invalid links
 			mut invalid_links := []string{}
-			for link, real_path in linkmap {
-				link_path := dir + link
+			for link_, real_path in linkmap {
+				link_path := dir + link_
 				if link_path == real_path {
-					invalid_links << link
+					invalid_links << link_
 					continue
 				}
-				println('  $link: $real_path')
+				println('  $link_: $real_path')
 			}
 			for inv_link in invalid_links {
 				println(term.bright_magenta('  INVALID') + ' $inv_link')
 			}
 		} else {
 			mut links := []string{}
-			for link, real_path in linkmap {
-				link_path := dir + link
+			for link_, real_path in linkmap {
+				link_path := dir + link_
 				if link_path == real_path {
-					links << term.bright_magenta(link)
+					links << term.bright_magenta(link_)
 					continue
 				}
-				links << link
+				links << link_
 			}
 			// TODO: move pretty print into extra function
 			mut rows := []string{}
 			mut row_idx := 0
-			for i, l in links {
+			for i, link in links {
 				if i % 5 == 0 {
 					rows << ''
 					row_idx = i / 5
 				}
-				rows[row_idx] += '$l, '
+				rows[row_idx] += '$link, '
 			}
 			rows[rows.len - 1] = rows.last().all_before_last(', ')
 			for row in rows {
