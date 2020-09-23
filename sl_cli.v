@@ -5,6 +5,7 @@ import os
 import term
 import linker
 
+// TODO: use same structure as linker
 const (
 	link_dirs     = {
 		'per-user': os.home_dir() + '.local/bin/'
@@ -120,7 +121,8 @@ fn del_func(cmd Command) {
 }
 
 fn list_func(cmd Command) {
-	for scope, _ in link_dirs {
+	scopes := link_dirs.keys()
+	for s, scope in scopes {
 		$if test {
 			if scope != 'test' {
 				continue
@@ -164,6 +166,9 @@ fn list_func(cmd Command) {
 			for row in rows {
 				println('  $row')
 			}
+		}
+		if s < scopes.len - 1 {
+			println('')
 		}
 	}
 }
