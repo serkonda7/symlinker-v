@@ -10,7 +10,7 @@ const (
 	tsource     = troot + '/tfiles/'
 	sl_test     = 'test'
 	sl_test2    = 'test2'
-	m_link       = 'm_link'
+	m_link      = 'm_link'
 	invalid     = 'invalid'
 	normal_file = 'normal_file'
 	inexistent  = 'inexistent'
@@ -119,12 +119,14 @@ fn test_delete_link_errors() {
 	// Scope suggestion user --> machine
 	delete_link(m_link, uscope) or {
 		err_count++
-		assert err == '`$m_link` is a $mscope link. Run `sudo symlinker del -m $m_link` to delete it.'
+		assert err ==
+			'`$m_link` is a $mscope link. Run `sudo symlinker del -m $m_link` to delete it.'
 	}
 	// Scope suggestion machine --> user
 	delete_link(sl_test, mscope) or {
 		err_count++
-		assert err == '`$sl_test` is a $uscope link. Run `symlinker del $sl_test` to delete it.'
+		assert err ==
+			'`$sl_test` is a $uscope link. Run `symlinker del $sl_test` to delete it.'
 	}
 	assert err_count == 4
 }
