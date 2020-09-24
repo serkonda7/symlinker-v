@@ -4,7 +4,7 @@ import os
 import term
 
 const (
-	link_dirs = {
+	link_dirs      = {
 		'per-user': os.home_dir() + '.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 	}
@@ -49,9 +49,9 @@ pub fn delete_link(name, scope string) ?string {
 			other_link_path := get_dir(oscope) + name
 			mut sudo, mut flag := '', ''
 			$if test {
-				sudo, flag = if oscope == 'tmachine' { 'sudo ', '-m ' } else {'', ''}
+				sudo, flag = if oscope == 'tmachine' { 'sudo ', '-m ' } else { '', '' }
 			} $else {
-				sudo, flag = if oscope == 'machine-wide' { 'sudo ', '-m ' } else {'', ''}
+				sudo, flag = if oscope == 'machine-wide' { 'sudo ', '-m ' } else { '', '' }
 			}
 			other_cmd := '${sudo}symlinker del $flag$name'
 			if os.is_link(other_link_path) {
@@ -73,7 +73,7 @@ pub fn delete_link(name, scope string) ?string {
 
 pub fn get_real_links(scope string) (map[string]string, string) {
 	mut msg := ''
-	mut linkmap := map[string]string
+	mut linkmap := map[string]string{}
 	dir := get_dir(scope)
 	files := os.ls(dir) or {
 		panic(err)
