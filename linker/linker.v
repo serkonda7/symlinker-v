@@ -128,6 +128,8 @@ pub fn open_link_dir(link_name, scope string) ?(string, string) {
 	mut dir := get_dir(scope)
 	mut msg := ''
 	if link_name == '' {
+		msg = 'Opening the $scope symlink folder...'
+	} else {
 		links := os.ls(dir) or {
 			panic(err)
 		}
@@ -137,8 +139,6 @@ pub fn open_link_dir(link_name, scope string) ?(string, string) {
 		} else {
 			return error('Cannot open source directory of inexistent $scope link `$link_name`.')
 		}
-	} else {
-		msg = 'Opening the $scope symlink folder...'
 	}
 	return 'xdg-open $dir', msg
 }
