@@ -3,11 +3,11 @@ module main
 import os
 
 const (
-	troot       = os.temp_dir() + '/symlinker'
-	tsource     = troot + '/tfiles/'
-	link1       = 'link1'
-	link2       = 'link2'
-	link3       = 'link3'
+	troot   = os.temp_dir() + '/symlinker'
+	tsource = troot + '/tfiles/'
+	link1   = 'link1'
+	link2   = 'link2'
+	link3   = 'link3'
 )
 
 fn testsuite_begin() {
@@ -80,11 +80,11 @@ fn test_update_cmd() {
 	cmd.parse(['', 'update', '--name', 'alt_link', '--source', 'link2', 'alt2'])
 }
 
-// TODO: open
-
 fn test_del_cmd() {
 	mut cmd := create_cmd()
 	cmd.parse(['', 'del', 'link1'])
 	cmd = create_cmd()
 	cmd.parse(['', 'del', 'alt_link', 'link3'])
 }
+
+// TODO: open
