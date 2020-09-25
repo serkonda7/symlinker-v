@@ -88,7 +88,6 @@ pub fn get_real_links(scope string) (map[string]string, string) {
 	return linkmap, msg
 }
 
-// TODO: add tests
 pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	old_path := get_dir(scope) + old_name
 	if !os.is_link(old_path) {

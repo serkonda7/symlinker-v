@@ -114,16 +114,16 @@ fn test_update_link() {
 		panic(err)
 	}
 	assert link_exists(link3, uscope)
-	assert messages == ['Changed path of `$link3` from "$tsource$sl_test" to "$tsource$link3".']
+	assert messages ==
+		['Changed path of `$link3` from "$tsource$sl_test" to "$tsource$link3".']
 	// Update name and source
 	messages = update_link(link3, uscope, sl_test, sl_test) or {
 		panic(err)
 	}
 	assert link_exists(sl_test, uscope)
-	assert messages == [
-		'Renamed $uscope link `$link3` to `$sl_test`.',
-		'Changed path of `$sl_test` from "$tsource$link3" to "$tsource$sl_test".',
-	]
+	assert messages ==
+		[
+		'Renamed $uscope link `$link3` to `$sl_test`.', 'Changed path of `$sl_test` from "$tsource$link3" to "$tsource$sl_test".']
 }
 
 fn test_update_link_errors() {
@@ -134,7 +134,8 @@ fn test_update_link_errors() {
 		assert err == 'New name (`$sl_test`) cannot be the same as current name.'
 	}
 	update_link(sl_test, uscope, '', sl_test) or {
-		assert err == 'New source path ("$tsource$sl_test") cannot be the same as old source path.'
+		assert err ==
+			'New source path ("$tsource$sl_test") cannot be the same as old source path.'
 	}
 	update_link(sl_test, uscope, '', '') or {
 		assert err == '`update` requires at least one of flag of `--name` and `--source`.'
