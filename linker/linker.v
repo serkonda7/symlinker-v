@@ -90,10 +90,17 @@ pub fn get_real_links(scope string) (map[string]string, string) {
 
 // TODO: add tests
 pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
-	dir := get_dir(scope)
-	curr_path := dir + old_name
-	if !os.is_link(curr_path) {
+	old_path := get_dir(scope) + old_name
+	if !os.is_link(old_path) {
 		return error('Cannot update inexistent $scope link `$old_name`.')
+	}
+	if new_name == old_name {
+		return error('New name (`$new_name`) cannot be the same as current name.')
+	}
+	old_rsource := os.real_path(old_path)
+	new_rsource := os.real_path(new_source)
+	if new_rsource == old_rsource {
+		return error('New source path ("$new_rsource") cannot be the same as old source path.')
 	}
 	update_name := new_name != ''
 	update_source := new_source != ''
@@ -101,12 +108,11 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 		return error('`update` requires at least one of flag of `--name` and `--source`.')
 	}
 	name_to_set := if update_name { new_name } else { old_name }
-	old_rsource := os.real_path(curr_path)
 	source_to_set := if update_source { new_source } else { old_rsource }
 	create_link(source_to_set, name_to_set, scope) or {
 		return error(err)
 	}
-	os.rm(curr_path) or {
+	os.rm(old_path) or {
 		panic(err)
 	}
 	mut messages := []string{}
@@ -114,7 +120,6 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 		messages << 'Renamed $scope link `$old_name` to `$new_name`.'
 	}
 	if update_source {
-		new_rsource := os.real_path(source_to_set)
 		messages << 'Changed path of `$name_to_set` from "$old_rsource" to "$new_rsource".'
 	}
 	return messages
