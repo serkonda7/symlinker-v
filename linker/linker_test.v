@@ -127,19 +127,25 @@ fn test_update_link() {
 }
 
 fn test_update_link_errors() {
+	mut err_count := 0
 	update_link(inexistent, uscope, '', '') or {
+		err_count++
 		assert err == 'Cannot update inexistent $uscope link `$inexistent`.'
 	}
 	update_link(sl_test, uscope, sl_test, '') or {
+		err_count++
 		assert err == 'New name (`$sl_test`) cannot be the same as current name.'
 	}
 	update_link(sl_test, uscope, '', sl_test) or {
+		err_count++
 		assert err ==
 			'New source path ("$tsource$sl_test") cannot be the same as old source path.'
 	}
 	update_link(sl_test, uscope, '', '') or {
+		err_count++
 		assert err == '`update` requires at least one of flag of `--name` and `--source`.'
 	}
+	assert err_count == 4
 }
 
 fn test_get_real_links() {
