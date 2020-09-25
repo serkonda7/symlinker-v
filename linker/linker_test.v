@@ -152,6 +152,13 @@ fn test_get_real_links() {
 	assert msg == ''
 }
 
+fn test_split_valid_invalid_links() {
+	linkmap, _ := get_real_links(uscope)
+	valid_links, invalid_links := split_valid_invalid_links(linkmap, uscope)
+	assert valid_links == [sl_test, sl_test2]
+	assert invalid_links == [invalid]
+}
+
 // TODO: test Permission denied error
 fn test_delete_link_errors() {
 	mut err_count := 0

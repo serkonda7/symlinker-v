@@ -29,7 +29,6 @@ pub fn create_link(source_name, link_name, scope string) ?string {
 			if os.real_path(link_path) == source_path {
 				return '`${term.bold(link_name)}` already links to "$source_path".'
 			}
-			// TODO: show tip to use `update`
 			return error('Another $scope link with name `$link_name` does already exist.')
 		}
 		return error('File with name "$link_name" does already exist.')
@@ -124,7 +123,6 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	return messages
 }
 
-// TODO: add tests
 pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {
 	mut valid := []string{}
 	mut invalid := []string{}
