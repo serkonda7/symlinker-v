@@ -10,6 +10,7 @@ const (
 	tsource     = troot + '/tfiles/'
 	sl_test     = 'test'
 	sl_test2    = 'test2'
+	link3       = 'link3'
 	m_link      = 'm_link'
 	invalid     = 'invalid'
 	normal_file = 'normal_file'
@@ -34,6 +35,9 @@ fn testsuite_begin() {
 	os.write_file(sl_test2, '') or {
 		panic(err)
 	}
+	os.write_file(link3, '') or {
+		panic(err)
+	}
 	os.write_file(m_link, '') or {
 		panic(err)
 	}
@@ -48,22 +52,25 @@ fn testsuite_end() {
 }
 
 fn test_create_link() {
+	// Create a normal link
 	mut msg := create_link(sl_test, sl_test, uscope) or {
 		panic(err)
 	}
 	assert link_exists(sl_test, uscope)
 	assert msg == 'Created $uscope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
+	// Link with different name
 	msg = create_link(sl_test, sl_test2, uscope) or {
 		panic(err)
 	}
 	assert link_exists(sl_test2, uscope)
 	assert msg == 'Created $uscope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
+	// Link already links this file
 	msg = create_link(sl_test, sl_test, uscope) or {
 		panic(err)
 	}
 	assert link_exists(sl_test, uscope)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource$sl_test".'
-	// Create invalid link
+	// Create a link and make it invalid
 	create_link(invalid, invalid, uscope)
 	os.rm(invalid) or {
 		panic(err)
@@ -93,6 +100,46 @@ fn test_create_link_errors() {
 		assert err == 'File with name "$normal_file" does already exist.'
 	}
 	assert err_count == 3
+}
+
+fn test_update_link() {
+	// Update name
+	mut messages := update_link(sl_test, uscope, link3, '') or {
+		panic(err)
+	}
+	assert link_exists(link3, uscope)
+	assert messages == ['Renamed $uscope link `$sl_test` to `$link3`.']
+	// Update source
+	messages = update_link(link3, uscope, '', link3) or {
+		panic(err)
+	}
+	assert link_exists(link3, uscope)
+	assert messages ==
+		['Changed path of `$link3` from "$tsource$sl_test" to "$tsource$link3".']
+	// Update name and source
+	messages = update_link(link3, uscope, sl_test, sl_test) or {
+		panic(err)
+	}
+	assert link_exists(sl_test, uscope)
+	assert messages ==
+		[
+		'Renamed $uscope link `$link3` to `$sl_test`.', 'Changed path of `$sl_test` from "$tsource$link3" to "$tsource$sl_test".']
+}
+
+fn test_update_link_errors() {
+	update_link(inexistent, uscope, '', '') or {
+		assert err == 'Cannot update inexistent $uscope link `$inexistent`.'
+	}
+	update_link(sl_test, uscope, sl_test, '') or {
+		assert err == 'New name (`$sl_test`) cannot be the same as current name.'
+	}
+	update_link(sl_test, uscope, '', sl_test) or {
+		assert err ==
+			'New source path ("$tsource$sl_test") cannot be the same as old source path.'
+	}
+	update_link(sl_test, uscope, '', '') or {
+		assert err == '`update` requires at least one of flag of `--name` and `--source`.'
+	}
 }
 
 fn test_get_real_links() {
@@ -160,3 +207,5 @@ fn link_exists(name, scope string) bool {
 	dir := get_dir(scope)
 	return os.is_link(dir + name)
 }
+
+// TODO: link exists with source
