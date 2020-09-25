@@ -123,6 +123,26 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	return messages
 }
 
+// TODO: add test
+pub fn open_link_dir(link_name, scope string) ?(string, string) {
+	mut dir := get_dir(scope)
+	mut msg := ''
+	if link_name == '' {
+		links := os.ls(dir) or {
+			panic(err)
+		}
+		if link_name in links && os.is_link(dir + link_name) {
+			dir = os.real_path(dir + link_name).all_before_last('/')
+			msg = 'Opening the source directory of `$link_name`...'
+		} else {
+			return error('Cannot open source directory of inexistent $scope link `$link_name`.')
+		}
+	} else {
+		msg = 'Opening the $scope symlink folder...'
+	}
+	return 'xdg-open $dir', msg
+}
+
 pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {
 	mut valid := []string{}
 	mut invalid := []string{}
@@ -138,8 +158,7 @@ pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]str
 	return valid, invalid
 }
 
-// TODO: make private once sl_cli does not use it anymore
-pub fn get_dir(scope string) string {
+fn get_dir(scope string) string {
 	$if test {
 		return test_link_dirs[scope]
 	} $else {
