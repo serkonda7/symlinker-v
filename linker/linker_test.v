@@ -187,7 +187,19 @@ fn test_open_link_dir_errors() {
 		assert err ==
 			'Cannot open source directory of inexistent $uscope link `$inexistent`.'
 	}
-	assert err_count == 1
+	// Scope suggestion user --> machine
+	open_link_dir(m_link, uscope) or {
+		err_count++
+		assert err ==
+			"`$m_link` is a $mscope link. Run `symlinker open -m $m_link` to open it's source directory."
+	}
+	// Scope suggestion machine --> user
+	open_link_dir(sl_test, mscope) or {
+		err_count++
+		assert err ==
+			"`$sl_test` is a $uscope link. Run `symlinker open $sl_test` to open it's source directory."
+	}
+	assert err_count == 3
 }
 
 // TODO: test Permission denied error

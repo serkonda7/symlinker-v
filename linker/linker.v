@@ -133,10 +133,25 @@ pub fn open_link_dir(link_name, scope string) ?(string, string) {
 			panic(err)
 		}
 		if link_name in links && os.is_link(dir + link_name) {
-			// TODO: scope sugestion
 			dir = os.real_path(dir + link_name).all_before_last('/') + '/'
 			msg = 'Opening the source directory of `$link_name`...'
 		} else {
+			oscope := other_scope(scope)
+			other_link_path := get_dir(oscope) + link_name
+			if os.is_link(other_link_path) {
+				mut flag := ''
+				$if test {
+					if oscope == 'tmachine' {
+						flag = '-m '
+					}
+				} $else {
+					if oscope == 'machine-wide' {
+						flag = '-m '
+					}
+				}
+				other_cmd := 'symlinker open $flag$link_name'
+				return error("`$link_name` is a $oscope link. Run `$other_cmd` to open it's source directory.")
+			}
 			return error('Cannot open source directory of inexistent $scope link `$link_name`.')
 		}
 	}
