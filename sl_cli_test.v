@@ -13,4 +13,12 @@ fn test_name_flag_validation() {
 	assert msg == 'Value of `--name` is empty, "$valid_tname" will be used instead.'
 }
 
+fn test_array_to_rows() {
+	arr := ['Lorem', 'ipsum', 'dolor', 'sit', 'amet']
+	single_row := array_to_rows(arr, 5)
+	assert single_row == ['Lorem, ipsum, dolor, sit, amet']
+	rows := array_to_rows(arr, 3)
+	assert rows == ['Lorem, ipsum, dolor, ', 'sit, amet']
+}
+
 // TODO: test command parsing

@@ -134,17 +134,7 @@ fn list_func(cmd Command) {
 			for inv in invalid {
 				links << term.bright_magenta(inv)
 			}
-			// TODO: move pretty print into extra function
-			mut rows := []string{}
-			mut row_idx := 0
-			for i, link in links {
-				if i % 5 == 0 {
-					rows << ''
-					row_idx = i / 5
-				}
-				rows[row_idx] += '$link, '
-			}
-			rows[rows.len - 1] = rows.last().all_before_last(', ')
+			rows := array_to_rows(links, 5)
 			for row in rows {
 				println('  $row')
 			}
@@ -211,6 +201,20 @@ fn validate_name_flag(name, alt_name string) (string, string) {
 		tname = os.file_name(alt_name)
 	}
 	return tname, msg
+}
+
+fn array_to_rows(arr []string, max_row_entries int) []string {
+	mut rows := []string{}
+	mut row_idx := 0
+	for i, a in arr {
+		if i % max_row_entries == 0 {
+			rows << ''
+			row_idx = i / max_row_entries
+		}
+		rows[row_idx] += '$a, '
+	}
+	rows[rows.len - 1] = rows.last().all_before_last(', ')
+	return rows
 }
 
 fn get_scope(cmd Command) string {
