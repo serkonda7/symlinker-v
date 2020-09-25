@@ -46,12 +46,7 @@ pub fn delete_link(name, scope string) ?string {
 		if !os.exists(link_path) {
 			oscope := other_scope(scope)
 			other_link_path := get_dir(oscope) + name
-			mut sudo, mut flag := '', ''
-			$if test {
-				sudo, flag = if oscope == 'tmachine' { 'sudo ', '-m ' } else { '', '' }
-			} $else {
-				sudo, flag = if oscope == 'machine-wide' { 'sudo ', '-m ' } else { '', '' }
-			}
+			sudo, flag := if oscope == 'tmachine' || oscope == 'machine-wide' { 'sudo ', '-m ' } else { '', '' }
 			other_cmd := '${sudo}symlinker del $flag$name'
 			if os.is_link(other_link_path) {
 				return error('`$name` is a $oscope link. Run `$other_cmd` to delete it.')
@@ -139,16 +134,7 @@ pub fn open_link_dir(link_name, scope string) ?(string, string) {
 			oscope := other_scope(scope)
 			other_link_path := get_dir(oscope) + link_name
 			if os.is_link(other_link_path) {
-				mut flag := ''
-				$if test {
-					if oscope == 'tmachine' {
-						flag = '-m '
-					}
-				} $else {
-					if oscope == 'machine-wide' {
-						flag = '-m '
-					}
-				}
+				flag := if oscope == 'tmachine' || oscope == 'machine-wide' { flag = '-m ' } else { '' }
 				other_cmd := 'symlinker open $flag$link_name'
 				return error("`$link_name` is a $oscope link. Run `$other_cmd` to open it's source directory.")
 			}
