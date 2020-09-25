@@ -158,13 +158,14 @@ fn list_func(cmd Command) {
 fn update_func(cmd Command) {
 	name_flag_val := cmd.flags.get_string_or('name', '')
 	source_flag_val := cmd.flags.get_string_or('source', '')
-	println(name_flag_val)
-	println(source_flag_val)
 	scope := get_scope(cmd)
 	link_name := cmd.args[0]
-	linker.update_link(link_name, scope, name_flag_val, source_flag_val) or {
+	messages := linker.update_link(link_name, scope, name_flag_val, source_flag_val) or {
 		println(term.bright_red(err))
 		exit(1)
+	}
+	for msg in messages {
+		println(msg)
 	}
 }
 
