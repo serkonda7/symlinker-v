@@ -101,7 +101,7 @@ pub fn update_link(old_name, scope, new_name, new_source string) ? {
 		return error('`update` requires at least one of flag of `--name` and `--source`.')
 	}
 	name_to_set := if update_name { new_name } else { old_name }
-	source_to_set := if update_source { new_source } else { old_name }
+	source_to_set := if update_source { new_source } else { os.real_path(curr_path) }
 	create_link(source_to_set, name_to_set, scope) or {
 		return error(err)
 	}
