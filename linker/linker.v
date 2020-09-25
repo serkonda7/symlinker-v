@@ -134,7 +134,7 @@ pub fn open_link_dir(link_name, scope string) ?(string, string) {
 			oscope := other_scope(scope)
 			other_link_path := get_dir(oscope) + link_name
 			if os.is_link(other_link_path) {
-				flag := if oscope == 'tmachine' || oscope == 'machine-wide' { flag = '-m ' } else { '' }
+				flag := if oscope == 'tmachine' || oscope == 'machine-wide' { '-m ' } else { '' }
 				other_cmd := 'symlinker open $flag$link_name'
 				return error("`$link_name` is a $oscope link. Run `$other_cmd` to open it's source directory.")
 			}
