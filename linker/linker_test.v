@@ -184,7 +184,8 @@ fn test_open_link_dir_errors() {
 	mut err_count := 0
 	open_link_dir(inexistent, uscope) or {
 		err_count++
-		assert err == 'Cannot open source directory of inexistent $uscope link `$inexistent`.'
+		assert err ==
+			'Cannot open source directory of inexistent $uscope link `$inexistent`.'
 	}
 	assert err_count == 1
 }
