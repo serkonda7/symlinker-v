@@ -206,13 +206,18 @@ fn array_to_rows(arr []string, max_row_entries int) []string {
 }
 
 fn get_scope(cmd Command) string {
-	$if test {
-		return 'test'
-	}
 	machine_wide := cmd.flags.get_bool_or('machine', false)
-	return if machine_wide {
-		'machine-wide'
-	} else {
-		'per-user'
+	$if test {
+		return if machine_wide {
+			'tmachine'
+		} else {
+			'tuser'
+		}
+	} $else {
+		return if machine_wide {
+			'machine-wide'
+		} else {
+			'per-user'
+		}
 	}
 }
