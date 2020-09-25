@@ -109,11 +109,11 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	}
 	name_to_set := if update_name { new_name } else { old_name }
 	source_to_set := if update_source { new_source } else { old_rsource }
-	create_link(source_to_set, name_to_set, scope) or {
-		return error(err)
-	}
 	os.rm(old_path) or {
 		panic(err)
+	}
+	create_link(source_to_set, name_to_set, scope) or {
+		return error(err)
 	}
 	mut messages := []string{}
 	if update_name {
