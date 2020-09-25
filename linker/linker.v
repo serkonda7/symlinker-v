@@ -123,7 +123,6 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	return messages
 }
 
-// TODO: add test
 pub fn open_link_dir(link_name, scope string) ?(string, string) {
 	mut dir := get_dir(scope)
 	mut msg := ''
@@ -134,7 +133,8 @@ pub fn open_link_dir(link_name, scope string) ?(string, string) {
 			panic(err)
 		}
 		if link_name in links && os.is_link(dir + link_name) {
-			dir = os.real_path(dir + link_name).all_before_last('/')
+			// TODO: scope sugestion
+			dir = os.real_path(dir + link_name).all_before_last('/') + '/'
 			msg = 'Opening the source directory of `$link_name`...'
 		} else {
 			return error('Cannot open source directory of inexistent $scope link `$link_name`.')
