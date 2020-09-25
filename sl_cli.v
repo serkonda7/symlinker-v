@@ -160,29 +160,17 @@ fn update_func(cmd Command) {
 }
 
 fn open_func(cmd Command) {
-	// TODO: move parts to linker
 	if os.getenv('SUDO_USER') != '' {
-		term.fail_message('Please run without `sudo`.')
+		println(term.bright_red('Please run without `sudo`.'))
 		exit(1)
 	}
 	scope := get_scope(cmd)
-	mut dir := linker.get_dir(scope)
-	if cmd.args.len >= 1 {
-		target_link := cmd.args[0]
-		links := os.ls(dir) or {
-			panic(err)
-		}
-		if target_link in links {
-			dir = os.real_path(dir + target_link).all_before_last('/')
-			println('Opening the directory of "$target_link"...')
-		} else {
-			term.fail_message('Cannot open directory: "$target_link" is no $scope link')
-			exit(1)
-		}
-	} else {
-		println('Opening the $scope symlink folder...')
+	link_name := if cmd.args.len >= 1 { cmd.args[0] } else { '' }
+	command, msg := linker.open_link_dir(link_name, scope) or {
+		println(term.bright_red(err))
+		exit(1)
 	}
-	command := 'xdg-open $dir'
+	println(msg)
 	os.exec(command) or {
 		panic(err)
 	}

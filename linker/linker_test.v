@@ -165,6 +165,43 @@ fn test_split_valid_invalid_links() {
 	assert invalid_links == [invalid]
 }
 
+fn test_open_link_dir() {
+	// Open symlink folder
+	mut command, mut msg := open_link_dir('', uscope) or {
+		panic(err)
+	}
+	assert command == 'xdg-open ${get_dir(uscope)}'
+	assert msg == 'Opening the $uscope symlink folder...'
+	// Open a specific link
+	command, msg = open_link_dir(sl_test, uscope) or {
+		panic(err)
+	}
+	assert command == 'xdg-open $tsource'
+	assert msg == 'Opening the source directory of `$sl_test`...'
+}
+
+fn test_open_link_dir_errors() {
+	mut err_count := 0
+	open_link_dir(inexistent, uscope) or {
+		err_count++
+		assert err ==
+			'Cannot open source directory of inexistent $uscope link `$inexistent`.'
+	}
+	// Scope suggestion user --> machine
+	open_link_dir(m_link, uscope) or {
+		err_count++
+		assert err ==
+			"`$m_link` is a $mscope link. Run `symlinker open -m $m_link` to open it's source directory."
+	}
+	// Scope suggestion machine --> user
+	open_link_dir(sl_test, mscope) or {
+		err_count++
+		assert err ==
+			"`$sl_test` is a $uscope link. Run `symlinker open $sl_test` to open it's source directory."
+	}
+	assert err_count == 3
+}
+
 // TODO: test Permission denied error
 fn test_delete_link_errors() {
 	mut err_count := 0
