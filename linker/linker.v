@@ -93,10 +93,13 @@ pub fn update_link(old_name, scope, new_name, new_source string) ? {
 	dir := get_dir(scope)
 	curr_path := dir + old_name
 	if !os.is_link(curr_path) {
-		return error('Cannot update inexistent $scope link `$old_name`')
+		return error('Cannot update inexistent $scope link `$old_name`.')
 	}
 	update_name := new_name != ''
 	update_source := new_source != ''
+	if !update_name && !update_source {
+		return error('`update` requires at least one of flag of `--name` and `--source`.')
+	}
 	name_to_set := if update_name { new_name } else { old_name }
 	source_to_set := if update_source { new_source } else { old_name }
 	create_link(source_to_set, name_to_set, scope) or {
