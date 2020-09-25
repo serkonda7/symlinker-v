@@ -14,30 +14,30 @@ const (
 	}
 )
 
-pub fn create_link(source_name, target_name, scope string) ?string {
-	target_dir := get_dir(scope)
-	if !os.exists(target_dir) {
-		os.mkdir_all(target_dir)
+pub fn create_link(source_name, link_name, scope string) ?string {
+	link_dir := get_dir(scope)
+	if !os.exists(link_dir) {
+		os.mkdir_all(link_dir)
 	}
 	source_path := os.real_path(source_name)
 	if !os.exists(source_path) {
 		return error('Source file "$source_path" does not exist.')
 	}
-	target_path := target_dir + target_name
-	if os.exists(target_path) {
-		if os.is_link(target_path) {
-			if os.real_path(target_path) == source_path {
-				return '`${term.bold(target_name)}` already links to "$source_path".'
+	link_path := link_dir + link_name
+	if os.exists(link_path) {
+		if os.is_link(link_path) {
+			if os.real_path(link_path) == source_path {
+				return '`${term.bold(link_name)}` already links to "$source_path".'
 			}
 			// TODO: show tip to use `update`
-			return error('Another $scope link with name `$target_name` does already exist.')
+			return error('Another $scope link with name `$link_name` does already exist.')
 		}
-		return error('File with name "$target_name" does already exist.')
+		return error('File with name "$link_name" does already exist.')
 	}
-	os.symlink(source_path, target_path) or {
+	os.symlink(source_path, link_path) or {
 		return error('Permission denied.')
 	}
-	return 'Created $scope link `${term.bold(target_name)}` to "$source_path".'
+	return 'Created $scope link `${term.bold(link_name)}` to "$source_path".'
 }
 
 pub fn delete_link(name, scope string) ?string {
@@ -86,6 +86,33 @@ pub fn get_real_links(scope string) (map[string]string, string) {
 		linkmap[l] = os.real_path(dir + l)
 	}
 	return linkmap, msg
+}
+
+// TODO: add tests
+pub fn update_link(old_name, scope, new_name, new_source string) ? {
+	dir := get_dir(scope)
+	curr_path := dir + old_name
+	if !os.is_link(curr_path) {
+		return error('Cannot update inexistent $scope link `$old_name`')
+	}
+	update_name := new_name != ''
+	update_source := new_source != ''
+	name_to_set := if update_name { new_name } else { old_name }
+	source_to_set := if update_source { new_source } else { old_name }
+	create_link(source_to_set, name_to_set, scope) or {
+		return error(err)
+	}
+	os.rm(curr_path) or {
+		panic(err)
+	}
+	// if update_name {
+	// 	println('Renamed $scope link "$curr_name" to "$new_link_dest".')
+	// }
+	// if update_path {
+	// 	curr_name = new_link_dest
+	// 	real_source := os.real_path(new_link_source)
+	// 	println('Changed path of "$curr_name" to "$real_source".')
+	// }
 }
 
 // TODO: add tests

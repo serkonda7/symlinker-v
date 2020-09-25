@@ -63,13 +63,13 @@ fn create_cmd() Command {
 		flag: .string
 		name: 'name'
 		abbrev: 'n'
-		description: 'The new name.'
+		description: 'The new name for the link.'
 	})
 	update_cmd.add_flag({
 		flag: .string
-		name: 'path'
-		abbrev: 'p'
-		description: 'The new path.'
+		name: 'source'
+		abbrev: 's'
+		description: 'The new source path it links to.'
 	})
 	mut open_cmd := Command{
 		name: 'open'
@@ -156,39 +156,20 @@ fn list_func(cmd Command) {
 }
 
 fn update_func(cmd Command) {
-	// TODO: move parts to linker
 	name_flag_val := cmd.flags.get_string_or('name', '')
-	path_flag_val := cmd.flags.get_string_or('path', '')
+	source_flag_val := cmd.flags.get_string_or('source', '')
 	update_name := name_flag_val != ''
-	update_path := path_flag_val != ''
-	if !update_name && !update_path {
-		term.fail_message('`update` should be used with at least one flag')
+	update_source := source_flag_val != ''
+	if !update_name && !update_source {
+		// TODO: make it a warning?
+		println(term.bright_red('`update` should be used with at least one flag.'))
 		exit(1)
 	}
 	scope := get_scope(cmd)
-	link_parent_dir := linker.get_dir(scope)
-	mut curr_name := cmd.args[0]
-	curr_path := link_parent_dir + curr_name
-	if !os.exists(curr_path) {
-		term.fail_message('Cannot update inexistent link "$curr_path"')
+	link_name := cmd.args[0]
+	linker.update_link(link_name, scope, name_flag_val, source_flag_val) or {
+		println(term.bright_red(err))
 		exit(1)
-	}
-	new_link_source := if update_path { path_flag_val } else { curr_name }
-	new_link_dest := if update_name { name_flag_val } else { curr_name }
-	linker.create_link(new_link_source, new_link_dest, scope) or {
-		term.fail_message(err)
-		exit(1)
-	}
-	os.rm(curr_path) or {
-		panic(err)
-	}
-	if update_name {
-		println('Renamed $scope link "$curr_name" to "$new_link_dest".')
-	}
-	if update_path {
-		curr_name = new_link_dest
-		real_source := os.real_path(new_link_source)
-		println('Changed path of "$curr_name" to "$real_source".')
 	}
 }
 
