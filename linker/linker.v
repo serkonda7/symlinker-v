@@ -113,7 +113,8 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 		messages << 'Renamed $scope link `$old_name` to `${term.bold(new_name)}`.'
 	}
 	if update_source {
-		messages << 'Changed path of `${term.bold(name_to_set)}` from "$old_rsource" to "$new_rsource".'
+		messages <<
+			'Changed path of `${term.bold(name_to_set)}` from "$old_rsource" to "$new_rsource".'
 	}
 	return messages
 }
