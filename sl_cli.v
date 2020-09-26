@@ -27,6 +27,7 @@ fn create_cmd() Command {
 	mut link_cmd := Command{
 		name: 'link'
 		description: 'Create a new symlink to <file>.'
+		usage: '<file>'
 		required_args: 1
 		execute: link_func
 	}
@@ -39,6 +40,7 @@ fn create_cmd() Command {
 	mut del_cmd := Command{
 		name: 'del'
 		description: 'Delete all specified symlinks.'
+		usage: '<link1> <...>'
 		required_args: 1
 		execute: del_func
 	}
@@ -55,7 +57,8 @@ fn create_cmd() Command {
 	})
 	mut update_cmd := Command{
 		name: 'update'
-		description: "Rename a symlink or update it's real path."
+		description: "Rename a symlink or update it's real path. Use at least on of the flags."
+		usage: '<link>'
 		required_args: 1
 		execute: update_func
 	}
@@ -67,13 +70,14 @@ fn create_cmd() Command {
 	})
 	update_cmd.add_flag({
 		flag: .string
-		name: 'source'
-		abbrev: 's'
-		description: 'The new source path it links to.'
+		name: 'path'
+		abbrev: 'p'
+		description: 'The new path that will be linked'
 	})
 	mut open_cmd := Command{
 		name: 'open'
 		description: 'Open a specific symlink or the general root dir in the file explorer.'
+		usage: '[link]'
 		execute: open_func
 	}
 	cmd.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
@@ -147,10 +151,10 @@ fn list_func(cmd Command) {
 
 fn update_func(cmd Command) {
 	name_flag_val := cmd.flags.get_string_or('name', '')
-	source_flag_val := cmd.flags.get_string_or('source', '')
+	path_flag_val := cmd.flags.get_string_or('path', '')
 	scope := get_scope(cmd)
 	link_name := cmd.args[0]
-	messages := linker.update_link(link_name, scope, name_flag_val, source_flag_val) or {
+	messages := linker.update_link(link_name, scope, name_flag_val, path_flag_val) or {
 		println(term.bright_red(err))
 		exit(1)
 	}
