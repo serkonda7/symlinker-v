@@ -1,6 +1,31 @@
 # Changelog
 
 
+## 2.0.0
+_26 September 2020_
+
+**Additions**
+- `link`: new message if the exact same link already exists.
+- `link --name`: show a hint if whitespace was stripped from the provided name.
+- `del`: give a different message if the deleted link was invalid.
+- `del`, `open`: add a suggestion if the specified link only exists in the other scope.
+- `update`: throw an error when the provided values are the same as the old ones.
+- Create a huge amount of (new) tests to ensure great stability.
+
+**Changes**
+- Split the code into two files, the command-line-interface and the actual logic.
+- Error and success messages are much more helpful and informative.
+- `list`: invalid links are now always marked, not only with `--real`.
+- `help`: some updates to the help message and the command usages. 
+- CI: remove windows/mac build job
+
+**Fixes**
+- `update`: prevent possible deletation of the link that should be updated.
+- `update`: fix corrupted links if `--path` was left empty.
+- `update`: fix possible fail in link creation step if the name was not changed.
+- Fix regression that error messages were not printed.
+
+
 ## 1.0.1
 _15 September 2020_
 
