@@ -108,14 +108,14 @@ fn test_update_link() {
 		panic(err)
 	}
 	assert link_exists(link3, uscope)
-	assert messages == ['Renamed $uscope link `$sl_test` to `$link3`.']
+	assert messages == ['Renamed $uscope link `$sl_test` to `${term.bold(link3)}`.']
 	// Update source
 	messages = update_link(link3, uscope, '', link3) or {
 		panic(err)
 	}
 	assert link_exists(link3, uscope)
 	assert messages ==
-		['Changed path of `$link3` from "$tsource$sl_test" to "$tsource$link3".']
+		['Changed path of `${term.bold(link3)}` from "$tsource$sl_test" to "$tsource$link3".']
 	// Update name and source
 	messages = update_link(link3, uscope, sl_test, sl_test) or {
 		panic(err)
@@ -123,7 +123,7 @@ fn test_update_link() {
 	assert link_exists(sl_test, uscope)
 	assert messages ==
 		[
-		'Renamed $uscope link `$link3` to `$sl_test`.', 'Changed path of `$sl_test` from "$tsource$link3" to "$tsource$sl_test".']
+		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.', 'Changed path of `${term.bold(sl_test)}` from "$tsource$link3" to "$tsource$sl_test".']
 }
 
 fn test_update_link_errors() {
@@ -233,12 +233,12 @@ fn test_delete_link() {
 		panic(err)
 	}
 	assert !link_exists(sl_test, uscope)
-	assert msg == 'Deleted $uscope link `$sl_test` to "$tsource$sl_test".'
+	assert msg == 'Deleted $uscope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
 	msg = delete_link(sl_test2, uscope) or {
 		panic(err)
 	}
 	assert !link_exists(sl_test2, uscope)
-	assert msg == 'Deleted $uscope link `$sl_test2` to "$tsource$sl_test".'
+	assert msg == 'Deleted $uscope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
 	msg = delete_link(invalid, uscope) or {
 		panic(err)
 	}

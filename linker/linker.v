@@ -62,7 +62,7 @@ pub fn delete_link(name, scope string) ?string {
 	if source_path == link_path {
 		return 'Deleted invalid link `$name`.'
 	}
-	return 'Deleted $scope link `$name` to "$source_path".'
+	return 'Deleted $scope link `${term.bold(name)}` to "$source_path".'
 }
 
 pub fn get_real_links(scope string) (map[string]string, string) {
@@ -110,10 +110,10 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	}
 	mut messages := []string{}
 	if update_name {
-		messages << 'Renamed $scope link `$old_name` to `$new_name`.'
+		messages << 'Renamed $scope link `$old_name` to `${term.bold(new_name)}`.'
 	}
 	if update_source {
-		messages << 'Changed path of `$name_to_set` from "$old_rsource" to "$new_rsource".'
+		messages << 'Changed path of `${term.bold(name_to_set)}` from "$old_rsource" to "$new_rsource".'
 	}
 	return messages
 }
