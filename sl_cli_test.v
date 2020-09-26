@@ -75,9 +75,9 @@ fn test_update_cmd() {
 	mut cmd := create_cmd()
 	cmd.parse(['', 'update', '--name', 'alt2', 'alt_link'])
 	cmd = create_cmd()
-	cmd.parse(['', 'update', '--source', 'link1', 'alt2'])
+	cmd.parse(['', 'update', '--path', 'link1', 'alt2'])
 	cmd = create_cmd()
-	cmd.parse(['', 'update', '--name', 'alt_link', '--source', 'link2', 'alt2'])
+	cmd.parse(['', 'update', '--name', 'alt_link', '--path', 'link2', 'alt2'])
 }
 
 fn test_del_cmd() {
