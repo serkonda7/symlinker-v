@@ -4,9 +4,10 @@
 CLI utility tool to create and manage symlinks in the PATH.
 
 
-## Building from source
-symlinker is written in V. If you don't have it, go [here][v_repo] first.
+## Installation
+You can download the latest stable release [here][release-latest].
 
+**OR** build symlinker from source. In this case you need to install [V][v_repo] first.
 ```sh
 git clone https://github.com/serkonda7/symlinker.git
 cd symlinker
@@ -45,5 +46,5 @@ Licensed under the [MIT License](LICENSE.md)
 
 
 <!-- Links -->
-[releases]: https://github.com/Serkonda/symlinker/releases
+[release-latest]: https://github.com/serkonda7/symlinker/releases/download/latest/symlinker
 [v_repo]: https://github.com/vlang/v#installing-v-from-source
