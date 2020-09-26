@@ -1,7 +1,7 @@
 # symlinker
 ![CI](https://github.com/Serkonda/symlinker/workflows/CI/badge.svg?branch=master)
 
-CLI utility tool to create and manage symlinks in the PATH.
+Small and lightweight CLI utility tool to create and manage symlinks in the PATH.
 
 
 ## Installation
