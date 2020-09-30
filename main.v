@@ -3,7 +3,6 @@ module main
 import cli { Command }
 import os
 import term
-import linker
 
 fn main() {
 	mut cmd := create_cmd()
@@ -92,7 +91,7 @@ fn link_func(cmd Command) {
 	if validation_msg != '' {
 		println(validation_msg)
 	}
-	msg := linker.create_link(source_name, target_name, scope) or {
+	msg := create_link(source_name, target_name, scope) or {
 		println(term.bright_red(err))
 		exit(1)
 	}
@@ -103,7 +102,7 @@ fn del_func(cmd Command) {
 	scope := get_scope(cmd)
 	mut err_count := 0
 	for arg in cmd.args {
-		msg := linker.delete_link(arg, scope) or {
+		msg := delete_link(arg, scope) or {
 			err_count++
 			println(term.bright_red(err))
 			continue
@@ -116,15 +115,15 @@ fn del_func(cmd Command) {
 }
 
 fn list_func(cmd Command) {
-	scopes := $if test { linker.test_link_dirs.keys() } $else { linker.link_dirs.keys() }
+	scopes := $if test { test_link_dirs.keys() } $else { link_dirs.keys() }
 	for s, scope in scopes {
-		linkmap, msg := linker.get_real_links(scope)
+		linkmap, msg := get_real_links(scope)
 		if msg != '' {
 			println(msg)
 			continue
 		}
 		println(term.bold('$scope links:'))
-		valid, invalid := linker.split_valid_invalid_links(linkmap, scope)
+		valid, invalid := split_valid_invalid_links(linkmap, scope)
 		f_real := cmd.flags.get_bool_or('real', false)
 		if f_real {
 			for v in valid {
@@ -154,7 +153,7 @@ fn update_func(cmd Command) {
 	path_flag_val := cmd.flags.get_string_or('path', '')
 	scope := get_scope(cmd)
 	link_name := cmd.args[0]
-	messages := linker.update_link(link_name, scope, name_flag_val, path_flag_val) or {
+	messages := update_link(link_name, scope, name_flag_val, path_flag_val) or {
 		println(term.bright_red(err))
 		exit(1)
 	}
@@ -170,7 +169,7 @@ fn open_func(cmd Command) {
 	}
 	scope := get_scope(cmd)
 	link_name := if cmd.args.len >= 1 { cmd.args[0] } else { '' }
-	command, msg := linker.open_link_dir(link_name, scope) or {
+	command, msg := open_link_dir(link_name, scope) or {
 		println(term.bright_red(err))
 		exit(1)
 	}
