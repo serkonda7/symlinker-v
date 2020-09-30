@@ -1,4 +1,4 @@
-module linker
+module main
 
 import os
 import term

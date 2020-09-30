@@ -1,4 +1,4 @@
-module linker
+module main
 
 import os
 import term
@@ -14,7 +14,7 @@ const (
 	}
 )
 
-pub fn create_link(source_name, link_name, scope string) ?string {
+fn create_link(source_name, link_name, scope string) ?string {
 	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir)
@@ -39,7 +39,7 @@ pub fn create_link(source_name, link_name, scope string) ?string {
 	return 'Created $scope link `${term.bold(link_name)}` to "$source_path".'
 }
 
-pub fn delete_link(name, scope string) ?string {
+fn delete_link(name, scope string) ?string {
 	dir := get_dir(scope)
 	link_path := dir + name
 	if !os.is_link(link_path) {
@@ -65,7 +65,7 @@ pub fn delete_link(name, scope string) ?string {
 	return 'Deleted $scope link `${term.bold(name)}` to "$source_path".'
 }
 
-pub fn get_real_links(scope string) (map[string]string, string) {
+fn get_real_links(scope string) (map[string]string, string) {
 	mut msg := ''
 	mut linkmap := map[string]string{}
 	dir := get_dir(scope)
@@ -82,7 +82,7 @@ pub fn get_real_links(scope string) (map[string]string, string) {
 	return linkmap, msg
 }
 
-pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
+fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	old_path := get_dir(scope) + old_name
 	if !os.is_link(old_path) {
 		return error('Cannot update inexistent $scope link `$old_name`.')
@@ -119,7 +119,7 @@ pub fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	return messages
 }
 
-pub fn open_link_dir(link_name, scope string) ?(string, string) {
+fn open_link_dir(link_name, scope string) ?(string, string) {
 	mut dir := get_dir(scope)
 	mut msg := ''
 	if link_name == '' {
@@ -145,7 +145,7 @@ pub fn open_link_dir(link_name, scope string) ?(string, string) {
 	return 'xdg-open $dir', msg
 }
 
-pub fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {
+fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {
 	mut valid := []string{}
 	mut invalid := []string{}
 	dir := get_dir(scope)
