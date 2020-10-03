@@ -5,7 +5,7 @@ import term
 
 const (
 	link_dirs      = {
-		'per-user': os.home_dir() + '.local/bin/'
+		'per-user': os.home_dir() + '/.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 	}
 	test_link_dirs = {
