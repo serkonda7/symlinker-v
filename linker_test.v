@@ -22,6 +22,11 @@ fn testsuite_begin() {
 	m_target := get_dir(mscope)
 	os.rmdir_all(troot)
 	os.mkdir_all(tsource)
+	// Test get_real_links when folders do not exist
+	linkmap, msg := get_real_links(uscope)
+	assert linkmap.len == 0
+	assert msg == 'No $uscope symlinks detected.'
+	// Create all folders and files
 	os.mkdir_all(u_target)
 	os.mkdir_all(m_target)
 	os.chdir(u_target)
@@ -160,7 +165,8 @@ fn test_get_real_links() {
 
 fn test_split_valid_invalid_links() {
 	linkmap, _ := get_real_links(uscope)
-	valid_links, invalid_links := split_valid_invalid_links(linkmap, uscope)
+	mut valid_links, invalid_links := split_valid_invalid_links(linkmap, uscope)
+	valid_links.sort()
 	assert valid_links == [sl_test, sl_test2]
 	assert invalid_links == [invalid]
 }
