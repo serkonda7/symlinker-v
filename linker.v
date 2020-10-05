@@ -69,12 +69,8 @@ fn get_real_links(scope string) (map[string]string, string) {
 	mut msg := ''
 	mut linkmap := map[string]string{}
 	dir := get_dir(scope)
-	if !os.exists(dir) {
-		msg = 'No $scope symlinks detected.'
-		return linkmap, msg
-	}
 	files := os.ls(dir) or {
-		panic(err)
+		[]string{}
 	}
 	links := files.filter(os.is_link(dir + it))
 	if links.len == 0 {
@@ -130,7 +126,7 @@ fn open_link_dir(link_name, scope string) ?(string, string) {
 		msg = 'Opening the $scope symlink folder...'
 	} else {
 		links := os.ls(dir) or {
-			panic(err)
+			[]string{}
 		}
 		if link_name in links && os.is_link(dir + link_name) {
 			dir = os.real_path(dir + link_name).all_before_last('/') + '/'
@@ -146,7 +142,7 @@ fn open_link_dir(link_name, scope string) ?(string, string) {
 			return error('Cannot open source directory of inexistent $scope link `$link_name`.')
 		}
 	}
-	return 'xdg-open $dir', msg
+	return 'xdg-open $dir &', msg
 }
 
 fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {

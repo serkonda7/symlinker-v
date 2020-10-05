@@ -119,7 +119,7 @@ fn list_func(cmd Command) {
 	for s, scope in scopes {
 		linkmap, msg := get_real_links(scope)
 		if msg != '' {
-			println(msg)
+			println('$msg\n')
 			continue
 		}
 		println(term.bold('$scope links:'))
