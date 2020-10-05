@@ -1,6 +1,22 @@
 # Changelog
 
 
+## 2.1.0
+_5 October 2020_
+
+**Critical**
+- Prevent possible access to unwanted files using `add -n`, `del`, `open` and `update` with relative paths.
+
+**Changes**
+- `open`: run the file explorer as background process
+- Move linker back to main module but as separate file
+
+**Fixes**
+- `list`: don't panic if a linkdir does not exist
+- `open`: prevent runtime error if the linkdir to be opened does not exist
+- `open`: give other scope suggestion also if the current scope linkdir does not exist
+
+
 ## 2.0.0
 _26 September 2020_
 
@@ -16,7 +32,7 @@ _26 September 2020_
 - Split the code into two files, the command-line-interface and the actual logic.
 - Error and success messages are much more helpful and informative.
 - `list`: invalid links are now always marked, not only with `--real`.
-- `help`: some updates to the help message and the command usages. 
+- `help`: some updates to the help message and the command usages.
 - CI: remove windows/mac build job
 
 **Fixes**
