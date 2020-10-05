@@ -30,14 +30,14 @@ fn testsuite_begin() ? {
 	os.write_file(m_link, '') ?
 	os.write_file(invalid, '') ?
 	// Run tests that need the target folders to not exist
-	linkmap, msg := get_real_links(uscope)
+	linkmap, msg1 := get_real_links(uscope)
 	assert linkmap.len == 0
-	assert msg == 'No $uscope symlinks detected.'
-	mut command, mut msg := open_link_dir('', uscope) or {
+	assert msg1 == 'No $uscope symlinks detected.'
+	command, msg2 := open_link_dir('', uscope) or {
 		panic(err)
 	}
 	assert command == 'xdg-open ${get_dir(uscope)} &'
-	assert msg == 'Opening the $uscope symlink folder...'
+	assert msg2 == 'Opening the $uscope symlink folder...'
 	// Create the target folders
 	os.mkdir_all(u_target)
 	os.mkdir_all(m_target)
