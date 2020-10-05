@@ -123,6 +123,9 @@ fn open_link_dir(link_name, scope string) ?(string, string) {
 	mut dir := get_dir(scope)
 	mut msg := ''
 	if link_name == '' {
+		if !os.exists(dir) {
+			os.mkdir_all(dir)
+		}
 		msg = 'Opening the $scope symlink folder...'
 	} else {
 		links := os.ls(dir) or {

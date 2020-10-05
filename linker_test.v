@@ -17,16 +17,28 @@ const (
 	inexistent  = 'inexistent'
 )
 
-fn testsuite_begin() {
+fn testsuite_begin() ? {
 	u_target := get_dir(uscope)
 	m_target := get_dir(mscope)
 	os.rmdir_all(troot)
+	// Setup the source folder
 	os.mkdir_all(tsource)
-	// Test get_real_links when folders do not exist
+	os.chdir(tsource)
+	os.write_file(sl_test, '') ?
+	os.write_file(sl_test2, '') ?
+	os.write_file(link3, '') ?
+	os.write_file(m_link, '') ?
+	os.write_file(invalid, '') ?
+	// Run tests that need the target folders to not exist
 	linkmap, msg := get_real_links(uscope)
 	assert linkmap.len == 0
 	assert msg == 'No $uscope symlinks detected.'
-	// Create all folders and files
+	mut command, mut msg := open_link_dir('', uscope) or {
+		panic(err)
+	}
+	assert command == 'xdg-open ${get_dir(uscope)} &'
+	assert msg == 'Opening the $uscope symlink folder...'
+	// Create the target folders
 	os.mkdir_all(u_target)
 	os.mkdir_all(m_target)
 	os.chdir(u_target)
@@ -34,21 +46,6 @@ fn testsuite_begin() {
 		panic(err)
 	}
 	os.chdir(tsource)
-	os.write_file(sl_test, '') or {
-		panic(err)
-	}
-	os.write_file(sl_test2, '') or {
-		panic(err)
-	}
-	os.write_file(link3, '') or {
-		panic(err)
-	}
-	os.write_file(m_link, '') or {
-		panic(err)
-	}
-	os.write_file(invalid, '') or {
-		panic(err)
-	}
 }
 
 fn testsuite_end() {
@@ -176,13 +173,13 @@ fn test_open_link_dir() {
 	mut command, mut msg := open_link_dir('', uscope) or {
 		panic(err)
 	}
-	assert command == 'xdg-open ${get_dir(uscope)}'
+	assert command == 'xdg-open ${get_dir(uscope)} &'
 	assert msg == 'Opening the $uscope symlink folder...'
 	// Open a specific link
 	command, msg = open_link_dir(sl_test, uscope) or {
 		panic(err)
 	}
-	assert command == 'xdg-open $tsource'
+	assert command == 'xdg-open $tsource &'
 	assert msg == 'Opening the source directory of `$sl_test`...'
 }
 
