@@ -69,6 +69,10 @@ fn get_real_links(scope string) (map[string]string, string) {
 	mut msg := ''
 	mut linkmap := map[string]string{}
 	dir := get_dir(scope)
+	if !os.exists(dir) {
+		msg = 'No $scope symlinks detected.'
+		return linkmap, msg
+	}
 	files := os.ls(dir) or {
 		panic(err)
 	}
