@@ -23,37 +23,39 @@ fn create_link(source_name, link_name, scope string) ?string {
 	if !os.exists(source_path) {
 		return error('Source file "$source_path" does not exist.')
 	}
-	link_path := link_dir + link_name
+	lname := os.file_name(link_name)
+	link_path := link_dir + lname
 	if os.exists(link_path) {
 		if os.is_link(link_path) {
 			if os.real_path(link_path) == source_path {
-				return '`${term.bold(link_name)}` already links to "$source_path".'
+				return '`${term.bold(lname)}` already links to "$source_path".'
 			}
-			return error('Another $scope link with name `$link_name` does already exist.')
+			return error('Another $scope link with name `$lname` does already exist.')
 		}
-		return error('File with name "$link_name" does already exist.')
+		return error('File with name "$lname" does already exist.')
 	}
 	os.symlink(source_path, link_path) or {
 		return error('Permission denied.')
 	}
-	return 'Created $scope link `${term.bold(link_name)}` to "$source_path".'
+	return 'Created $scope link `${term.bold(lname)}` to "$source_path".'
 }
 
 fn delete_link(name, scope string) ?string {
 	dir := get_dir(scope)
-	link_path := dir + name
+	lname := os.file_name(name)
+	link_path := dir + lname
 	if !os.is_link(link_path) {
 		if !os.exists(link_path) {
 			oscope := other_scope(scope)
-			other_link_path := get_dir(oscope) + name
+			other_link_path := get_dir(oscope) + lname
 			sudo, flag := if oscope == 'tmachine' || oscope == 'machine-wide' { 'sudo ', '-m ' } else { '', '' }
-			other_cmd := '${sudo}symlinker del $flag$name'
+			other_cmd := '${sudo}symlinker del $flag$lname'
 			if os.is_link(other_link_path) {
-				return error('`$name` is a $oscope link. Run `$other_cmd` to delete it.')
+				return error('`$lname` is a $oscope link. Run `$other_cmd` to delete it.')
 			}
-			return error('$scope link `$name` does not exist.')
+			return error('$scope link `$lname` does not exist.')
 		}
-		return error('Only symlinks can be deleted but "$name" is no $scope link.')
+		return error('Only symlinks can be deleted but "$lname" is no $scope link.')
 	}
 	source_path := os.real_path(link_path)
 	os.rm(link_path) or {
@@ -83,24 +85,26 @@ fn get_real_links(scope string) (map[string]string, string) {
 }
 
 fn update_link(old_name, scope, new_name, new_source string) ?[]string {
-	old_path := get_dir(scope) + old_name
+	new_lname := os.file_name(new_name)
+	old_lname := os.file_name(old_name)
+	old_path := get_dir(scope) + old_lname
 	if !os.is_link(old_path) {
-		return error('Cannot update inexistent $scope link `$old_name`.')
+		return error('Cannot update inexistent $scope link `$old_lname`.')
 	}
-	if new_name == old_name {
-		return error('New name (`$new_name`) cannot be the same as current name.')
+	if new_lname == old_lname {
+		return error('New name (`$new_lname`) cannot be the same as current name.')
 	}
 	old_rsource := os.real_path(old_path)
 	new_rsource := os.real_path(new_source)
 	if new_rsource == old_rsource {
 		return error('New source path ("$new_rsource") cannot be the same as old source path.')
 	}
-	update_name := new_name != ''
+	update_name := new_lname != ''
 	update_source := new_source != ''
 	if !update_name && !update_source {
 		return error('`update` requires at least one of flag of `--name` and `--source`.')
 	}
-	name_to_set := if update_name { new_name } else { old_name }
+	name_to_set := if update_name { new_lname } else { old_lname }
 	source_to_set := if update_source { new_source } else { old_rsource }
 	os.rm(old_path) or {
 		panic(err)
@@ -110,7 +114,7 @@ fn update_link(old_name, scope, new_name, new_source string) ?[]string {
 	}
 	mut messages := []string{}
 	if update_name {
-		messages << 'Renamed $scope link `$old_name` to `${term.bold(new_name)}`.'
+		messages << 'Renamed $scope link `$old_lname` to `${term.bold(new_lname)}`.'
 	}
 	if update_source {
 		messages <<

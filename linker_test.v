@@ -42,9 +42,7 @@ fn testsuite_begin() ? {
 	os.mkdir_all(u_target)
 	os.mkdir_all(m_target)
 	os.chdir(u_target)
-	os.write_file(normal_file, '') or {
-		panic(err)
-	}
+	os.write_file(normal_file, '') ?
 	os.chdir(tsource)
 }
 
