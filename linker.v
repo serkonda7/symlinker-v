@@ -108,7 +108,7 @@ fn update_link(oldname, scope, newname, new_source string) ?[]string {
 	source_to_set := if update_source { new_source } else { old_rsource }
 	old_copy_path := '$os.temp_dir()/$old_name'
 	os.cp(old_path, old_copy_path) or {
-		return
+		return none
 	}
 	os.rm(old_path) or {
 		panic(err)
