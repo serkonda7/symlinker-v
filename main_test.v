@@ -52,7 +52,6 @@ fn test_array_to_rows() {
 }
 
 // TODO all: test with --machine
-// TODO all: test the link exists
 fn test_link_cmd() {
 	mut cmd := create_cmd()
 	cmd.parse(['', 'link', 'link1'])

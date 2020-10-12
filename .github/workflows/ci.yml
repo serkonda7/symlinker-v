@@ -28,4 +28,4 @@ jobs:
       - name: Build symlinker
         run: v -prod .
       - name: Run tests
-        run: v test .
+        run: v -stats test .
