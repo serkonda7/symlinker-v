@@ -106,10 +106,19 @@ fn update_link(oldname, scope, newname, new_source string) ?[]string {
 	}
 	name_to_set := if update_name { new_name } else { old_name }
 	source_to_set := if update_source { new_source } else { old_rsource }
+	old_copy_path := '$os.temp_dir()/$old_name'
+	os.cp(old_path, old_copy_path) or {
+		return
+	}
 	os.rm(old_path) or {
 		panic(err)
 	}
 	create_link(source_to_set, name_to_set, scope) or {
+		if old_copy_path != '' {
+			os.cp(old_copy_path, old_path) or {
+				panic(err)
+			}
+		}
 		return error(err)
 	}
 	mut messages := []string{}
