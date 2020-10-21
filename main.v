@@ -179,7 +179,7 @@ fn open_func(cmd Command) {
 	}
 }
 
-fn validate_name_flag(name, alt_name string) (string, string) {
+fn validate_name_flag(name string, alt_name string) (string, string) {
 	mut msg := ''
 	mut tname := name
 	if tname.ends_with(' ') {

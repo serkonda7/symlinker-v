@@ -14,7 +14,7 @@ const (
 	}
 )
 
-fn create_link(source_name, linkname, scope string) ?string {
+fn create_link(source_name string, linkname string, scope string) ?string {
 	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir)
@@ -40,7 +40,7 @@ fn create_link(source_name, linkname, scope string) ?string {
 	return 'Created $scope link `${term.bold(link_name)}` to "$source_path".'
 }
 
-fn delete_link(link_name, scope string) ?string {
+fn delete_link(link_name string, scope string) ?string {
 	dir := get_dir(scope)
 	name := os.file_name(link_name)
 	link_path := dir + name
@@ -84,7 +84,7 @@ fn get_real_links(scope string) (map[string]string, string) {
 	return linkmap, msg
 }
 
-fn update_link(oldname, scope, newname, new_source string) ?[]string {
+fn update_link(oldname string, scope string, newname string, new_source string) ?[]string {
 	new_name := os.file_name(newname)
 	old_name := os.file_name(oldname)
 	old_path := get_dir(scope) + old_name
@@ -132,7 +132,7 @@ fn update_link(oldname, scope, newname, new_source string) ?[]string {
 	return messages
 }
 
-fn open_link_dir(name, scope string) ?(string, string) {
+fn open_link_dir(name string, scope string) ?(string, string) {
 	link_name := os.file_name(name)
 	mut dir := get_dir(scope)
 	mut msg := ''

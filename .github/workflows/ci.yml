@@ -11,6 +11,20 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
+  code-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up V
+        uses: nocturlab/setup-vlang-action@v1
+        with:
+          v-version: master
+        id: v
+      - name: v fmt -verify
+        run: |
+          v fmt -verify main.v main_test.v linker.v linker_test.v
+
   ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -21,10 +35,6 @@ jobs:
         with:
           v-version: master
         id: v
-      - name: Verify code formatting
-        run: |
-          v fmt -verify main.v main_test.v
-          v fmt -verify linker.v linker_test.v
       - name: Build symlinker
         run: v -prod .
       - name: Run tests

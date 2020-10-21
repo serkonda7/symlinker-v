@@ -254,7 +254,7 @@ fn test_get_real_links_in_empty_scope() {
 }
 
 // Helper functions
-fn link_exists(name, scope string) bool {
+fn link_exists(name string, scope string) bool {
 	dir := get_dir(scope)
 	return os.is_link(dir + name)
 }
