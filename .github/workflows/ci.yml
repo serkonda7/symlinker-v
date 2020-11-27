@@ -14,28 +14,37 @@ jobs:
   code-formatting:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout V
         uses: actions/checkout@v2
-      - name: Set up V
-        uses: nocturlab/setup-vlang-action@v1
         with:
-          v-version: master
-        id: v
-      - name: v fmt -verify
+          repository: vlang/v
+      - name: Build V
+        run: make
+      - name: Checkout symlinker
+        uses: actions/checkout@v2
+        with:
+            path: symlinker
+      - name: fmt -verify
         run: |
-          v fmt -verify main.v main_test.v linker.v linker_test.v
+          cd symlinker
+          ../v fmt -verify main.v main_test.v linker.v linker_test.v
 
-  ubuntu:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout V
         uses: actions/checkout@v2
-      - name: Set up V
-        uses: nocturlab/setup-vlang-action@v1
         with:
-          v-version: master
-        id: v
+          repository: vlang/v
+      - name: Build V
+        run: make
+      - name: Checkout symlinker
+        uses: actions/checkout@v2
+        with:
+            path: symlinker
       - name: Build symlinker
-        run: v -prod .
+        run: |
+          cd symlinker
+          ../v -prod .
       - name: Run tests
-        run: v -stats test .
+        run: ../v test .
