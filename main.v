@@ -9,20 +9,20 @@ fn main() {
 	cmd.parse(os.args)
 }
 
-fn create_cmd() Command {
+fn create_cmd() cli.Command {
 	mut cmd := Command{
 		name: 'symlinker'
 		version: '2.1.0'
 		disable_flags: true
 		sort_commands: false
 	}
-	cmd.add_flag({
+	cmd.add_flag(
 		flag: .bool
 		name: 'machine'
 		abbrev: 'm'
 		description: 'Execute the command machine-wide.'
 		global: true
-	})
+	)
 	mut link_cmd := Command{
 		name: 'link'
 		description: 'Create a new symlink to <file>.'
@@ -30,12 +30,12 @@ fn create_cmd() Command {
 		required_args: 1
 		execute: link_func
 	}
-	link_cmd.add_flag({
+	link_cmd.add_flag(
 		flag: .string
 		name: 'name'
 		abbrev: 'n'
 		description: 'Use a custom name for the link.'
-	})
+	)
 	mut del_cmd := Command{
 		name: 'del'
 		description: 'Delete all specified symlinks.'
@@ -48,12 +48,12 @@ fn create_cmd() Command {
 		description: 'List all symlinks.'
 		execute: list_func
 	}
-	list_cmd.add_flag({
+	list_cmd.add_flag(
 		flag: .bool
 		name: 'real'
 		abbrev: 'r'
 		description: 'Also print the path the links point to.'
-	})
+	)
 	mut update_cmd := Command{
 		name: 'update'
 		description: "Rename a symlink or update it's real path. Use at least on of the flags."
@@ -61,18 +61,18 @@ fn create_cmd() Command {
 		required_args: 1
 		execute: update_func
 	}
-	update_cmd.add_flag({
+	update_cmd.add_flag(
 		flag: .string
 		name: 'name'
 		abbrev: 'n'
 		description: 'The new name for the link.'
-	})
-	update_cmd.add_flag({
+	)
+	update_cmd.add_flag(
 		flag: .string
 		name: 'path'
 		abbrev: 'p'
 		description: 'The new path that will be linked'
-	})
+	)
 	mut open_cmd := Command{
 		name: 'open'
 		description: 'Open a specific symlink or the general root dir in the file explorer.'
@@ -83,7 +83,7 @@ fn create_cmd() Command {
 	return cmd
 }
 
-fn link_func(cmd Command) {
+fn link_func(cmd cli.Command) {
 	scope := get_scope(cmd)
 	source_name := cmd.args[0]
 	name_flag_val := cmd.flags.get_string_or('name', '')
@@ -98,7 +98,7 @@ fn link_func(cmd Command) {
 	println(msg)
 }
 
-fn del_func(cmd Command) {
+fn del_func(cmd cli.Command) {
 	scope := get_scope(cmd)
 	mut err_count := 0
 	for arg in cmd.args {
@@ -114,7 +114,7 @@ fn del_func(cmd Command) {
 	}
 }
 
-fn list_func(cmd Command) {
+fn list_func(cmd cli.Command) {
 	scopes := $if test { test_link_dirs.keys() } $else { link_dirs.keys() }
 	for s, scope in scopes {
 		linkmap, msg := get_real_links(scope)
@@ -148,7 +148,7 @@ fn list_func(cmd Command) {
 	}
 }
 
-fn update_func(cmd Command) {
+fn update_func(cmd cli.Command) {
 	name_flag_val := cmd.flags.get_string_or('name', '')
 	path_flag_val := cmd.flags.get_string_or('path', '')
 	scope := get_scope(cmd)
@@ -162,7 +162,7 @@ fn update_func(cmd Command) {
 	}
 }
 
-fn open_func(cmd Command) {
+fn open_func(cmd cli.Command) {
 	if os.getenv('SUDO_USER') != '' {
 		println(term.bright_red('Please run without `sudo`.'))
 		exit(1)
@@ -174,9 +174,7 @@ fn open_func(cmd Command) {
 		exit(1)
 	}
 	println(msg)
-	os.exec(command) or {
-		panic(err)
-	}
+	os.exec(command) or { panic(err) }
 }
 
 fn validate_name_flag(name string, alt_name string) (string, string) {
@@ -208,7 +206,7 @@ fn array_to_rows(arr []string, max_row_entries int) []string {
 	return rows
 }
 
-fn get_scope(cmd Command) string {
+fn get_scope(cmd cli.Command) string {
 	machine_wide := cmd.flags.get_bool_or('machine', false)
 	$if test {
 		return if machine_wide {
