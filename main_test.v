@@ -14,15 +14,9 @@ fn testsuite_begin() {
 	os.rmdir_all(troot)
 	os.mkdir_all(tsource)
 	os.chdir(tsource)
-	os.write_file(link1, '') or {
-		panic(err)
-	}
-	os.write_file(link2, '') or {
-		panic(err)
-	}
-	os.write_file(link3, '') or {
-		panic(err)
-	}
+	os.write_file(link1, '') or { panic(err) }
+	os.write_file(link2, '') or { panic(err) }
+	os.write_file(link3, '') or { panic(err) }
 }
 
 fn testsuite_end() {

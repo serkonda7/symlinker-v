@@ -23,7 +23,10 @@ jobs:
       - name: fmt -verify
         run: |
           cd symlinker
-          ../v fmt -verify main.v main_test.v linker.v linker_test.v
+          ../v fmt -verify main.v
+          ../v fmt -verify main_test.v
+          ../v fmt -verify linker.v
+          ../v fmt -verify linker_test.v
 
   build-and-test:
     runs-on: ubuntu-latest

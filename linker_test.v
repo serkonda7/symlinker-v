@@ -33,9 +33,7 @@ fn testsuite_begin() ? {
 	linkmap, msg1 := get_real_links(uscope)
 	assert linkmap.len == 0
 	assert msg1 == 'No $uscope symlinks detected.'
-	command, msg2 := open_link_dir('', uscope) or {
-		panic(err)
-	}
+	command, msg2 := open_link_dir('', uscope) or { panic(err) }
 	assert command == 'xdg-open ${get_dir(uscope)} &'
 	assert msg2 == 'Opening the $uscope symlink folder...'
 	// Create the target folders
@@ -53,33 +51,23 @@ fn testsuite_end() {
 
 fn test_create_link() {
 	// Create a normal link
-	mut msg := create_link(sl_test, sl_test, uscope) or {
-		panic(err)
-	}
+	mut msg := create_link(sl_test, sl_test, uscope) or { panic(err) }
 	assert link_exists(sl_test, uscope)
 	assert msg == 'Created $uscope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
 	// Link with different name
-	msg = create_link(sl_test, sl_test2, uscope) or {
-		panic(err)
-	}
+	msg = create_link(sl_test, sl_test2, uscope) or { panic(err) }
 	assert link_exists(sl_test2, uscope)
 	assert msg == 'Created $uscope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
 	// Link already links this file
-	msg = create_link(sl_test, sl_test, uscope) or {
-		panic(err)
-	}
+	msg = create_link(sl_test, sl_test, uscope) or { panic(err) }
 	assert link_exists(sl_test, uscope)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource$sl_test".'
 	// Create a link and make it invalid
 	create_link(invalid, invalid, uscope)
-	os.rm(invalid) or {
-		panic(err)
-	}
+	os.rm(invalid) or { panic(err) }
 	assert !os.exists(invalid)
 	// Create tmachine link
-	msg = create_link(m_link, m_link, mscope) or {
-		panic(err)
-	}
+	msg = create_link(m_link, m_link, mscope) or { panic(err) }
 	assert link_exists(m_link, mscope)
 	assert msg == 'Created $mscope link `${term.bold(m_link)}` to "$tsource$m_link".'
 }
@@ -104,22 +92,16 @@ fn test_create_link_errors() {
 
 fn test_update_link() {
 	// Update name
-	mut messages := update_link(sl_test, uscope, link3, '') or {
-		panic(err)
-	}
+	mut messages := update_link(sl_test, uscope, link3, '') or { panic(err) }
 	assert link_exists(link3, uscope)
 	assert messages == ['Renamed $uscope link `$sl_test` to `${term.bold(link3)}`.']
 	// Update source
-	messages = update_link(link3, uscope, '', link3) or {
-		panic(err)
-	}
+	messages = update_link(link3, uscope, '', link3) or { panic(err) }
 	assert link_exists(link3, uscope)
 	assert messages ==
 		['Changed path of `${term.bold(link3)}` from "$tsource$sl_test" to "$tsource$link3".']
 	// Update name and source
-	messages = update_link(link3, uscope, sl_test, sl_test) or {
-		panic(err)
-	}
+	messages = update_link(link3, uscope, sl_test, sl_test) or { panic(err) }
 	assert link_exists(sl_test, uscope)
 	assert messages ==
 		[
@@ -168,15 +150,11 @@ fn test_split_valid_invalid_links() {
 
 fn test_open_link_dir() {
 	// Open symlink folder
-	mut command, mut msg := open_link_dir('', uscope) or {
-		panic(err)
-	}
+	mut command, mut msg := open_link_dir('', uscope) or { panic(err) }
 	assert command == 'xdg-open ${get_dir(uscope)} &'
 	assert msg == 'Opening the $uscope symlink folder...'
 	// Open a specific link
-	command, msg = open_link_dir(sl_test, uscope) or {
-		panic(err)
-	}
+	command, msg = open_link_dir(sl_test, uscope) or { panic(err) }
 	assert command == 'xdg-open $tsource &'
 	assert msg == 'Opening the source directory of `$sl_test`...'
 }
@@ -230,19 +208,13 @@ fn test_delete_link_errors() {
 }
 
 fn test_delete_link() {
-	mut msg := delete_link(sl_test, uscope) or {
-		panic(err)
-	}
+	mut msg := delete_link(sl_test, uscope) or { panic(err) }
 	assert !link_exists(sl_test, uscope)
 	assert msg == 'Deleted $uscope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
-	msg = delete_link(sl_test2, uscope) or {
-		panic(err)
-	}
+	msg = delete_link(sl_test2, uscope) or { panic(err) }
 	assert !link_exists(sl_test2, uscope)
 	assert msg == 'Deleted $uscope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
-	msg = delete_link(invalid, uscope) or {
-		panic(err)
-	}
+	msg = delete_link(invalid, uscope) or { panic(err) }
 	assert !link_exists(invalid, uscope)
 	assert msg == 'Deleted invalid link `$invalid`.'
 }

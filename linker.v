@@ -5,11 +5,11 @@ import term
 
 const (
 	link_dirs      = {
-		'per-user': os.home_dir() + '/.local/bin/'
+		'per-user':     os.home_dir() + '/.local/bin/'
 		'machine-wide': '/usr/local/bin/'
 	}
 	test_link_dirs = {
-		'tuser': os.temp_dir() + '/symlinker/tu_links/'
+		'tuser':    os.temp_dir() + '/symlinker/tu_links/'
 		'tmachine': os.temp_dir() + '/symlinker/tm_links/'
 	}
 )
@@ -34,9 +34,7 @@ fn create_link(source_name string, linkname string, scope string) ?string {
 		}
 		return error('File with name "$link_name" does already exist.')
 	}
-	os.symlink(source_path, link_path) or {
-		return error('Permission denied.')
-	}
+	os.symlink(source_path, link_path) or { return error('Permission denied.') }
 	return 'Created $scope link `${term.bold(link_name)}` to "$source_path".'
 }
 
@@ -58,9 +56,7 @@ fn delete_link(link_name string, scope string) ?string {
 		return error('Only symlinks can be deleted but "$name" is no $scope link.')
 	}
 	source_path := os.real_path(link_path)
-	os.rm(link_path) or {
-		return error('Permission denied.')
-	}
+	os.rm(link_path) or { return error('Permission denied.') }
 	if source_path == link_path {
 		return 'Deleted invalid link `$name`.'
 	}
@@ -71,9 +67,7 @@ fn get_real_links(scope string) (map[string]string, string) {
 	mut msg := ''
 	mut linkmap := map[string]string{}
 	dir := get_dir(scope)
-	files := os.ls(dir) or {
-		[]string{}
-	}
+	files := os.ls(dir) or { []string{} }
 	links := files.filter(os.is_link(dir + it))
 	if links.len == 0 {
 		msg = 'No $scope symlinks detected.'
@@ -107,17 +101,11 @@ fn update_link(oldname string, scope string, newname string, new_source string) 
 	name_to_set := if update_name { new_name } else { old_name }
 	source_to_set := if update_source { new_source } else { old_rsource }
 	old_copy_path := '$os.temp_dir()/$old_name'
-	os.cp(old_path, old_copy_path) or {
-		return none
-	}
-	os.rm(old_path) or {
-		panic(err)
-	}
+	os.cp(old_path, old_copy_path) or { return none }
+	os.rm(old_path) or { panic(err) }
 	create_link(source_to_set, name_to_set, scope) or {
 		if old_copy_path != '' {
-			os.cp(old_copy_path, old_path) or {
-				panic(err)
-			}
+			os.cp(old_copy_path, old_path) or { panic(err) }
 		}
 		return error(err)
 	}
@@ -142,9 +130,7 @@ fn open_link_dir(name string, scope string) ?(string, string) {
 		}
 		msg = 'Opening the $scope symlink folder...'
 	} else {
-		links := os.ls(dir) or {
-			[]string{}
-		}
+		links := os.ls(dir) or { []string{} }
 		if link_name in links && os.is_link(dir + link_name) {
 			dir = os.real_path(dir + link_name).all_before_last('/') + '/'
 			msg = 'Opening the source directory of `$link_name`...'
