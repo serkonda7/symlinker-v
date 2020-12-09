@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.1.1
+_9 Decemebr 2020_
+
+**Changes**
+- Restore the old symlink if updating it fails
+- Some CI updates
+
 ## 2.1.0
 _5 October 2020_
 

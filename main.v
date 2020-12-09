@@ -12,7 +12,7 @@ fn main() {
 fn create_cmd() cli.Command {
 	mut cmd := Command{
 		name: 'symlinker'
-		version: '2.1.0'
+		version: '2.1.1'
 		disable_flags: true
 		sort_commands: false
 	}
