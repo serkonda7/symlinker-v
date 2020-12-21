@@ -1,5 +1,6 @@
 # Ignore build files
 symlinker
+sl
 *.exe
 *.ilk
 *.pdb

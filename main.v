@@ -133,7 +133,7 @@ fn list_func(cmd cli.Command) {
 				println(term.bright_magenta('  INVALID: $inv'))
 			}
 		} else {
-			mut links := valid
+			mut links := valid.clone()
 			for inv in invalid {
 				links << term.bright_magenta(inv)
 			}
