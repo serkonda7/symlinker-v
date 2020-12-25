@@ -9,7 +9,7 @@ fn main() {
 	cmd.parse(os.args)
 }
 
-fn create_cmd() cli.Command {
+fn create_cmd() Command {
 	mut cmd := Command{
 		name: 'symlinker'
 		version: '2.1.1'
@@ -83,7 +83,7 @@ fn create_cmd() cli.Command {
 	return cmd
 }
 
-fn link_func(cmd cli.Command) {
+fn link_func(cmd Command) {
 	scope := get_scope(cmd)
 	source_name := cmd.args[0]
 	name_flag_val := cmd.flags.get_string_or('name', '')
@@ -98,7 +98,7 @@ fn link_func(cmd cli.Command) {
 	println(msg)
 }
 
-fn del_func(cmd cli.Command) {
+fn del_func(cmd Command) {
 	scope := get_scope(cmd)
 	mut err_count := 0
 	for arg in cmd.args {
@@ -114,7 +114,7 @@ fn del_func(cmd cli.Command) {
 	}
 }
 
-fn list_func(cmd cli.Command) {
+fn list_func(cmd Command) {
 	scopes := $if test { test_link_dirs.keys() } $else { link_dirs.keys() }
 	for s, scope in scopes {
 		linkmap, msg := get_real_links(scope)
@@ -148,7 +148,7 @@ fn list_func(cmd cli.Command) {
 	}
 }
 
-fn update_func(cmd cli.Command) {
+fn update_func(cmd Command) {
 	name_flag_val := cmd.flags.get_string_or('name', '')
 	path_flag_val := cmd.flags.get_string_or('path', '')
 	scope := get_scope(cmd)
@@ -162,7 +162,7 @@ fn update_func(cmd cli.Command) {
 	}
 }
 
-fn open_func(cmd cli.Command) {
+fn open_func(cmd Command) {
 	if os.getenv('SUDO_USER') != '' {
 		println(term.bright_red('Please run without `sudo`.'))
 		exit(1)
@@ -206,7 +206,7 @@ fn array_to_rows(arr []string, max_row_entries int) []string {
 	return rows
 }
 
-fn get_scope(cmd cli.Command) string {
+fn get_scope(cmd Command) string {
 	machine_wide := cmd.flags.get_bool_or('machine', false)
 	$if test {
 		return if machine_wide {
