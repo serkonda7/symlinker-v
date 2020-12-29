@@ -45,6 +45,12 @@ fn test_array_to_rows() {
 	assert rows == ['Lorem, ipsum, dolor, ', 'sit, amet']
 }
 
+fn test_name_max() {
+	names := ['Lorem', 'sit', 'amet']
+	expected := 5
+	assert name_max(names) == expected
+}
+
 // TODO all: test with --machine
 fn test_link_cmd() {
 	mut cmd := create_cmd()
