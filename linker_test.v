@@ -125,7 +125,7 @@ fn test_update_link_errors() {
 	}
 	update_link(sl_test, uscope, '', '') or {
 		err_count++
-		assert err == '`update` requires at least one of flag of `--name` and `--source`.'
+		assert err == '`update` requires at least one of flag of `--name` and `--path`.'
 	}
 	assert err_count == 4
 }
