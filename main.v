@@ -116,7 +116,7 @@ fn del_func(cmd Command) {
 
 fn list_func(cmd Command) {
 	scopes := $if test { test_link_dirs.keys() } $else { link_dirs.keys() }
-	for s, scope in scopes {
+	for i, scope in scopes {
 		linkmap, msg := get_real_links(scope)
 		if msg != '' {
 			println('$msg\n')
@@ -126,8 +126,10 @@ fn list_func(cmd Command) {
 		valid, invalid := split_valid_invalid_links(linkmap, scope)
 		f_real := cmd.flags.get_bool_or('real', false)
 		if f_real {
+			max_len := name_max(valid)
 			for v in valid {
-				println('  $v: ${linkmap[v]}')
+				s := ' '.repeat(max_len - v.len + 1)
+				println('  $v:$s${linkmap[v]}')
 			}
 			for inv in invalid {
 				println(term.bright_magenta('  INVALID: $inv'))
@@ -142,7 +144,7 @@ fn list_func(cmd Command) {
 				println('  $row')
 			}
 		}
-		if s < scopes.len - 1 {
+		if i < scopes.len - 1 {
 			println('')
 		}
 	}
@@ -204,6 +206,16 @@ fn array_to_rows(arr []string, max_row_entries int) []string {
 	}
 	rows[rows.len - 1] = rows.last().all_before_last(', ')
 	return rows
+}
+
+fn name_max(names []string) int {
+	mut max := 0
+	for n in names {
+		if n.len > max {
+			max = n.len
+		}
+	}
+	return max
 }
 
 fn get_scope(cmd Command) string {
