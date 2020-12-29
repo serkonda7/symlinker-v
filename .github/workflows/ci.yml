@@ -21,12 +21,7 @@ jobs:
         with:
             path: symlinker
       - name: fmt -verify
-        run: |
-          cd symlinker
-          ../v fmt -verify main.v
-          ../v fmt -verify main_test.v
-          ../v fmt -verify linker.v
-          ../v fmt -verify linker_test.v
+        run: ./v fmt -verify symlinker/
 
   build-and-test:
     runs-on: ubuntu-latest
@@ -42,10 +37,6 @@ jobs:
         with:
             path: symlinker
       - name: Build symlinker
-        run: |
-          cd symlinker
-          ../v -prod .
+        run: ./v -prod symlinker/
       - name: Run tests
-        run: |
-          cd symlinker
-          ../v test .
+        run: ./v test symlinker
