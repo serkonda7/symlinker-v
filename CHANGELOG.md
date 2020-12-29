@@ -1,8 +1,18 @@
 # Changelog
 
 
+## 2.2.0
+_29 December 2020_
+
+**Changes**
+- `list --real`: the real paths are now aligned
+
+**Fixes**
+- Show the correct flag name (`--path`) in an `update` error message
+
+
 ## 2.1.1
-_9 Decemebr 2020_
+_9 December 2020_
 
 **Changes**
 - Restore the old symlink if updating it fails
