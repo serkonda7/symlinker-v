@@ -71,6 +71,10 @@ fn test_create_link() {
 	msg = create_link(m_link, m_link, mscope) or { panic(err) }
 	assert link_exists(m_link, mscope)
 	assert msg == 'Created $mscope link `${term.bold(m_link)}` to "$tsource/$m_link".'
+	// Path traversal attacks should not work
+	msg = create_link(sl_test, '../$sl_test3', uscope) or { panic(err) }
+	assert link_exists(sl_test3, uscope)
+	assert !link_exists('../$sl_test3', uscope)
 }
 
 fn test_create_link_errors() {
@@ -105,9 +109,7 @@ fn test_update_link() {
 	assert link_exists(sl_test, uscope)
 	assert messages ==
 		[
-		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.',
-		'Changed path of `${term.bold(sl_test)}` from "$tsource/$link3" to "$tsource/$sl_test".'
-	]
+		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.', 'Changed path of `${term.bold(sl_test)}` from "$tsource/$link3" to "$tsource/$sl_test".']
 }
 
 fn test_update_link_errors() {
@@ -138,6 +140,7 @@ fn test_get_real_links() {
 	expected[invalid] = get_dir(uscope) + '/$invalid'
 	expected[sl_test] = '$tsource/$sl_test'
 	expected[sl_test2] = '$tsource/$sl_test'
+	expected[sl_test3] = '$tsource/$sl_test'
 	assert linkmap == expected
 	assert msg == ''
 }
@@ -146,7 +149,7 @@ fn test_split_valid_invalid_links() {
 	linkmap, _ := get_real_links(uscope)
 	mut valid_links, invalid_links := split_valid_invalid_links(linkmap, uscope)
 	valid_links.sort()
-	assert valid_links == [sl_test, sl_test2]
+	assert valid_links == [sl_test, sl_test2, sl_test3]
 	assert invalid_links == [invalid]
 }
 
@@ -215,6 +218,8 @@ fn test_delete_link() {
 	msg = delete_link(sl_test2, uscope) or { panic(err) }
 	assert !link_exists(sl_test2, uscope)
 	assert msg == 'Deleted $uscope link `${term.bold(sl_test2)}` to "$tsource/$sl_test".'
+	delete_link(sl_test3, uscope) or { panic(err) }
+	assert !link_exists(sl_test3, uscope)
 	msg = delete_link(invalid, uscope) or { panic(err) }
 	assert !link_exists(invalid, uscope)
 	assert msg == 'Deleted invalid link `$invalid`.'
