@@ -51,7 +51,6 @@ fn test_name_max() {
 	assert name_max(names) == expected
 }
 
-// TODO all: test with --machine
 fn test_link_cmd() {
 	mut cmd := create_cmd()
 	cmd.parse(['', 'link', 'link1'])

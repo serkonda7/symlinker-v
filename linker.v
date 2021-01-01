@@ -5,12 +5,12 @@ import term
 
 const (
 	link_dirs      = {
-		'per-user':     os.home_dir() + '/.local/bin/'
-		'machine-wide': '/usr/local/bin/'
+		'per-user':     os.home_dir() + '/.local/bin'
+		'machine-wide': '/usr/local/bin'
 	}
 	test_link_dirs = {
-		'tuser':    os.temp_dir() + '/symlinker/tu_links/'
-		'tmachine': os.temp_dir() + '/symlinker/tm_links/'
+		'tuser':    os.temp_dir() + '/symlinker/tu_links'
+		'tmachine': os.temp_dir() + '/symlinker/tm_links'
 	}
 )
 
@@ -24,7 +24,7 @@ fn create_link(source_name string, linkname string, scope string) ?string {
 		return error('Source file "$source_path" does not exist.')
 	}
 	link_name := os.file_name(linkname)
-	link_path := link_dir + link_name
+	link_path := '$link_dir/$link_name'
 	if os.exists(link_path) {
 		if os.is_link(link_path) {
 			if os.real_path(link_path) == source_path {
@@ -41,11 +41,11 @@ fn create_link(source_name string, linkname string, scope string) ?string {
 fn delete_link(link_name string, scope string) ?string {
 	dir := get_dir(scope)
 	name := os.file_name(link_name)
-	link_path := dir + name
+	link_path := '$dir/$name'
 	if !os.is_link(link_path) {
 		if !os.exists(link_path) {
 			oscope := other_scope(scope)
-			other_link_path := get_dir(oscope) + name
+			other_link_path := get_dir(oscope) + '/$name'
 			sudo, f := if oscope in ['tmachine', 'machine-wide'] { 'sudo ', '-m ' } else { '', '' }
 			other_cmd := '${sudo}symlinker del $f$name'
 			if os.is_link(other_link_path) {
@@ -68,12 +68,13 @@ fn get_real_links(scope string) (map[string]string, string) {
 	mut linkmap := map[string]string{}
 	dir := get_dir(scope)
 	files := os.ls(dir) or { []string{} }
-	links := files.filter(os.is_link(dir + it))
+	mut links := files.filter(os.is_link('$dir/$it'))
+	links.sort()
 	if links.len == 0 {
 		msg = 'No $scope symlinks detected.'
 	}
 	for l in links {
-		linkmap[l] = os.real_path(dir + l)
+		linkmap[l] = os.real_path('$dir/$l')
 	}
 	return linkmap, msg
 }
@@ -81,7 +82,7 @@ fn get_real_links(scope string) (map[string]string, string) {
 fn update_link(oldname string, scope string, newname string, new_source string) ?[]string {
 	new_name := os.file_name(newname)
 	old_name := os.file_name(oldname)
-	old_path := get_dir(scope) + old_name
+	old_path := get_dir(scope) + '/$old_name'
 	if !os.is_link(old_path) {
 		return error('Cannot update inexistent $scope link `$old_name`.')
 	}
@@ -131,12 +132,12 @@ fn open_link_dir(name string, scope string) ?(string, string) {
 		msg = 'Opening the $scope symlink folder...'
 	} else {
 		links := os.ls(dir) or { []string{} }
-		if link_name in links && os.is_link(dir + link_name) {
-			dir = os.real_path(dir + link_name).all_before_last('/') + '/'
+		if link_name in links && os.is_link('$dir/$link_name') {
+			dir = os.real_path('$dir/$link_name').all_before_last('/')
 			msg = 'Opening the source directory of `$link_name`...'
 		} else {
 			oscope := other_scope(scope)
-			other_link_path := get_dir(oscope) + link_name
+			other_link_path := get_dir(oscope) + '/$link_name'
 			if os.is_link(other_link_path) {
 				flag := if oscope == 'tmachine' || oscope == 'machine-wide' { '-m ' } else { '' }
 				other_cmd := 'symlinker open $flag$link_name'
@@ -153,7 +154,7 @@ fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string,
 	mut invalid := []string{}
 	dir := get_dir(scope)
 	for lnk, real_path in linkmap {
-		link_path := dir + lnk
+		link_path := '$dir/$lnk'
 		if link_path == real_path {
 			invalid << lnk
 		} else {

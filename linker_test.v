@@ -7,9 +7,10 @@ const (
 	uscope      = 'tuser'
 	mscope      = 'tmachine'
 	troot       = os.temp_dir() + '/symlinker'
-	tsource     = troot + '/tfiles/'
+	tsource     = troot + '/tfiles'
 	sl_test     = 'test'
 	sl_test2    = 'test2'
+	sl_test3    = 'test3'
 	link3       = 'link3'
 	m_link      = 'm_link'
 	invalid     = 'invalid'
@@ -53,15 +54,15 @@ fn test_create_link() {
 	// Create a normal link
 	mut msg := create_link(sl_test, sl_test, uscope) or { panic(err) }
 	assert link_exists(sl_test, uscope)
-	assert msg == 'Created $uscope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
+	assert msg == 'Created $uscope link `${term.bold(sl_test)}` to "$tsource/$sl_test".'
 	// Link with different name
 	msg = create_link(sl_test, sl_test2, uscope) or { panic(err) }
 	assert link_exists(sl_test2, uscope)
-	assert msg == 'Created $uscope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
+	assert msg == 'Created $uscope link `${term.bold(sl_test2)}` to "$tsource/$sl_test".'
 	// Link already links this file
 	msg = create_link(sl_test, sl_test, uscope) or { panic(err) }
 	assert link_exists(sl_test, uscope)
-	assert msg == '`${term.bold(sl_test)}` already links to "$tsource$sl_test".'
+	assert msg == '`${term.bold(sl_test)}` already links to "$tsource/$sl_test".'
 	// Create a link and make it invalid
 	create_link(invalid, invalid, uscope)
 	os.rm(invalid) or { panic(err) }
@@ -69,10 +70,9 @@ fn test_create_link() {
 	// Create tmachine link
 	msg = create_link(m_link, m_link, mscope) or { panic(err) }
 	assert link_exists(m_link, mscope)
-	assert msg == 'Created $mscope link `${term.bold(m_link)}` to "$tsource$m_link".'
+	assert msg == 'Created $mscope link `${term.bold(m_link)}` to "$tsource/$m_link".'
 }
 
-// TODO: test Permission denied error
 fn test_create_link_errors() {
 	mut err_count := 0
 	create_link(inexistent, inexistent, uscope) or {
@@ -99,13 +99,15 @@ fn test_update_link() {
 	messages = update_link(link3, uscope, '', link3) or { panic(err) }
 	assert link_exists(link3, uscope)
 	assert messages ==
-		['Changed path of `${term.bold(link3)}` from "$tsource$sl_test" to "$tsource$link3".']
+		['Changed path of `${term.bold(link3)}` from "$tsource/$sl_test" to "$tsource/$link3".']
 	// Update name and source
 	messages = update_link(link3, uscope, sl_test, sl_test) or { panic(err) }
 	assert link_exists(sl_test, uscope)
 	assert messages ==
 		[
-		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.', 'Changed path of `${term.bold(sl_test)}` from "$tsource$link3" to "$tsource$sl_test".']
+		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.',
+		'Changed path of `${term.bold(sl_test)}` from "$tsource/$link3" to "$tsource/$sl_test".'
+	]
 }
 
 fn test_update_link_errors() {
@@ -121,7 +123,7 @@ fn test_update_link_errors() {
 	update_link(sl_test, uscope, '', sl_test) or {
 		err_count++
 		assert err ==
-			'New source path ("$tsource$sl_test") cannot be the same as old source path.'
+			'New source path ("$tsource/$sl_test") cannot be the same as old source path.'
 	}
 	update_link(sl_test, uscope, '', '') or {
 		err_count++
@@ -133,9 +135,9 @@ fn test_update_link_errors() {
 fn test_get_real_links() {
 	linkmap, msg := get_real_links(uscope)
 	mut expected := map[string]string{}
-	expected[invalid] = get_dir(uscope) + invalid
-	expected[sl_test] = tsource + sl_test
-	expected[sl_test2] = tsource + sl_test
+	expected[invalid] = get_dir(uscope) + '/$invalid'
+	expected[sl_test] = '$tsource/$sl_test'
+	expected[sl_test2] = '$tsource/$sl_test'
 	assert linkmap == expected
 	assert msg == ''
 }
@@ -181,7 +183,6 @@ fn test_open_link_dir_errors() {
 	assert err_count == 3
 }
 
-// TODO: test Permission denied error
 fn test_delete_link_errors() {
 	mut err_count := 0
 	delete_link(inexistent, uscope) or {
@@ -210,10 +211,10 @@ fn test_delete_link_errors() {
 fn test_delete_link() {
 	mut msg := delete_link(sl_test, uscope) or { panic(err) }
 	assert !link_exists(sl_test, uscope)
-	assert msg == 'Deleted $uscope link `${term.bold(sl_test)}` to "$tsource$sl_test".'
+	assert msg == 'Deleted $uscope link `${term.bold(sl_test)}` to "$tsource/$sl_test".'
 	msg = delete_link(sl_test2, uscope) or { panic(err) }
 	assert !link_exists(sl_test2, uscope)
-	assert msg == 'Deleted $uscope link `${term.bold(sl_test2)}` to "$tsource$sl_test".'
+	assert msg == 'Deleted $uscope link `${term.bold(sl_test2)}` to "$tsource/$sl_test".'
 	msg = delete_link(invalid, uscope) or { panic(err) }
 	assert !link_exists(invalid, uscope)
 	assert msg == 'Deleted invalid link `$invalid`.'
@@ -228,7 +229,7 @@ fn test_get_real_links_in_empty_scope() {
 // Helper functions
 fn link_exists(name string, scope string) bool {
 	dir := get_dir(scope)
-	return os.is_link(dir + name)
+	return os.is_link('$dir/$name')
 }
 
 // TODO: link exists with source
