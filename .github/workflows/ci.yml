@@ -23,7 +23,23 @@ jobs:
       - name: fmt -verify
         run: ./v fmt -verify symlinker/
 
-  build-and-test:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+      - name: Build V
+        run: make
+      - name: Checkout symlinker
+        uses: actions/checkout@v2
+        with:
+            path: symlinker
+      - name: Run tests
+        run: ./v test symlinker
+
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout V
@@ -38,5 +54,3 @@ jobs:
             path: symlinker
       - name: Build symlinker
         run: ./v -prod symlinker/
-      - name: Run tests
-        run: ./v test symlinker
