@@ -13,7 +13,7 @@ const (
 	sl_test3    = 'test3'
 	link3       = 'link3'
 	m_link      = 'm_link'
-	invalid     = 'invalid'
+	inv         = 'invalid'
 	normal_file = 'normal_file'
 	inexistent  = 'inexistent'
 )
@@ -29,7 +29,7 @@ fn testsuite_begin() ? {
 	os.write_file(sl_test2, '') ?
 	os.write_file(link3, '') ?
 	os.write_file(m_link, '') ?
-	os.write_file(invalid, '') ?
+	os.write_file(inv, '') ?
 	// Run tests that need the target folders to not exist
 	linkmap, msg1 := get_real_links(uscope)
 	assert linkmap.len == 0
@@ -64,9 +64,9 @@ fn test_create_link() {
 	assert link_exists(sl_test, uscope)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource/$sl_test".'
 	// Create a link and make it invalid
-	create_link(invalid, invalid, uscope)
-	os.rm(invalid) or { panic(err) }
-	assert !os.exists(invalid)
+	create_link(inv, inv, uscope)
+	os.rm(inv) or { panic(err) }
+	assert !os.exists(inv)
 	// Create tmachine link
 	msg = create_link(m_link, m_link, mscope) or { panic(err) }
 	assert link_exists(m_link, mscope)
@@ -137,7 +137,7 @@ fn test_update_link_errors() {
 fn test_get_real_links() {
 	linkmap, msg := get_real_links(uscope)
 	mut expected := map[string]string{}
-	expected[invalid] = get_dir(uscope) + '/$invalid'
+	expected[inv] = get_dir(uscope) + '/$inv'
 	expected[sl_test] = '$tsource/$sl_test'
 	expected[sl_test2] = '$tsource/$sl_test'
 	expected[sl_test3] = '$tsource/$sl_test'
@@ -150,7 +150,7 @@ fn test_split_valid_invalid_links() {
 	mut valid_links, invalid_links := split_valid_invalid_links(linkmap, uscope)
 	valid_links.sort()
 	assert valid_links == [sl_test, sl_test2, sl_test3]
-	assert invalid_links == [invalid]
+	assert invalid_links == [inv]
 }
 
 fn test_open_link_dir() {
@@ -220,9 +220,9 @@ fn test_delete_link() {
 	assert msg == 'Deleted $uscope link `${term.bold(sl_test2)}` to "$tsource/$sl_test".'
 	delete_link(sl_test3, uscope) or { panic(err) }
 	assert !link_exists(sl_test3, uscope)
-	msg = delete_link(invalid, uscope) or { panic(err) }
-	assert !link_exists(invalid, uscope)
-	assert msg == 'Deleted invalid link `$invalid`.'
+	msg = delete_link(inv, uscope) or { panic(err) }
+	assert !link_exists(inv, uscope)
+	assert msg == 'Deleted invalid link `$inv`.'
 }
 
 fn test_get_real_links_in_empty_scope() {
