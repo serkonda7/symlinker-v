@@ -25,7 +25,7 @@ fn new_app() Command {
 				abbrev: 'm'
 				description: 'Execute the command machine-wide.'
 				global: true
-			}
+			},
 		]
 	}
 	link_cmd := Command{
@@ -40,7 +40,7 @@ fn new_app() Command {
 				name: 'name'
 				abbrev: 'n'
 				description: 'Use a custom name for the link.'
-			}
+			},
 		]
 	}
 	del_cmd := Command{
@@ -60,7 +60,7 @@ fn new_app() Command {
 				name: 'real'
 				abbrev: 'r'
 				description: 'Also print the path the links point to.'
-			}
+			},
 		]
 	}
 	update_cmd := Command{
@@ -76,12 +76,12 @@ fn new_app() Command {
 				abbrev: 'n'
 				description: 'The new name for the link.'
 			},
-			Flag {
+			Flag{
 				flag: .string
 				name: 'path'
 				abbrev: 'p'
 				description: 'The new path that will be linked'
-			}
+			},
 		]
 	}
 	open_cmd := Command{

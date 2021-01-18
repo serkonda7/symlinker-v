@@ -86,5 +86,4 @@ fn test_del_cmd() {
 	app.parse(['', 'del', 'alt_link', 'link3'])
 }
 */
-
 // TODO: open
