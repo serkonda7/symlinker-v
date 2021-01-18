@@ -35,7 +35,7 @@ fn testsuite_begin() ? {
 	assert linkmap.len == 0
 	assert msg1 == 'No $uscope symlinks detected.'
 	command, msg2 := open_link_dir('', uscope) or { panic(err) }
-	assert command == 'xdg-open ${get_dir(uscope)} &'
+	assert command == 'xdg-open ${get_dir(uscope)} &>/dev/null'
 	assert msg2 == 'Opening the $uscope symlink folder...'
 	// Create the target folders
 	os.mkdir_all(u_target)
@@ -158,11 +158,11 @@ fn test_split_valid_invalid_links() {
 fn test_open_link_dir() {
 	// Open symlink folder
 	mut command, mut msg := open_link_dir('', uscope) or { panic(err) }
-	assert command == 'xdg-open ${get_dir(uscope)} &'
+	assert command == 'xdg-open ${get_dir(uscope)} &>/dev/null'
 	assert msg == 'Opening the $uscope symlink folder...'
 	// Open a specific link
 	command, msg = open_link_dir(sl_test, uscope) or { panic(err) }
-	assert command == 'xdg-open $tsource &'
+	assert command == 'xdg-open $tsource &>/dev/null'
 	assert msg == 'Opening the source directory of `$sl_test`...'
 }
 
