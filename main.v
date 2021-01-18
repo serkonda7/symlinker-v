@@ -3,6 +3,7 @@ module main
 import cli { Command, Flag }
 import os
 import term
+import v.vmod
 
 fn main() {
 	mut app := new_app()
@@ -10,9 +11,11 @@ fn main() {
 }
 
 fn new_app() Command {
+	mod := vmod.decode(@VMOD_FILE) or { panic(err) }
 	mut app := Command{
 		name: 'symlinker'
-		version: '2.2.0'
+		description: mod.description
+		version: mod.version
 		disable_flags: true
 		sort_commands: false
 		flags: [
