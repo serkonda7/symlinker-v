@@ -108,8 +108,10 @@ fn test_update_link() {
 	messages = update_link(link3, uscope, sl_test, sl_test) or { panic(err) }
 	assert link_exists(sl_test, uscope)
 	assert messages ==
-		[
-		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.', 'Changed path of `${term.bold(sl_test)}` from "$tsource/$link3" to "$tsource/$sl_test".']
+			[
+		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.',
+		'Changed path of `${term.bold(sl_test)}` from "$tsource/$link3" to "$tsource/$sl_test".',
+	]
 }
 
 fn test_update_link_errors() {

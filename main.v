@@ -86,7 +86,7 @@ fn create_cmd() Command {
 fn link_func(cmd Command) {
 	scope := get_scope(cmd)
 	source_name := cmd.args[0]
-	name_flag_val := cmd.flags.get_string_or('name', '')
+	name_flag_val := cmd.flags.get_string('name') or { '' }
 	target_name, validation_msg := validate_name_flag(name_flag_val, source_name)
 	if validation_msg != '' {
 		println(validation_msg)
@@ -124,7 +124,7 @@ fn list_func(cmd Command) {
 		}
 		println(term.bold('$scope links:'))
 		valid, invalid := split_valid_invalid_links(linkmap, scope)
-		f_real := cmd.flags.get_bool_or('real', false)
+		f_real := cmd.flags.get_bool('real') or { false }
 		if f_real {
 			max_len := name_max(valid)
 			for v in valid {
@@ -151,8 +151,8 @@ fn list_func(cmd Command) {
 }
 
 fn update_func(cmd Command) {
-	name_flag_val := cmd.flags.get_string_or('name', '')
-	path_flag_val := cmd.flags.get_string_or('path', '')
+	name_flag_val := cmd.flags.get_string('name') or { '' }
+	path_flag_val := cmd.flags.get_string('path') or { '' }
 	scope := get_scope(cmd)
 	link_name := cmd.args[0]
 	messages := update_link(link_name, scope, name_flag_val, path_flag_val) or {
@@ -219,7 +219,7 @@ fn name_max(names []string) int {
 }
 
 fn get_scope(cmd Command) string {
-	machine_wide := cmd.flags.get_bool_or('machine', false)
+	machine_wide := cmd.flags.get_bool('machine') or { false }
 	$if test {
 		return if machine_wide {
 			'tmachine'
