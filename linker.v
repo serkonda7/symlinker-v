@@ -146,7 +146,7 @@ fn open_link_dir(name string, scope string) ?(string, string) {
 			return error('Cannot open source directory of inexistent $scope link `$link_name`.')
 		}
 	}
-	return 'xdg-open $dir &', msg
+	return 'xdg-open $dir &>/dev/null', msg
 }
 
 fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {
