@@ -1,6 +1,20 @@
 # Changelog
 
 
+## 2.2.1
+_18 January 2021_
+
+**Additions**
+- `help`: also print a description
+
+**Changes**
+- `open`: errors and warnings caused by the file explorer are hidden
+
+**Fixes**
+- Invalid paths can now be updated
+- fix `open` blocking the console
+
+
 ## 2.2.0
 _29 December 2020_
 
