@@ -99,11 +99,11 @@ fn link_func(cmd Command) {
 	scope := get_scope(cmd)
 	source_name := cmd.args[0]
 	name_flag_val := cmd.flags.get_string('name') or { '' }
-	target_name, validation_msg := validate_name_flag(name_flag_val, source_name)
-	if validation_msg != '' {
-		println(validation_msg)
+	name_res := name_from_source_or_flag(name_flag_val, source_name)
+	if name_res.msg != '' {
+		println(name_res.msg)
 	}
-	msg := create_link(source_name, target_name, scope) or {
+	msg := create_link(source_name, name_res.name, scope) or {
 		println(term.bright_red(err))
 		exit(1)
 	}
@@ -191,19 +191,27 @@ fn open_func(cmd Command) {
 	os.exec(command) or { panic(err) }
 }
 
-fn validate_name_flag(name string, alt_name string) (string, string) {
-	mut msg := ''
-	mut tname := name
-	if tname.ends_with(' ') {
-		tname = tname.trim_space()
-		if tname.len == 0 {
-			msg = 'Value of `--name` is empty, "$alt_name" will be used instead.'
+struct NameResult {
+	name string
+	msg  string
+}
+
+fn name_from_source_or_flag(flag_val string, source_val string) NameResult {
+	if flag_val.len > 0 {
+		name := flag_val.trim_space()
+		if name.len > 0 {
+			return {
+				name: name
+			}
+		}
+		return {
+			name: source_val
+			msg: 'Value of `--name` is empty, "$source_val" will be used instead.'
 		}
 	}
-	if tname == '' {
-		tname = os.file_name(alt_name)
+	return {
+		name: source_val
 	}
-	return tname, msg
 }
 
 fn array_to_rows(arr []string, max_row_entries int) []string {

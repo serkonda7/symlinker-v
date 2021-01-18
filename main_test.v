@@ -24,17 +24,23 @@ fn testsuite_end() {
 	os.rmdir_all(troot)
 }
 
-fn test_name_flag_validation() {
-	valid_tname := 'mylink'
-	mut tname, mut msg := validate_name_flag(valid_tname, '')
-	assert tname == valid_tname
-	assert msg == ''
-	tname, msg = validate_name_flag(' mylink  ', '')
-	assert tname == valid_tname
-	assert msg == ''
-	tname, msg = validate_name_flag('   ', valid_tname)
-	assert tname == valid_tname
-	assert msg == 'Value of `--name` is empty, "$valid_tname" will be used instead.'
+fn test_name_from_source_or_flag() {
+	// simple value for name flag
+	mut res := name_from_source_or_flag('l1', '')
+	assert res.name == 'l1'
+	assert res.msg == ''
+	// name flag was not set
+	res = name_from_source_or_flag('', 'l2')
+	assert res.name == 'l2'
+	assert res.msg == ''
+	// with bad spaces
+	res = name_from_source_or_flag(' l 3  ', '')
+	assert res.name == 'l 3'
+	assert res.msg == ''
+	// only spaces
+	res = name_from_source_or_flag('   ', 'l4')
+	assert res.name == 'l4'
+	assert res.msg == 'Value of `--name` is empty, "l4" will be used instead.'
 }
 
 fn test_array_to_rows() {
