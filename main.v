@@ -1,86 +1,98 @@
 module main
 
-import cli { Command }
+import cli { Command, Flag }
 import os
 import term
+import v.vmod
 
 fn main() {
-	mut cmd := create_cmd()
-	cmd.parse(os.args)
+	mut app := new_app()
+	app.parse(os.args)
 }
 
-fn create_cmd() Command {
-	mut cmd := Command{
+fn new_app() Command {
+	mod := vmod.decode(@VMOD_FILE) or { panic(err) }
+	mut app := Command{
 		name: 'symlinker'
-		version: '2.2.0'
+		description: mod.description
+		version: mod.version
 		disable_flags: true
 		sort_commands: false
+		flags: [
+			Flag{
+				flag: .bool
+				name: 'machine'
+				abbrev: 'm'
+				description: 'Execute the command machine-wide.'
+				global: true
+			},
+		]
 	}
-	cmd.add_flag(
-		flag: .bool
-		name: 'machine'
-		abbrev: 'm'
-		description: 'Execute the command machine-wide.'
-		global: true
-	)
-	mut link_cmd := Command{
+	link_cmd := Command{
 		name: 'link'
 		description: 'Create a new symlink to <file>.'
 		usage: '<file>'
 		required_args: 1
 		execute: link_func
+		flags: [
+			Flag{
+				flag: .string
+				name: 'name'
+				abbrev: 'n'
+				description: 'Use a custom name for the link.'
+			},
+		]
 	}
-	link_cmd.add_flag(
-		flag: .string
-		name: 'name'
-		abbrev: 'n'
-		description: 'Use a custom name for the link.'
-	)
-	mut del_cmd := Command{
+	del_cmd := Command{
 		name: 'del'
 		description: 'Delete all specified symlinks.'
 		usage: '<link1> <...>'
 		required_args: 1
 		execute: del_func
 	}
-	mut list_cmd := Command{
+	list_cmd := Command{
 		name: 'list'
 		description: 'List all symlinks.'
 		execute: list_func
+		flags: [
+			Flag{
+				flag: .bool
+				name: 'real'
+				abbrev: 'r'
+				description: 'Also print the path the links point to.'
+			},
+		]
 	}
-	list_cmd.add_flag(
-		flag: .bool
-		name: 'real'
-		abbrev: 'r'
-		description: 'Also print the path the links point to.'
-	)
-	mut update_cmd := Command{
+	update_cmd := Command{
 		name: 'update'
 		description: "Rename a symlink or update it's real path. Use at least on of the flags."
 		usage: '<link>'
 		required_args: 1
 		execute: update_func
+		flags: [
+			Flag{
+				flag: .string
+				name: 'name'
+				abbrev: 'n'
+				description: 'The new name for the link.'
+			},
+			Flag{
+				flag: .string
+				name: 'path'
+				abbrev: 'p'
+				description: 'The new path that will be linked'
+			},
+		]
 	}
-	update_cmd.add_flag(
-		flag: .string
-		name: 'name'
-		abbrev: 'n'
-		description: 'The new name for the link.'
-	)
-	update_cmd.add_flag(
-		flag: .string
-		name: 'path'
-		abbrev: 'p'
-		description: 'The new path that will be linked'
-	)
-	mut open_cmd := Command{
+	open_cmd := Command{
 		name: 'open'
 		description: 'Open a specific symlink or the general root dir in the file explorer.'
 		usage: '[link]'
 		execute: open_func
 	}
-	cmd.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
-	return cmd
+	app.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
+	app.setup()
+	return app
 }
 
 fn link_func(cmd Command) {
