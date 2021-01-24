@@ -115,8 +115,7 @@ fn update_link(oldname string, scope string, newname string, new_source string) 
 		messages << 'Renamed $scope link `$old_name` to `${term.bold(new_name)}`.'
 	}
 	if update_source {
-		messages <<
-			'Changed path of `${term.bold(name_to_set)}` from "$old_rsource" to "$new_rsource".'
+		messages << 'Changed path of `${term.bold(name_to_set)}` from "$old_rsource" to "$new_rsource".'
 	}
 	return messages
 }
@@ -166,9 +165,9 @@ fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string,
 
 fn get_dir(scope string) string {
 	$if test {
-		return test_link_dirs[scope]
+		return main.test_link_dirs[scope]
 	} $else {
-		return link_dirs[scope]
+		return main.link_dirs[scope]
 	}
 }
 
