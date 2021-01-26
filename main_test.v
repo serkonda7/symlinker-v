@@ -11,17 +11,17 @@ const (
 )
 
 fn testsuite_begin() {
-	os.rmdir_all(main.troot)
-	os.mkdir_all(main.tsource)
-	os.chdir(main.tsource)
-	os.write_file(main.link1, '') or { panic(err) }
-	os.write_file(main.link2, '') or { panic(err) }
-	os.write_file(main.link3, '') or { panic(err) }
+	os.rmdir_all(troot)
+	os.mkdir_all(tsource)
+	os.chdir(tsource)
+	os.write_file(link1, '') or { panic(err) }
+	os.write_file(link2, '') or { panic(err) }
+	os.write_file(link3, '') or { panic(err) }
 }
 
 fn testsuite_end() {
 	os.chdir(os.wd_at_startup)
-	os.rmdir_all(main.troot)
+	os.rmdir_all(troot)
 }
 
 fn test_name_from_source_or_flag() {

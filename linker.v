@@ -165,9 +165,9 @@ fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string,
 
 fn get_dir(scope string) string {
 	$if test {
-		return main.test_link_dirs[scope]
+		return test_link_dirs[scope]
 	} $else {
-		return main.link_dirs[scope]
+		return link_dirs[scope]
 	}
 }
 
