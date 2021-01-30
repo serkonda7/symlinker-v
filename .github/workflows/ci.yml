@@ -39,7 +39,7 @@ jobs:
         with:
             path: symlinker
       - name: Run tests
-        run: ./v test symlinker
+        run: ./v -W test symlinker
 
   build:
     runs-on: ubuntu-latest
