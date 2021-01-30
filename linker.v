@@ -17,7 +17,7 @@ const (
 fn create_link(source_name string, linkname string, scope string) ?string {
 	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {
-		os.mkdir_all(link_dir)
+		os.mkdir_all(link_dir) ?
 	}
 	source_path := os.real_path(source_name)
 	if !os.exists(source_path) {
@@ -126,7 +126,7 @@ fn open_link_dir(name string, scope string) ?(string, string) {
 	mut msg := ''
 	if link_name == '' {
 		if !os.exists(dir) {
-			os.mkdir_all(dir)
+			os.mkdir_all(dir) ?
 		}
 		msg = 'Opening the $scope symlink folder...'
 	} else {

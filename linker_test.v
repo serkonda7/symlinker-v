@@ -21,9 +21,9 @@ const (
 fn testsuite_begin() ? {
 	u_target := get_dir(uscope)
 	m_target := get_dir(mscope)
-	os.rmdir_all(troot)
+	os.rmdir_all(troot) or { }
 	// Setup the source folder
-	os.mkdir_all(tsource)
+	os.mkdir_all(tsource) or { panic(err) }
 	os.chdir(tsource)
 	os.write_file(sl_test, '') ?
 	os.write_file(sl_test2, '') ?
@@ -38,8 +38,8 @@ fn testsuite_begin() ? {
 	assert command == 'xdg-open ${get_dir(uscope)} &>/dev/null'
 	assert msg2 == 'Opening the $uscope symlink folder...'
 	// Create the target folders
-	os.mkdir_all(u_target)
-	os.mkdir_all(m_target)
+	os.mkdir_all(u_target) or { panic(err) }
+	os.mkdir_all(m_target) or { panic(err) }
 	os.chdir(u_target)
 	os.write_file(normal_file, '') ?
 	os.chdir(tsource)
@@ -47,7 +47,7 @@ fn testsuite_begin() ? {
 
 fn testsuite_end() {
 	os.chdir(os.wd_at_startup)
-	os.rmdir_all(troot)
+	os.rmdir_all(troot) or { }
 }
 
 fn test_create_link() {
@@ -64,7 +64,7 @@ fn test_create_link() {
 	assert link_exists(sl_test, uscope)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource/$sl_test".'
 	// Create a link and make it invalid
-	create_link(inv, inv, uscope)
+	create_link(inv, inv, uscope) or { panic(err) }
 	os.rm(inv) or { panic(err) }
 	assert !os.exists(inv)
 	// Create tmachine link
