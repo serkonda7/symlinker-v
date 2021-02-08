@@ -241,16 +241,8 @@ fn name_max(names []string) int {
 fn get_scope(cmd Command) string {
 	machine_wide := cmd.flags.get_bool('machine') or { false }
 	$if test {
-		return if machine_wide {
-			'tmachine'
-		} else {
-			'tuser'
-		}
+		return if machine_wide { 'tmachine' } else { 'tuser' }
 	} $else {
-		return if machine_wide {
-			'machine-wide'
-		} else {
-			'per-user'
-		}
+		return if machine_wide { 'machine-wide' } else { 'per-user' }
 	}
 }

@@ -173,16 +173,8 @@ fn get_dir(scope string) string {
 
 fn other_scope(scope string) string {
 	$if test {
-		return if scope == 'tuser' {
-			'tmachine'
-		} else {
-			'tuser'
-		}
+		return if scope == 'tuser' { 'tmachine' } else { 'tuser' }
 	} $else {
-		return if scope == 'per-user' {
-			'machine-wide'
-		} else {
-			'per-user'
-		}
+		return if scope == 'per-user' { 'machine-wide' } else { 'per-user' }
 	}
 }
