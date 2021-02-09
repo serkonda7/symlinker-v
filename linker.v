@@ -4,11 +4,11 @@ import os
 import term
 
 const (
-	link_dirs      = {
+	link_dirs      = map{
 		'per-user':     os.home_dir() + '/.local/bin'
 		'machine-wide': '/usr/local/bin'
 	}
-	test_link_dirs = {
+	test_link_dirs = map{
 		'tuser':    os.temp_dir() + '/symlinker/tu_links'
 		'tmachine': os.temp_dir() + '/symlinker/tm_links'
 	}
