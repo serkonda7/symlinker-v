@@ -81,15 +81,15 @@ fn test_create_link_errors() {
 	mut err_count := 0
 	create_link(inexistent, inexistent, uscope) or {
 		err_count++
-		assert err == 'Source file "$inexistent" does not exist.'
+		assert err.msg == 'Source file "$inexistent" does not exist.'
 	}
 	create_link(sl_test2, sl_test2, uscope) or {
 		err_count++
-		assert err == 'Another $uscope link with name `$sl_test2` does already exist.'
+		assert err.msg == 'Another $uscope link with name `$sl_test2` does already exist.'
 	}
 	create_link(sl_test, normal_file, uscope) or {
 		err_count++
-		assert err == 'File with name "$normal_file" does already exist.'
+		assert err.msg == 'File with name "$normal_file" does already exist.'
 	}
 	assert err_count == 3
 }
@@ -113,19 +113,19 @@ fn test_update_link_errors() {
 	mut err_count := 0
 	update_link(inexistent, uscope, '', '') or {
 		err_count++
-		assert err == 'Cannot update inexistent $uscope link `$inexistent`.'
+		assert err.msg == 'Cannot update inexistent $uscope link `$inexistent`.'
 	}
 	update_link(sl_test, uscope, sl_test, '') or {
 		err_count++
-		assert err == 'New name (`$sl_test`) cannot be the same as current name.'
+		assert err.msg == 'New name (`$sl_test`) cannot be the same as current name.'
 	}
 	update_link(sl_test, uscope, '', sl_test) or {
 		err_count++
-		assert err == 'New source path ("$tsource/$sl_test") cannot be the same as old source path.'
+		assert err.msg == 'New source path ("$tsource/$sl_test") cannot be the same as old source path.'
 	}
 	update_link(sl_test, uscope, '', '') or {
 		err_count++
-		assert err == '`update` requires at least one of flag of `--name` and `--path`.'
+		assert err.msg == '`update` requires at least one of flag of `--name` and `--path`.'
 	}
 	assert err_count == 4
 }
@@ -164,17 +164,17 @@ fn test_open_link_dir_errors() {
 	mut err_count := 0
 	open_link_dir(inexistent, uscope) or {
 		err_count++
-		assert err == 'Cannot open source directory of inexistent $uscope link `$inexistent`.'
+		assert err.msg == 'Cannot open source directory of inexistent $uscope link `$inexistent`.'
 	}
 	// Scope suggestion user --> machine
 	open_link_dir(m_link, uscope) or {
 		err_count++
-		assert err == "`$m_link` is a $mscope link. Run `symlinker open -m $m_link` to open it's source directory."
+		assert err.msg == "`$m_link` is a $mscope link. Run `symlinker open -m $m_link` to open it's source directory."
 	}
 	// Scope suggestion machine --> user
 	open_link_dir(sl_test, mscope) or {
 		err_count++
-		assert err == "`$sl_test` is a $uscope link. Run `symlinker open $sl_test` to open it's source directory."
+		assert err.msg == "`$sl_test` is a $uscope link. Run `symlinker open $sl_test` to open it's source directory."
 	}
 	assert err_count == 3
 }
@@ -183,21 +183,21 @@ fn test_delete_link_errors() {
 	mut err_count := 0
 	delete_link(inexistent, uscope) or {
 		err_count++
-		assert err == '$uscope link `$inexistent` does not exist.'
+		assert err.msg == '$uscope link `$inexistent` does not exist.'
 	}
 	delete_link(normal_file, uscope) or {
 		err_count++
-		assert err == 'Only symlinks can be deleted but "$normal_file" is no $uscope link.'
+		assert err.msg == 'Only symlinks can be deleted but "$normal_file" is no $uscope link.'
 	}
 	// Scope suggestion user --> machine
 	delete_link(m_link, uscope) or {
 		err_count++
-		assert err == '`$m_link` is a $mscope link. Run `sudo symlinker del -m $m_link` to delete it.'
+		assert err.msg == '`$m_link` is a $mscope link. Run `sudo symlinker del -m $m_link` to delete it.'
 	}
 	// Scope suggestion machine --> user
 	delete_link(sl_test, mscope) or {
 		err_count++
-		assert err == '`$sl_test` is a $uscope link. Run `symlinker del $sl_test` to delete it.'
+		assert err.msg == '`$sl_test` is a $uscope link. Run `symlinker del $sl_test` to delete it.'
 	}
 	assert err_count == 4
 }

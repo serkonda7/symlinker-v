@@ -108,7 +108,7 @@ fn update_link(oldname string, scope string, newname string, new_source string) 
 		if os.exists(old_copy_path) {
 			os.cp(old_copy_path, old_path) or { panic(err) }
 		}
-		return error(err)
+		return err
 	}
 	mut messages := []string{}
 	if update_name {
