@@ -11,7 +11,7 @@ const (
 )
 
 fn testsuite_begin() {
-	os.rmdir_all(troot) or { }
+	os.rmdir_all(troot) or {}
 	os.mkdir_all(tsource) or { panic(err) }
 	os.chdir(tsource)
 	os.write_file(link1, '') or { panic(err) }
@@ -21,7 +21,7 @@ fn testsuite_begin() {
 
 fn testsuite_end() {
 	os.chdir(os.wd_at_startup)
-	os.rmdir_all(troot) or { }
+	os.rmdir_all(troot) or {}
 }
 
 fn test_name_from_source_or_flag() {

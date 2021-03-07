@@ -21,7 +21,7 @@ const (
 fn testsuite_begin() ? {
 	u_target := get_dir(uscope)
 	m_target := get_dir(mscope)
-	os.rmdir_all(troot) or { }
+	os.rmdir_all(troot) or {}
 	// Setup the source folder
 	os.mkdir_all(tsource) or { panic(err) }
 	os.chdir(tsource)
@@ -47,7 +47,7 @@ fn testsuite_begin() ? {
 
 fn testsuite_end() {
 	os.chdir(os.wd_at_startup)
-	os.rmdir_all(troot) or { }
+	os.rmdir_all(troot) or {}
 }
 
 fn test_create_link() {
