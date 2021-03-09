@@ -188,7 +188,7 @@ fn open_func(cmd Command) {
 		exit(1)
 	}
 	println(msg)
-	os.exec(command) or { panic(err) }
+	os.execute(command)
 }
 
 struct NameResult {
