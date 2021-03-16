@@ -9,7 +9,7 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  code-formatting:
+  code-style:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout V
@@ -22,8 +22,12 @@ jobs:
         uses: actions/checkout@v2
         with:
             path: symlinker
-      - name: fmt -verify
-        run: ./v fmt -verify symlinker/
+      - name: vet
+        run: ./v vet -W symlinker/
+      - name: fmt
+        run: |
+          ./v fmt -diff symlinker/
+          ./v fmt -verify symlinker/
 
   test:
     runs-on: ubuntu-latest
@@ -39,6 +43,8 @@ jobs:
         with:
             path: symlinker
       - name: Run tests
+        run: ./v test symlinker
+      - name: Run tests with -W
         run: ./v -W test symlinker
 
   build:
@@ -54,5 +60,7 @@ jobs:
         uses: actions/checkout@v2
         with:
             path: symlinker
-      - name: Build symlinker
-        run: ./v -prod symlinker/
+      - name: Development build
+        run: ./v symlinker/
+      - name: Production build
+        run: ./v -prod -compress symlinker/
