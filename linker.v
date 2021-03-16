@@ -4,17 +4,22 @@ import os
 import term
 
 const (
-	link_dirs      = map{
-		'per-user':     os.home_dir() + '/.local/bin'
-		'machine-wide': '/usr/local/bin'
-	}
-	test_link_dirs = map{
-		'tuser':    os.temp_dir() + '/symlinker/tu_links'
-		'tmachine': os.temp_dir() + '/symlinker/tm_links'
+	link_dirs = map{
+		Scope.user:         os.home_dir() + '/.local/bin'
+		Scope.machine_wide: '/usr/local/bin'
+		Scope.t_user:       os.temp_dir() + '/symlinker/tu_links'
+		Scope.t_machine:    os.temp_dir() + '/symlinker/tm_links'
 	}
 )
 
-fn create_link(source_name string, linkname string, scope string) ?string {
+enum Scope {
+	user
+	machine_wide
+	t_user
+	t_machine
+}
+
+fn create_link(source_name string, linkname string, scope Scope) ?string {
 	link_dir := get_dir(scope)
 	if !os.exists(link_dir) {
 		os.mkdir_all(link_dir) ?
@@ -38,7 +43,7 @@ fn create_link(source_name string, linkname string, scope string) ?string {
 	return 'Created $scope link `${term.bold(link_name)}` to "$source_path".'
 }
 
-fn delete_link(link_name string, scope string) ?string {
+fn delete_link(link_name string, scope Scope) ?string {
 	dir := get_dir(scope)
 	name := os.file_name(link_name)
 	link_path := '$dir/$name'
@@ -46,7 +51,11 @@ fn delete_link(link_name string, scope string) ?string {
 		if !os.exists(link_path) {
 			oscope := other_scope(scope)
 			other_link_path := get_dir(oscope) + '/$name'
-			sudo, f := if oscope in ['tmachine', 'machine-wide'] { 'sudo ', '-m ' } else { '', '' }
+			sudo, f := if oscope in [Scope.t_machine, Scope.machine_wide] {
+				'sudo ', '-m '
+			} else {
+				'', ''
+			}
 			other_cmd := '${sudo}symlinker del $f$name'
 			if os.is_link(other_link_path) {
 				return error('`$name` is a $oscope link. Run `$other_cmd` to delete it.')
@@ -63,7 +72,7 @@ fn delete_link(link_name string, scope string) ?string {
 	return 'Deleted $scope link `${term.bold(name)}` to "$source_path".'
 }
 
-fn get_real_links(scope string) (map[string]string, string) {
+fn get_real_links(scope Scope) (map[string]string, string) {
 	mut msg := ''
 	mut linkmap := map[string]string{}
 	dir := get_dir(scope)
@@ -79,7 +88,7 @@ fn get_real_links(scope string) (map[string]string, string) {
 	return linkmap, msg
 }
 
-fn update_link(oldname string, scope string, newname string, new_source string) ?[]string {
+fn update_link(oldname string, scope Scope, newname string, new_source string) ?[]string {
 	new_name := os.file_name(newname)
 	old_name := os.file_name(oldname)
 	old_path := get_dir(scope) + '/$old_name'
@@ -120,7 +129,7 @@ fn update_link(oldname string, scope string, newname string, new_source string) 
 	return messages
 }
 
-fn open_link_dir(name string, scope string) ?(string, string) {
+fn open_link_dir(name string, scope Scope) ?(string, string) {
 	link_name := os.file_name(name)
 	mut dir := get_dir(scope)
 	mut msg := ''
@@ -138,7 +147,7 @@ fn open_link_dir(name string, scope string) ?(string, string) {
 			oscope := other_scope(scope)
 			other_link_path := get_dir(oscope) + '/$link_name'
 			if os.is_link(other_link_path) {
-				flag := if oscope == 'tmachine' || oscope == 'machine-wide' { '-m ' } else { '' }
+				flag := if oscope == .t_machine || oscope == .machine_wide { '-m ' } else { '' }
 				other_cmd := 'symlinker open $flag$link_name'
 				return error("`$link_name` is a $oscope link. Run `$other_cmd` to open it's source directory.")
 			}
@@ -148,7 +157,7 @@ fn open_link_dir(name string, scope string) ?(string, string) {
 	return 'xdg-open $dir &>/dev/null', msg
 }
 
-fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string, []string) {
+fn split_valid_invalid_links(linkmap map[string]string, scope Scope) ([]string, []string) {
 	mut valid := []string{}
 	mut invalid := []string{}
 	dir := get_dir(scope)
@@ -163,18 +172,14 @@ fn split_valid_invalid_links(linkmap map[string]string, scope string) ([]string,
 	return valid, invalid
 }
 
-fn get_dir(scope string) string {
-	$if test {
-		return test_link_dirs[scope]
-	} $else {
-		return link_dirs[scope]
-	}
+fn get_dir(scope Scope) string {
+	return link_dirs[scope]
 }
 
-fn other_scope(scope string) string {
+fn other_scope(scope Scope) Scope {
 	$if test {
-		return if scope == 'tuser' { 'tmachine' } else { 'tuser' }
+		return if scope == .t_user { Scope.t_machine } else { Scope.t_user }
 	} $else {
-		return if scope == 'per-user' { 'machine-wide' } else { 'per-user' }
+		return if scope == .user { Scope.machine_wide } else { Scope.user }
 	}
 }

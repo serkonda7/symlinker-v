@@ -30,7 +30,7 @@ fn new_app() Command {
 	}
 	link_cmd := Command{
 		name: 'link'
-		description: 'Create a new symlink to <file>.'
+		description: 'Create a new symlink to <file>. The name will be equal to the filename.'
 		usage: '<file>'
 		required_args: 1
 		execute: link_func
@@ -39,7 +39,7 @@ fn new_app() Command {
 				flag: .string
 				name: 'name'
 				abbrev: 'n'
-				description: 'Use a custom name for the link.'
+				description: 'Specify a custom name for the link.'
 			},
 		]
 	}
@@ -59,13 +59,13 @@ fn new_app() Command {
 				flag: .bool
 				name: 'real'
 				abbrev: 'r'
-				description: 'Also print the path the links point to.'
+				description: 'Also print where the links point to.'
 			},
 		]
 	}
 	update_cmd := Command{
 		name: 'update'
-		description: "Rename a symlink or update it's real path. Use at least on of the flags."
+		description: "Rename a symlink or update it's real path. Requires at least on of the flags."
 		usage: '<link>'
 		required_args: 1
 		execute: update_func
@@ -127,7 +127,7 @@ fn del_func(cmd Command) {
 }
 
 fn list_func(cmd Command) {
-	scopes := $if test { test_link_dirs.keys() } $else { link_dirs.keys() }
+	scopes := $if test { link_dirs.keys()[2..] } $else { link_dirs.keys()[..2] }
 	for i, scope in scopes {
 		linkmap, msg := get_real_links(scope)
 		if msg != '' {
@@ -238,11 +238,11 @@ fn name_max(names []string) int {
 	return max
 }
 
-fn get_scope(cmd Command) string {
+fn get_scope(cmd Command) Scope {
 	machine_wide := cmd.flags.get_bool('machine') or { false }
 	$if test {
-		return if machine_wide { 'tmachine' } else { 'tuser' }
+		return if machine_wide { Scope.t_machine } else { Scope.t_user }
 	} $else {
-		return if machine_wide { 'machine-wide' } else { 'per-user' }
+		return if machine_wide { Scope.machine_wide } else { Scope.user }
 	}
 }

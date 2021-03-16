@@ -4,8 +4,8 @@ import os
 import term
 
 const (
-	uscope      = 'tuser'
-	mscope      = 'tmachine'
+	uscope      = Scope.t_user
+	mscope      = Scope.t_machine
 	troot       = os.temp_dir() + '/symlinker'
 	tsource     = troot + '/tfiles'
 	sl_test     = 'test'
@@ -223,7 +223,7 @@ fn test_get_real_links_in_empty_scope() {
 }
 
 // Helper functions
-fn link_exists(name string, scope string) bool {
+fn link_exists(name string, scope Scope) bool {
 	dir := get_dir(scope)
 	return os.is_link('$dir/$name')
 }
