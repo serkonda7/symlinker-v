@@ -17,7 +17,6 @@ fn new_app() Command {
 		description: mod.description
 		version: mod.version
 		disable_flags: true
-		sort_commands: false
 		flags: [
 			Flag{
 				flag: .bool
@@ -27,70 +26,71 @@ fn new_app() Command {
 				global: true
 			},
 		]
-	}
-	link_cmd := Command{
-		name: 'link'
-		description: 'Create a new symlink to <file>. The name will be equal to the filename.'
-		usage: '<file>'
-		required_args: 1
-		execute: link_func
-		flags: [
-			Flag{
-				flag: .string
-				name: 'name'
-				abbrev: 'n'
-				description: 'Specify a custom name for the link.'
+		commands: [
+			Command{
+				name: 'link'
+				description: 'Create a new symlink to <file>. The name will be equal to the filename.'
+				usage: '<file>'
+				required_args: 1
+				execute: link_func
+				flags: [
+					Flag{
+						flag: .string
+						name: 'name'
+						abbrev: 'n'
+						description: 'Specify a custom name for the link.'
+					},
+				]
+			},
+			Command{
+				name: 'del'
+				description: 'Delete all specified symlinks.'
+				usage: '<link1> <...>'
+				required_args: 1
+				execute: del_func
+			},
+			Command{
+				name: 'list'
+				description: 'List all symlinks.'
+				execute: list_func
+				flags: [
+					Flag{
+						flag: .bool
+						name: 'real'
+						abbrev: 'r'
+						description: 'Also print where the links point to.'
+					},
+				]
+			},
+			Command{
+				name: 'update'
+				description: "Rename a symlink or update it's real path. Requires at least on of the flags."
+				usage: '<link>'
+				required_args: 1
+				execute: update_func
+				flags: [
+					Flag{
+						flag: .string
+						name: 'name'
+						abbrev: 'n'
+						description: 'The new name for the link.'
+					},
+					Flag{
+						flag: .string
+						name: 'path'
+						abbrev: 'p'
+						description: 'The new path that will be linked'
+					},
+				]
+			},
+			Command{
+				name: 'open'
+				description: 'Open a specific symlink or the general root dir in the file explorer.'
+				usage: '[link]'
+				execute: open_func
 			},
 		]
 	}
-	del_cmd := Command{
-		name: 'del'
-		description: 'Delete all specified symlinks.'
-		usage: '<link1> <...>'
-		required_args: 1
-		execute: del_func
-	}
-	list_cmd := Command{
-		name: 'list'
-		description: 'List all symlinks.'
-		execute: list_func
-		flags: [
-			Flag{
-				flag: .bool
-				name: 'real'
-				abbrev: 'r'
-				description: 'Also print where the links point to.'
-			},
-		]
-	}
-	update_cmd := Command{
-		name: 'update'
-		description: "Rename a symlink or update it's real path. Requires at least on of the flags."
-		usage: '<link>'
-		required_args: 1
-		execute: update_func
-		flags: [
-			Flag{
-				flag: .string
-				name: 'name'
-				abbrev: 'n'
-				description: 'The new name for the link.'
-			},
-			Flag{
-				flag: .string
-				name: 'path'
-				abbrev: 'p'
-				description: 'The new path that will be linked'
-			},
-		]
-	}
-	open_cmd := Command{
-		name: 'open'
-		description: 'Open a specific symlink or the general root dir in the file explorer.'
-		usage: '[link]'
-		execute: open_func
-	}
-	app.add_commands([link_cmd, del_cmd, list_cmd, update_cmd, open_cmd])
 	app.setup()
 	return app
 }

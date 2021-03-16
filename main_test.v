@@ -24,6 +24,11 @@ fn testsuite_end() {
 	os.rmdir_all(troot) or {}
 }
 
+fn test_new_app() {
+	app := new_app()
+	assert app.commands.len == 5
+}
+
 fn test_name_from_source_or_flag() {
 	// simple value for name flag
 	mut res := name_from_source_or_flag('l1', '')
