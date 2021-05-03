@@ -12,8 +12,10 @@ const (
 	sl_test2    = 'test2'
 	sl_test3    = 'test3'
 	link3       = 'link3'
+	link4       = 'link4'
 	m_link      = 'm_link'
 	inv         = 'invalid'
+	inv2        = 'invalid2'
 	normal_file = 'normal_file'
 	inexistent  = 'inexistent'
 )
@@ -30,6 +32,7 @@ fn testsuite_begin() ? {
 	os.write_file(link3, '') ?
 	os.write_file(m_link, '') ?
 	os.write_file(inv, '') ?
+	os.write_file(inv2, '') ?
 	// Run tests that need the target folders to not exist
 	linkmap, msg1 := get_real_links(uscope)
 	assert linkmap.len == 0
@@ -63,10 +66,13 @@ fn test_create_link() {
 	msg = create_link(sl_test, sl_test, uscope) or { panic(err) }
 	assert link_exists(sl_test, uscope)
 	assert msg == '`${term.bold(sl_test)}` already links to "$tsource/$sl_test".'
-	// Create a link and make it invalid
+	// Create links and make them invalid
 	create_link(inv, inv, uscope) or { panic(err) }
 	os.rm(inv) or { panic(err) }
 	assert !os.exists(inv)
+	create_link(inv2, inv2, uscope) or { panic(err) }
+	os.rm(inv2) or { panic(err) }
+	assert !os.exists(inv2)
 	// Create tmachine link
 	msg = create_link(m_link, m_link, mscope) or { panic(err) }
 	assert link_exists(m_link, mscope)
@@ -108,8 +114,16 @@ fn test_update_link() {
 	// Update name and source
 	messages = update_link(link3, uscope, sl_test, sl_test) or { panic(err) }
 	assert link_exists(sl_test, uscope)
-	assert messages == ['Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.',
+	assert messages == [
+		'Renamed $uscope link `$link3` to `${term.bold(sl_test)}`.',
 		'Changed path of `${term.bold(sl_test)}` from "$tsource/$link3" to "$tsource/$sl_test".',
+	]
+	// Update invalid link path
+	messages = update_link(inv2, uscope, link4, sl_test) or { panic(err) }
+	assert link_exists(link4, uscope)
+	assert messages == [
+		'Renamed $uscope link `$inv2` to `${term.bold(link4)}`.',
+		'Set path of `${term.bold(link4)}` to "$tsource/$sl_test".',
 	]
 }
 
@@ -141,6 +155,7 @@ fn test_get_real_links() {
 	expected[sl_test] = '$tsource/$sl_test'
 	expected[sl_test2] = '$tsource/$sl_test'
 	expected[sl_test3] = '$tsource/$sl_test'
+	expected[link4] = '$tsource/$sl_test'
 	assert linkmap == expected
 	assert msg == ''
 }
@@ -149,7 +164,9 @@ fn test_split_valid_invalid_links() {
 	linkmap, _ := get_real_links(uscope)
 	mut valid_links, invalid_links := split_valid_invalid_links(linkmap, uscope)
 	valid_links.sort()
-	assert valid_links == [sl_test, sl_test2, sl_test3]
+	mut exp_valid_links := [sl_test, sl_test2, sl_test3, link4]
+	exp_valid_links.sort()
+	assert valid_links == exp_valid_links
 	assert invalid_links == [inv]
 }
 
@@ -215,6 +232,8 @@ fn test_delete_link() {
 	assert msg == 'Deleted $uscope link `${term.bold(sl_test2)}` to "$tsource/$sl_test".'
 	delete_link(sl_test3, uscope) or { panic(err) }
 	assert !link_exists(sl_test3, uscope)
+	delete_link(link4, uscope) or { panic(err) }
+	assert !link_exists(link4, uscope)
 	msg = delete_link(inv, uscope) or { panic(err) }
 	assert !link_exists(inv, uscope)
 	assert msg == 'Deleted invalid link `$inv`.'
@@ -231,5 +250,3 @@ fn link_exists(name string, scope Scope) bool {
 	dir := get_dir(scope)
 	return os.is_link('$dir/$name')
 }
-
-// TODO: link exists with source

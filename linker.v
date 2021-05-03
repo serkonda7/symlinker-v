@@ -114,6 +114,7 @@ fn update_link(oldname string, scope Scope, newname string, new_source string) ?
 	os.cp(old_path, old_copy_path) or {} // Backup copy should not cause the program to fail
 	os.rm(old_path) or { panic(err) }
 	create_link(source_to_set, name_to_set, scope) or {
+		// Restore the backup on fail
 		if os.exists(old_copy_path) {
 			os.cp(old_copy_path, old_path) or { panic(err) }
 		}
@@ -124,7 +125,11 @@ fn update_link(oldname string, scope Scope, newname string, new_source string) ?
 		messages << 'Renamed $scope link `$old_name` to `${term.bold(new_name)}`.'
 	}
 	if update_source {
-		messages << 'Changed path of `${term.bold(name_to_set)}` from "$old_rsource" to "$new_rsource".'
+		messages << if old_path == old_rsource {
+			'Set path of `${term.bold(name_to_set)}` to "$new_rsource".'
+		} else {
+			'Changed path of `${term.bold(name_to_set)}` from "$old_rsource" to "$new_rsource".'
+		}
 	}
 	return messages
 }
