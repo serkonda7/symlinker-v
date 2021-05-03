@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 2.2.2
+_3 May 2021_
+
+**Changes**
+- updating the path of an invalid link now gives a different message
+- more tests and CI checks
+
 ## 2.2.1
 _18 January 2021_
 

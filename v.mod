@@ -4,6 +4,6 @@ Module {
 	author: 'Lukas Neubert <serkonda@protonmail.com>'
 	license: 'MIT'
 	repo_url: 'https://github.com/serkonda7/symlinker'
-	version: '2.2.1'
+	version: '2.2.2'
 	dependencies: []
 }
