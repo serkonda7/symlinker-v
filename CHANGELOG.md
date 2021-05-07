@@ -1,4 +1,9 @@
 # Changelog
+## 2.2.3
+_7 May 2021_
+
+**Fixes**
+- Fix invalid memory access on `symlinker help <subcmd>`
 
 
 ## 2.2.2
