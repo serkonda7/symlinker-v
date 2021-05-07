@@ -10,9 +10,9 @@ fn main() {
 	app.parse(os.args)
 }
 
-fn new_app() Command {
+fn new_app() &Command {
 	mod := vmod.decode(@VMOD_FILE) or { panic(err) }
-	mut app := Command{
+	mut app := &Command{
 		name: 'symlinker'
 		description: mod.description
 		version: mod.version
