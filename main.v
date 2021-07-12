@@ -11,7 +11,7 @@ fn main() {
 }
 
 fn new_app() &Command {
-	mod := vmod.decode(@VMOD_FILE) or { panic(err) }
+	mod := vmod.decode(@VMOD_FILE) or { panic(err.msg) }
 	mut app := &Command{
 		name: 'symlinker'
 		description: mod.description
@@ -104,7 +104,7 @@ fn link_func(cmd Command) {
 		println(name_res.msg)
 	}
 	msg := create_link(source_name, name_res.name, scope) or {
-		println(term.bright_red(err))
+		println(term.bright_red(err.msg))
 		exit(1)
 	}
 	println(msg)
@@ -116,7 +116,7 @@ fn del_func(cmd Command) {
 	for arg in cmd.args {
 		msg := delete_link(arg, scope) or {
 			err_count++
-			println(term.bright_red(err))
+			println(term.bright_red(err.msg))
 			continue
 		}
 		println(msg)
@@ -168,7 +168,7 @@ fn update_func(cmd Command) {
 	scope := get_scope(cmd)
 	link_name := cmd.args[0]
 	messages := update_link(link_name, scope, name_flag_val, path_flag_val) or {
-		println(term.bright_red(err))
+		println(term.bright_red(err.msg))
 		exit(1)
 	}
 	for msg in messages {
@@ -184,7 +184,7 @@ fn open_func(cmd Command) {
 	scope := get_scope(cmd)
 	link_name := if cmd.args.len >= 1 { cmd.args[0] } else { '' }
 	command, msg := open_link_dir(link_name, scope) or {
-		println(term.bright_red(err))
+		println(term.bright_red(err.msg))
 		exit(1)
 	}
 	println(msg)
