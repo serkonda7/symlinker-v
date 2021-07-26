@@ -63,4 +63,4 @@ jobs:
       - name: Development build
         run: ./v symlinker/
       - name: Production build
-        run: ./v -prod -compress symlinker/
+        run: ./v -prod -W -compress symlinker/

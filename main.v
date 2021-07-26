@@ -200,16 +200,16 @@ fn name_from_source_or_flag(flag_val string, source_val string) NameResult {
 	if flag_val.len > 0 {
 		name := flag_val.trim_space()
 		if name.len > 0 {
-			return {
+			return NameResult{
 				name: name
 			}
 		}
-		return {
+		return NameResult{
 			name: source_val
 			msg: 'Value of `--name` is empty, "$source_val" will be used instead.'
 		}
 	}
-	return {
+	return NameResult{
 		name: source_val
 	}
 }
