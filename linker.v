@@ -4,7 +4,7 @@ import os
 import term
 
 const (
-	link_dirs = map{
+	link_dirs = {
 		Scope.user:         os.home_dir() + '/.local/bin'
 		Scope.machine_wide: '/usr/local/bin'
 		Scope.t_user:       os.temp_dir() + '/symlinker/tu_links'

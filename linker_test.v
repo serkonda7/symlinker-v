@@ -26,7 +26,7 @@ fn testsuite_begin() ? {
 	os.rmdir_all(troot) or {}
 	// Setup the source folder
 	os.mkdir_all(tsource) or { panic(err) }
-	os.chdir(tsource)
+	os.chdir(tsource) or { panic(err) }
 	os.write_file(sl_test, '') ?
 	os.write_file(sl_test2, '') ?
 	os.write_file(link3, '') ?
@@ -43,13 +43,13 @@ fn testsuite_begin() ? {
 	// Create the target folders
 	os.mkdir_all(u_target) or { panic(err) }
 	os.mkdir_all(m_target) or { panic(err) }
-	os.chdir(u_target)
+	os.chdir(u_target) or { panic(err) }
 	os.write_file(normal_file, '') ?
-	os.chdir(tsource)
+	os.chdir(tsource) or { panic(err) }
 }
 
 fn testsuite_end() {
-	os.chdir(os.wd_at_startup)
+	os.chdir(os.wd_at_startup) or { panic(err) }
 	os.rmdir_all(troot) or {}
 }
 
